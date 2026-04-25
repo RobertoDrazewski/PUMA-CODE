@@ -16,19 +16,24 @@ export default function AIChat({ lang, t }: AIChatProps) {
   
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll optimizado
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages, loading]);
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
 
-  // URL de la API: Eliminamos cualquier barra diagonal al final para evitar rutas rotas
+  // URL de la API limpia
   const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, "");
 
+  // Función 1: Chat con la IA
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
     setLoading(true);
     
     const userMessage = { role: "user", content: input };
@@ -38,13 +43,12 @@ export default function AIChat({ lang, t }: AIChatProps) {
     setInput("");
 
     try {
-      // --- BLINDAJE PARA MÓVILES ---
       const res = await fetch(`${API_URL}/api/ai/chat`, {
         method: 'POST',
-        mode: 'cors', // Forzamos modo CORS para móviles
+        mode: 'cors',
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json' // Clave para Safari/iOS
+          'Accept': 'application/json' 
         },
         body: JSON.stringify({ 
           messages: newMessages, 
@@ -53,24 +57,23 @@ export default function AIChat({ lang, t }: AIChatProps) {
         }),
       });
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      if (!res.ok) throw new Error(`Status: ${res.status}`);
 
       const data = await res.json();
       
       if (data && data.reply) {
         setMessages([...newMessages, { role: "assistant", content: data.reply }]);
-      } else {
-        throw new Error("Respuesta de IA vacía");
       }
     } catch (error) {
-      console.error("❌ Error en comunicación móvil:", error);
-      // Opcional: mostrar un mensaje de error en el chat para que el usuario sepa que falló
+      console.error("❌ Error Chat Móvil:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  // Función 2: Envío de Presupuesto (REPARADA PARA MÓVILES)
   const sendRequestToRoberto = async () => {
+    if (loading) return;
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/ai/analyze`, {
@@ -86,17 +89,23 @@ export default function AIChat({ lang, t }: AIChatProps) {
         }),
       });
       
+      if (!res.ok) throw new Error(`Status: ${res.status}`);
+
       const data = await res.json();
       if (data.success) {
         setIsSent(true);
+      } else {
+        alert("Error al procesar el presupuesto. Reintenta.");
       }
     } catch (error) {
-      console.error("Error al enviar solicitud:", error);
+      console.error("❌ Error Análisis Móvil:", error);
+      alert("La red está lenta. Por favor, intenta enviar el presupuesto una vez más.");
     } finally {
       setLoading(false);
     }
   };
 
+  // VISTA 1: IDENTIFICACIÓN
   if (!isIdentified) {
     return (
       <div className="bg-gray-900 border border-blue-500/30 p-8 rounded-xl shadow-2xl max-w-md mx-auto animate-in fade-in zoom-in duration-300">
@@ -128,6 +137,7 @@ export default function AIChat({ lang, t }: AIChatProps) {
     );
   }
 
+  // VISTA 2: ÉXITO
   if (isSent) {
     return (
       <div className="bg-gray-900 border border-green-500/30 p-10 rounded-xl text-center space-y-4 animate-in zoom-in duration-500">
@@ -138,6 +148,7 @@ export default function AIChat({ lang, t }: AIChatProps) {
     );
   }
 
+  // VISTA 3: CHAT
   return (
     <div className="bg-gray-900 border border-blue-500/30 p-6 rounded-xl shadow-2xl space-y-4">
       <div className="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -178,9 +189,9 @@ export default function AIChat({ lang, t }: AIChatProps) {
         <button 
           onClick={sendRequestToRoberto}
           disabled={loading}
-          className="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-gray-200 transition-all transform hover:scale-[1.01] active:scale-95 shadow-xl mb-2"
+          className="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-gray-200 transition-all transform hover:scale-[1.01] active:scale-95 shadow-xl mb-2 disabled:opacity-50"
         >
-          {loading ? "..." : t.chat_btn_quote}
+          {loading ? "Generando Presupuesto..." : t.chat_btn_quote}
         </button>
       )}
 
