@@ -14,10 +14,8 @@ export default function AIChat({ lang, t }: AIChatProps) {
   const [isIdentified, setIsIdentified] = useState(false);
   const [isSent, setIsSent] = useState(false);
   
-  // Referencia para el auto-scroll
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll cada vez que cambian los mensajes
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -26,33 +24,47 @@ export default function AIChat({ lang, t }: AIChatProps) {
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
 
-  // URL dinámica: Usa la de producción o localhost si no existe
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  // URL de la API: Eliminamos cualquier barra diagonal al final para evitar rutas rotas
+  const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, "");
 
   const sendMessage = async () => {
     if (!input.trim()) return;
     setLoading(true);
-    const newMessages = [...messages, { role: "user", content: input }];
+    
+    const userMessage = { role: "user", content: input };
+    const newMessages = [...messages, userMessage];
+    
     setMessages(newMessages);
     setInput("");
 
     try {
-      // CAMBIO CLAVE: Se usa API_URL
+      // --- BLINDAJE PARA MÓVILES ---
       const res = await fetch(`${API_URL}/api/ai/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors', // Forzamos modo CORS para móviles
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json' // Clave para Safari/iOS
+        },
         body: JSON.stringify({ 
           messages: newMessages, 
           userData,
           language: lang 
         }),
       });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
       const data = await res.json();
-      if (data.reply) {
+      
+      if (data && data.reply) {
         setMessages([...newMessages, { role: "assistant", content: data.reply }]);
+      } else {
+        throw new Error("Respuesta de IA vacía");
       }
     } catch (error) {
-      console.error("Error en chat:", error);
+      console.error("❌ Error en comunicación móvil:", error);
+      // Opcional: mostrar un mensaje de error en el chat para que el usuario sepa que falló
     } finally {
       setLoading(false);
     }
@@ -61,15 +73,19 @@ export default function AIChat({ lang, t }: AIChatProps) {
   const sendRequestToRoberto = async () => {
     setLoading(true);
     try {
-      // CAMBIO CLAVE: Se usa API_URL
       const res = await fetch(`${API_URL}/api/ai/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ 
             chatHistory: messages,
             userData: userData
         }),
       });
+      
       const data = await res.json();
       if (data.success) {
         setIsSent(true);
@@ -81,7 +97,6 @@ export default function AIChat({ lang, t }: AIChatProps) {
     }
   };
 
-  // 1. PANTALLA DE IDENTIFICACIÓN
   if (!isIdentified) {
     return (
       <div className="bg-gray-900 border border-blue-500/30 p-8 rounded-xl shadow-2xl max-w-md mx-auto animate-in fade-in zoom-in duration-300">
@@ -113,7 +128,6 @@ export default function AIChat({ lang, t }: AIChatProps) {
     );
   }
 
-  // 2. PANTALLA DE ÉXITO
   if (isSent) {
     return (
       <div className="bg-gray-900 border border-green-500/30 p-10 rounded-xl text-center space-y-4 animate-in zoom-in duration-500">
@@ -124,7 +138,6 @@ export default function AIChat({ lang, t }: AIChatProps) {
     );
   }
 
-  // 3. PANTALLA DE CHAT PRINCIPAL
   return (
     <div className="bg-gray-900 border border-blue-500/30 p-6 rounded-xl shadow-2xl space-y-4">
       <div className="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -155,7 +168,7 @@ export default function AIChat({ lang, t }: AIChatProps) {
         {loading && (
           <div className="flex justify-start">
             <div className="bg-gray-800 p-3 rounded-lg text-blue-400 text-[10px] animate-pulse font-bold tracking-widest uppercase">
-              Puma Code {t.chat_loading_text || "Thinking..."}
+              Puma Code Thinking...
             </div>
           </div>
         )}
