@@ -35,7 +35,7 @@ Ensure you have Node.js (v18 or higher) and npm installed.
 Clone the repository and install the necessary dependencies:
 
 Bash
-git clone https://github.com/your-username/puma-code.git
+git clone https://github.com/RobertoDrazewski/PUMA-CODE
 cd puma-code
 npm install
 3. Execution
@@ -62,31 +62,6 @@ Manifest: Customize public/manifest.json to change the app name or theme colors.
 
 Testing: Open the site on Safari (iOS) or Chrome (Android) and select "Add to Home Screen".
 
-🌐 Deployment to Production
-Step 1: Push to GitHub
-Create a new repository on GitHub.
-
-Link and push your local code:
-
-Bash
-git remote add origin https://github.com/RobertoDrazewski/PUMA-CODE.git
-git add .
-git commit -m "Initial commit: Puma Code V1"
-git push -u origin main
-
-Step 2: Deploy on Vercel
-Log in to Vercel.
-
-Import your GitHub repository.
-
-Vercel will automatically detect Next.js and deploy your site.
-
-Step 3: Domain Redirection
-In Vercel, go to Settings > Domains.
-
-Add www.puma-code.com.
-
-Update your DNS records (A and CNAME) at your domain provider's dashboard using the values provided by Vercel.
 
 👨‍💻 Author
 Roberto Drazewski CEO & Lead Developer at Puma Code
