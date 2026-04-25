@@ -9,26 +9,29 @@ const app = express();
 
 // --- MIDDLEWARES ---
 
-// 1. Configuración de CORS Blindada
+// 1. Configuración de CORS Blindada (Soporte total para móviles y navegadores)
 app.use(cors({
-    origin: '*', // Permite peticiones desde cualquier origen (ideal para pruebas móviles)
+    origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true
 }));
 
 // 2. Procesamiento de cuerpos de petición (JSON + TEXTO PLANO)
+// express.json() para PC y peticiones estándar
 app.use(express.json()); 
-// Este es vital por si el móvil envía datos como texto plano para evitar el "Pre-flight"
-app.use(express.text({ type: "text/plain" })); 
+// express.text() es el "truco" para que los móviles envíen datos sin ser bloqueados
+app.use(express.text({ type: "text/plain", limit: '10mb' })); 
 
-// 3. Middleware para convertir texto plano a JSON si es necesario
+// 3. Middleware de Conversión Automática
+// Si el móvil envía los datos como texto plano para evitar el Pre-flight, 
+// este middleware los convierte en objeto JSON antes de llegar a tus rutas.
 app.use((req, res, next) => {
     if (typeof req.body === 'string' && req.body.trim().startsWith('{')) {
         try {
             req.body = JSON.parse(req.body);
         } catch (e) {
-            console.error("Error parseando body de texto plano:", e);
+            console.error("⚠️ Error parseando body de texto plano:", e.message);
         }
     }
     next();
@@ -61,7 +64,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log('-------------------------------------------');
 });
 
-// 4. Aumentar el Timeout del servidor (Vital para procesos de IA largos)
-// Evita que Render o el servidor corten la conexión antes de 120 segundos
-server.keepAliveTimeout = 120000;
-server.headersTimeout = 125000;
+// 4. Configuración de Tiempos de Espera (Indispensable para Render + IA)
+// Esto evita que la conexión se cierre mientras OpenAI procesa el análisis
+server.keepAliveTimeout = 120000; // 120 segundos
+server.headersTimeout = 125000;   // 125 segundos
