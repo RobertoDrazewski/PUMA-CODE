@@ -9,14 +9,30 @@ const app = express();
 
 // --- MIDDLEWARES ---
 
-// Configuración de CORS mejorada para producción
+// 1. Configuración de CORS Blindada
 app.use(cors({
-    origin: '*', // En producción puedes cambiar '*' por tu URL de frontend de Render
+    origin: '*', // Permite peticiones desde cualquier origen (ideal para pruebas móviles)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    credentials: true
 }));
 
-app.use(express.json()); // Vital para procesar los cuerpos de las peticiones
+// 2. Procesamiento de cuerpos de petición (JSON + TEXTO PLANO)
+app.use(express.json()); 
+// Este es vital por si el móvil envía datos como texto plano para evitar el "Pre-flight"
+app.use(express.text({ type: "text/plain" })); 
+
+// 3. Middleware para convertir texto plano a JSON si es necesario
+app.use((req, res, next) => {
+    if (typeof req.body === 'string' && req.body.trim().startsWith('{')) {
+        try {
+            req.body = JSON.parse(req.body);
+        } catch (e) {
+            console.error("Error parseando body de texto plano:", e);
+        }
+    }
+    next();
+});
 
 // --- DEFINICIÓN DE RUTAS ---
 app.use('/api/ai', aiRoutes); 
@@ -37,11 +53,15 @@ app.use((err, req, res, next) => {
 });
 
 // --- INICIO DEL SERVIDOR ---
-// Render usa el puerto de la variable de entorno PORT, por eso process.env.PORT es vital
 const PORT = process.env.PORT || 10000; 
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log('-------------------------------------------');
     console.log(`🚀 Puma Code Server ready on port ${PORT}`);
     console.log('-------------------------------------------');
 });
+
+// 4. Aumentar el Timeout del servidor (Vital para procesos de IA largos)
+// Evita que Render o el servidor corten la conexión antes de 120 segundos
+server.keepAliveTimeout = 120000;
+server.headersTimeout = 125000;
