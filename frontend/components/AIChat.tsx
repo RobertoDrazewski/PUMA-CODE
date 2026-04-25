@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface AIChatProps {
   lang: string;
@@ -13,9 +13,21 @@ export default function AIChat({ lang, t }: AIChatProps) {
   const [userData, setUserData] = useState({ name: '', email: '' });
   const [isIdentified, setIsIdentified] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  
+  // Referencia para el auto-scroll
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Límite de mensajes ajustado a 4 según tu pedido anterior
+  // Auto-scroll cada vez que cambian los mensajes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
   const userMessageCount = messages.filter(m => m.role === 'user').length;
+
+  // URL dinámica: Usa la de producción o localhost si no existe
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -25,19 +37,22 @@ export default function AIChat({ lang, t }: AIChatProps) {
     setInput("");
 
     try {
-      const res = await fetch('http://localhost:5000/api/ai/chat', {
+      // CAMBIO CLAVE: Se usa API_URL
+      const res = await fetch(`${API_URL}/api/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           messages: newMessages, 
           userData,
-          language: lang // Enviamos el idioma al backend también
+          language: lang 
         }),
       });
       const data = await res.json();
-      setMessages([...newMessages, { role: "assistant", content: data.reply }]);
+      if (data.reply) {
+        setMessages([...newMessages, { role: "assistant", content: data.reply }]);
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error en chat:", error);
     } finally {
       setLoading(false);
     }
@@ -46,7 +61,8 @@ export default function AIChat({ lang, t }: AIChatProps) {
   const sendRequestToRoberto = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/ai/analyze', {
+      // CAMBIO CLAVE: Se usa API_URL
+      const res = await fetch(`${API_URL}/api/ai/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -65,7 +81,7 @@ export default function AIChat({ lang, t }: AIChatProps) {
     }
   };
 
-  // 1. PANTALLA DE IDENTIFICACIÓN (TRADUCIDA)
+  // 1. PANTALLA DE IDENTIFICACIÓN
   if (!isIdentified) {
     return (
       <div className="bg-gray-900 border border-blue-500/30 p-8 rounded-xl shadow-2xl max-w-md mx-auto animate-in fade-in zoom-in duration-300">
@@ -97,21 +113,18 @@ export default function AIChat({ lang, t }: AIChatProps) {
     );
   }
 
-  // 2. PANTALLA DE ÉXITO (TRADUCIDA)
+  // 2. PANTALLA DE ÉXITO
   if (isSent) {
     return (
       <div className="bg-gray-900 border border-green-500/30 p-10 rounded-xl text-center space-y-4 animate-in zoom-in duration-500">
         <div className="text-5xl">🐆</div>
         <h3 className="text-2xl font-bold text-white">{t.chat_success_title}</h3>
-        <p className="text-gray-400">
-          {t.chat_success_desc.replace("Roberto", "Roberto")} 
-          {/* Si quieres que el mail aparezca dinámico aquí puedes usar userData.email */}
-        </p>
+        <p className="text-gray-400">{t.chat_success_desc}</p>
       </div>
     );
   }
 
-  // 3. PANTALLA DE CHAT PRINCIPAL (TRADUCIDA)
+  // 3. PANTALLA DE CHAT PRINCIPAL
   return (
     <div className="bg-gray-900 border border-blue-500/30 p-6 rounded-xl shadow-2xl space-y-4">
       <div className="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -119,7 +132,10 @@ export default function AIChat({ lang, t }: AIChatProps) {
         <span className="text-gray-500 text-[10px]">{userData.name}</span>
       </div>
 
-      <div className="h-96 overflow-y-auto mb-4 space-y-4 p-2 custom-scrollbar">
+      <div 
+        ref={scrollRef}
+        className="h-96 overflow-y-auto mb-4 space-y-4 p-2 custom-scrollbar scroll-smooth"
+      >
         {messages.length === 0 && (
           <p className="text-gray-500 text-center mt-10 italic text-sm">
             {t.chat_welcome.replace("{name}", userData.name.split(' ')[0])}
@@ -138,14 +154,13 @@ export default function AIChat({ lang, t }: AIChatProps) {
         
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-800 p-3 rounded-lg text-blue-400 text-[10px] animate-pulse font-bold tracking-widest">
-              PUMA CODE IS THINKING...
+            <div className="bg-gray-800 p-3 rounded-lg text-blue-400 text-[10px] animate-pulse font-bold tracking-widest uppercase">
+              Puma Code {t.chat_loading_text || "Thinking..."}
             </div>
           </div>
         )}
       </div>
 
-      {/* BOTÓN DE ENVÍO FINAL (TRADUCIDO - Umbral de 4 mensajes) */}
       {userMessageCount >= 4 && (
         <button 
           onClick={sendRequestToRoberto}
@@ -170,7 +185,7 @@ export default function AIChat({ lang, t }: AIChatProps) {
           disabled={loading || !input.trim()}
           className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl font-bold transition-colors disabled:opacity-50"
         >
-          {loading ? "..." : t.chat_button_send}
+          {t.chat_button_send}
         </button>
       </div>
       
