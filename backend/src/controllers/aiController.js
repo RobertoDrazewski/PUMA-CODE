@@ -8,7 +8,7 @@ exports.chatWithAI = async (req, res) => {
     try {
         const { messages, userData } = req.body;
         const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini", // Modelo ultra rápido
+            model: "gpt-4o-mini",
             messages: [
                 { 
                     role: "system", 
@@ -27,61 +27,93 @@ exports.chatWithAI = async (req, res) => {
 
 exports.analyzeProject = async (req, res) => {
     try {
-        // Soporte para el modo "text/plain" que enviamos desde el móvil
+        // 1. Captura y normalización de datos (Soporte para JSON y texto plano del móvil)
         let data = req.body;
-        if (typeof data === 'string') data = JSON.parse(data);
+        if (typeof data === 'string') {
+            try { data = JSON.parse(data); } catch (e) { console.error("Error parseando body string"); }
+        }
         
         const { chatHistory, userData } = data;
-        
-        // 1. Respondemos inmediatamente al cliente para que el móvil no de timeout
-        // Esto libera al navegador del celular mientras el servidor sigue trabajando
-        res.status(200).json({ success: true, message: "Procesando de fondo" });
 
-        // --- TODO LO QUE SIGUE SE EJECUTA EN EL SERVIDOR SIN BLOQUEAR AL MÓVIL ---
+        // Validación preventiva
+        if (!userData || !chatHistory) {
+            console.error("❌ Datos insuficientes recibidos en analyzeProject");
+            return res.status(400).json({ success: false, message: "Datos incompletos" });
+        }
         
-        console.log(`🤖 Iniciando análisis para: ${userData.name}`);
+        // 2. Respuesta inmediata para que el celular muestre la pantalla de éxito
+        res.status(200).json({ success: true });
+
+        // --- PROCESO ASÍNCRONO DE FONDO ---
+        console.log(`🤖 Analizando lead para Roberto. Cliente: ${userData.name}`);
 
         const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 { 
                     role: "system", 
-                    content: `Eres el CTO Analista de Puma Code. 
-                    ESTRATEGIA: Mínimo $450 USD (Landings), Gestión $800-$1800 USD, Pro $2500+.
-                    Responde ÚNICAMENTE en JSON.` 
+                    content: `Eres el CTO Analista de Puma Code. Responde estrictamente en JSON.
+                    Esquema requerido:
+                    {
+                      "nombre_proyecto": "string",
+                      "precio_sugerido": "string",
+                      "tiempo_estimado": "string",
+                      "resumen_ejecutivo": "string",
+                      "stack": ["string"]
+                    }
+                    ESTRATEGIA: Landings $450+, Gestión $800-$1800, Pro $2500+. Usa USD.` 
                 },
-                { role: "user", content: `Analiza este lead: ${JSON.stringify({ userData, chatHistory })}` }
+                { role: "user", content: `Analiza esta charla: ${JSON.stringify(chatHistory)}` }
             ],
             response_format: { type: "json_object" }
         });
 
+        // Parseo seguro del análisis
         const analysis = JSON.parse(response.choices[0].message.content);
-        const stack = Array.isArray(analysis.stack_tecnico) ? analysis.stack_tecnico : ["Stack a definir"];
+        
+        // 3. Envío de mail con "Fallback" (si la IA falla o cambia nombres, no sale undefined)
+        const mailConfig = {
+            proyecto: analysis.nombre_proyecto || analysis.nombreProyecto || "Nuevo Proyecto",
+            precio: analysis.precio_sugerido || analysis.precioSugerido || "Consultar",
+            plazo: analysis.tiempo_estimado || analysis.tiempoEstimado || "A definir",
+            resumen: analysis.resumen_ejecutivo || analysis.resumenEjecutivo || "Sin resumen disponible",
+            stack: Array.isArray(analysis.stack) ? analysis.stack.join(", ") : "A definir"
+        };
 
-        // 2. Envío de mail asíncrono
         await resend.emails.send({
             from: 'Puma Code Leads <onboarding@resend.dev>',
             to: process.env.EMAIL_TO,
             replyTo: userData.email, 
-            subject: `🚀 NUEVA OPORTUNIDAD: ${analysis.nombre_proyecto}`,
+            subject: `🚀 LEAD: ${mailConfig.proyecto} - ${userData.name}`,
             html: `
-                <div style="font-family: sans-serif; max-width: 600px; border: 2px solid #2563eb; padding: 20px; border-radius: 12px;">
-                    <h2 style="color: #2563eb;">🐆 Puma Code: Nuevo Lead</h2>
-                    <p><strong>Cliente:</strong> ${userData.name} (${userData.email})</p>
-                    <div style="background: #f1f5f9; padding: 15px; border-radius: 8px;">
-                        <p><strong>Proyecto:</strong> ${analysis.nombre_proyecto}</p>
-                        <p><strong>Precio Sugerido:</strong> <span style="color: #059669; font-weight: bold;">${analysis.precio_sugerido}</span></p>
-                        <p><strong>Plazo:</strong> ${analysis.tiempo_estimado}</p>
+                <div style="font-family: sans-serif; max-width: 600px; border: 2px solid #2563eb; padding: 25px; border-radius: 12px; color: #1e293b;">
+                    <h2 style="color: #2563eb; margin-top: 0;">🐆 Puma Code: Nuevo Lead</h2>
+                    <p><strong>De:</strong> ${userData.name} (${userData.email})</p>
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+                    
+                    <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <p><strong>Proyecto:</strong> ${mailConfig.proyecto}</p>
+                        <p><strong>Precio Sugerido:</strong> <span style="font-size: 18px; font-weight: bold; color: #059669;">${mailConfig.precio}</span></p>
+                        <p><strong>Plazo:</strong> ${mailConfig.plazo}</p>
+                        <p><strong>Stack sugerido:</strong> ${mailConfig.stack}</p>
                     </div>
-                    <p><strong>Resumen:</strong> ${analysis.resumen_ejecutivo_para_roberto}</p>
+                    
+                    <h4 style="color: #334155; margin-bottom: 5px;">Resumen para Roberto:</h4>
+                    <p style="font-style: italic; color: #475569; background: #fff; padding: 10px; border-left: 4px solid #2563eb;">
+                        "${mailConfig.resumen}"
+                    </p>
+
+                    <div style="margin-top: 25px; padding: 10px; background: #eff6ff; border-radius: 8px; font-size: 12px;">
+                        <p>Tip: Responde este mail directamente para escribirle a ${userData.name}.</p>
+                    </div>
                 </div>
             `
         });
 
-        console.log("✅ Proceso completado y mail enviado.");
+        console.log("✅ Mail enviado correctamente a Roberto.");
 
     } catch (error) {
-        // Como ya respondimos al cliente, solo logueamos el error internamente
-        console.error("❌ Error en proceso asíncrono:", error.message);
+        console.error("❌ Error Crítico en analyzeProject:", error.message);
+        // No enviamos res.status aquí porque ya se envió un 200 OK al principio
     }
 };
