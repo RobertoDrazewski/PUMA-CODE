@@ -1,49 +1,111 @@
 const { OpenAI } = require('openai');
 const { Resend } = require('resend');
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-exports.analyzeProject = async (req, res) => {
+// --- FUNCIÓN 1: CHAT EN VIVO ---
+exports.chatWithAI = async (req, res) => {
     try {
-        // Normalizamos los datos (JSON o Texto Plano)
-        let body = req.body;
-        if (typeof body === 'string') body = JSON.parse(body);
-        const { chatHistory, userData } = body;
-
-        // 1. RESPUESTA INSTANTÁNEA: Libera al celular para que no de error de timeout
-        res.status(200).json({ success: true });
-
-        // 2. PROCESO DE FONDO (Async)
-        const completion = await openai.chat.completions.create({
+        const { messages, userData } = req.body;
+        const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
-                { role: "system", content: "Eres CTO de Puma Code. Analiza la charla y responde estrictamente en JSON con: nombre_proyecto, precio_sugerido, tiempo_estimado, resumen_ejecutivo." },
-                { role: "user", content: JSON.stringify(chatHistory) }
+                { 
+                    role: "system", 
+                    content: `Eres el Asesor Comercial de Puma Code. Hablas con ${userData?.name || 'un cliente'}. 
+                    REGLAS: Máximo 2 frases. Estilo Mendoza: cercano y profesional. No menciones código.` 
+                },
+                ...messages
+            ],
+        });
+        res.json({ reply: response.choices[0].message.content });
+    } catch (error) {
+        console.error("❌ Error en Chat:", error.message);
+        res.status(500).json({ error: "Error en el chat" });
+    }
+};
+
+// --- FUNCIÓN 2: ANÁLISIS Y ENVÍO DE PRESUPUESTO ---
+// Asegúrate de que en aiRoutes.js diga: aiController.analyzeProject
+exports.analyzeProject = async (req, res) => {
+    try {
+        // 1. Captura y normalización de datos (Soporte para PC y Móvil)
+        let data = req.body;
+        if (typeof data === 'string') {
+            try { data = JSON.parse(data); } catch (e) { console.error("Error parseando body"); }
+        }
+        
+        const { chatHistory, userData } = data;
+
+        // Validación de seguridad para evitar errores de 'undefined'
+        if (!userData || !chatHistory) {
+            console.error("❌ Datos insuficientes para el análisis");
+            return res.status(400).json({ success: false, message: "Datos incompletos" });
+        }
+        
+        // 2. RESPUESTA INMEDIATA (Libera al celular/PC para mostrar éxito)
+        res.status(200).json({ success: true });
+
+        // --- PROCESO ASÍNCRONO DE FONDO ---
+        console.log(`🤖 Generando reporte para: ${userData.name}`);
+
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                { 
+                    role: "system", 
+                    content: `Eres el CTO de Puma Code. Responde estrictamente en JSON con este esquema:
+                    {
+                      "nombre_proyecto": "string",
+                      "precio_sugerido": "string",
+                      "tiempo_estimado": "string",
+                      "resumen_ejecutivo": "string"
+                    }
+                    ESTRATEGIA: Landings $450+, Gestión $800-$1800, Pro $2500+.` 
+                },
+                { role: "user", content: `Analiza este historial: ${JSON.stringify(chatHistory)}` }
             ],
             response_format: { type: "json_object" }
         });
 
-        const analysis = JSON.parse(completion.choices[0].message.content);
+        const analysis = JSON.parse(response.choices[0].message.content);
+        
+        // 3. PARACAÍDAS DE DATOS (Evita que el mail llegue con 'undefined')
+        const proyecto = analysis.nombre_proyecto || analysis.nombreProyecto || "Nuevo Proyecto";
+        const precio = analysis.precio_sugerido || analysis.precioSugerido || "A definir";
+        const tiempo = analysis.tiempo_estimado || analysis.tiempoEstimado || "A definir";
+        const resumen = analysis.resumen_ejecutivo || analysis.resumenEjecutivo || "Revisar chat.";
 
-        // 3. ENVÍO DE MAIL CON FALLBACKS (Evita los 'undefined')
+        // 4. ENVÍO DE MAIL VÍA RESEND
         await resend.emails.send({
-            from: 'Puma Code <onboarding@resend.dev>',
+            from: 'Puma Code Leads <onboarding@resend.dev>',
             to: process.env.EMAIL_TO,
-            replyTo: userData.email,
-            subject: `🚀 LEAD: ${analysis.nombre_proyecto || 'Nuevo Proyecto'} - ${userData.name}`,
+            replyTo: userData.email, 
+            subject: `🚀 LEAD: ${proyecto} - ${userData.name}`,
             html: `
-                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                    <h2 style="color: #2563eb;">Nuevo Proyecto: ${analysis.nombre_proyecto || 'Sin Nombre'}</h2>
-                    <p><strong>Cliente:</strong> ${userData.name} (${userData.email})</p>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 5px;">
-                        <p><strong>Precio Sugerido:</strong> ${analysis.precio_sugerido || 'A definir'}</p>
-                        <p><strong>Plazo:</strong> ${analysis.tiempo_estimado || 'A definir'}</p>
-                        <p><strong>Resumen:</strong> ${analysis.resumen_ejecutivo || 'Ver chat'}</p>
+                <div style="font-family: sans-serif; max-width: 600px; border: 2px solid #2563eb; padding: 25px; border-radius: 12px; color: #1e293b;">
+                    <h2 style="color: #2563eb; margin-top: 0;">🐆 Puma Code: Nuevo Lead</h2>
+                    <p><strong>De:</strong> ${userData.name} (${userData.email})</p>
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+                    
+                    <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <p><strong>Proyecto:</strong> ${proyecto}</p>
+                        <p><strong>Precio Sugerido:</strong> <span style="font-size: 18px; font-weight: bold; color: #059669;">${precio}</span></p>
+                        <p><strong>Plazo:</strong> ${tiempo}</p>
                     </div>
-                </div>`
+                    
+                    <h4 style="color: #334155; margin-bottom: 5px;">Resumen Ejecutivo:</h4>
+                    <p style="font-style: italic; color: #475569; background: #fff; padding: 10px; border-left: 4px solid #2563eb;">
+                        "${resumen}"
+                    </p>
+                </div>
+            `
         });
-        console.log("✅ Mail enviado");
+
+        console.log("✅ Mail enviado con éxito.");
+
     } catch (error) {
-        console.error("❌ Error:", error.message);
+        console.error("❌ Error Crítico en el controlador:", error.message);
     }
 };
