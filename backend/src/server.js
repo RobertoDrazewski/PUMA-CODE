@@ -8,21 +8,25 @@ const aiRoutes = require('./routes/aiRoutes');
 const app = express();
 
 // --- MIDDLEWARES ---
-app.use(cors());
+
+// Configuración de CORS mejorada para producción
+app.use(cors({
+    origin: '*', // En producción puedes cambiar '*' por tu URL de frontend de Render
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json()); // Vital para procesar los cuerpos de las peticiones
 
 // --- DEFINICIÓN DE RUTAS ---
-// Todas las rutas de IA empezarán con /api/ai
 app.use('/api/ai', aiRoutes); 
 
-// Ruta de salud del servidor (HTML simple para el navegador)
+// Ruta de salud del servidor
 app.get('/', (req, res) => {
     res.status(200).send('🐆 Puma Code API is running smoothly...');
 });
 
 // --- MANEJO DE ERRORES GLOBAL ---
-// Este bloque captura cualquier error que no hayas atrapado en los controladores
-// y asegura que la respuesta sea SIEMPRE un JSON, evitando el error de "Unexpected token <"
 app.use((err, req, res, next) => {
     console.error('❌ SERVER ERROR:', err.stack);
     res.status(500).json({ 
@@ -33,10 +37,11 @@ app.use((err, req, res, next) => {
 });
 
 // --- INICIO DEL SERVIDOR ---
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+// Render usa el puerto de la variable de entorno PORT, por eso process.env.PORT es vital
+const PORT = process.env.PORT || 10000; 
+
+app.listen(PORT, '0.0.0.0', () => {
     console.log('-------------------------------------------');
     console.log(`🚀 Puma Code Server ready on port ${PORT}`);
-    console.log(`📡 API URL: http://localhost:${PORT}/api/ai`);
     console.log('-------------------------------------------');
 });
