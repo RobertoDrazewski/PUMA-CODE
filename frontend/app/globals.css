@@ -4,56 +4,111 @@
   :root {
     --background: #000000;
     --foreground: #ffffff;
+    --primary: #2563eb;
+    /* Color de acento para efectos de cristal */
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(10, 10, 10, 0.8);
   }
 
   html {
     scroll-behavior: smooth;
-    background-color: #000000;
+    /* Evita el desplazamiento horizontal accidental en móviles */
+    overflow-x: hidden;
+    background-color: var(--background);
+    /* Mejora la renderización de fuentes en MacOS */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #000000;
-    color: #ffffff;
-    font-family: var(--font-geist-sans), sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
     width: 100%;
+    /* Previene el "pull-to-refresh" en navegadores móviles que rompe la UI del chat */
+    overscroll-behavior-y: none;
   }
 
-  /* Forzamos que todos los main y sections intenten centrar su contenido */
   main {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    min-height: 100dvh;
   }
 
   section {
     width: 100%;
+    max-width: 1280px; /* Limita el ancho en pantallas gigantes */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  /* Mejora de inputs para evitar zoom automático en iOS al hacer foco */
+  input, textarea, select {
+    font-size: 16px !important;
   }
 }
 
-/* Scrollbar Personalizada */
+/* --- Scrollbar General --- */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #0a0a0a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2563eb;
+  background: #1e1e1e;
+  border: 2px solid #0a0a0a;
   border-radius: 10px;
 }
-
-/* Utilidad para el scroll del chat */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
+
+/* --- Utilidad para el Chat (Micro-Scroll) --- */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(37, 99, 235, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.4);
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 20px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 99, 235, 0.6);
+}
+
+/* --- Efectos de Cristal (Glassmorphism) --- */
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* --- Ajuste para el área segura de iPhones (Notch) --- */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
 }

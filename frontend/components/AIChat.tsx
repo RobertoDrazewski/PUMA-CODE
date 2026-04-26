@@ -1,87 +1,68 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
 
-interface AIChatProps { lang: string; t: any; }
+interface AIChatProps { lang: string; t: any; onClose: () => void; }
 
-export default function AIChat({ lang, t }: AIChatProps) {
+export default function AIChat({ lang, t, onClose }: AIChatProps) {
+  const [step, setStep] = useState<'welcome' | 'register' | 'chat'>('welcome');
   const [messages, setMessages] = useState<{ role: string, content: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({ name: '', email: '' });
-  const [isIdentified, setIsIdentified] = useState(false);
-  const [isSent, setIsSent] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const hasWelcomed = useRef(false);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
+  // 1. GESTIÓN DE AUDIO Y VOCES
   useEffect(() => {
     if (typeof window !== "undefined") {
-      audioRef.current = new Audio('/notify.mp3');
+      audioRef.current = new Audio('/notify.mp3'); // Asegúrate que el archivo esté en public/
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices();
-        const bestVoice = voices.find(v => 
-          v.lang.startsWith(lang) && (v.name.includes('Google') || v.name.includes('Natural'))
-        ) || voices.find(v => v.lang.startsWith(lang));
-        if (bestVoice) voiceRef.current = bestVoice;
+        // Buscamos una voz natural según el idioma
+        voiceRef.current = voices.find(v => v.lang.startsWith(lang) && (v.name.includes('Google') || v.name.includes('Natural'))) || voices.find(v => v.lang.startsWith(lang)) || null;
       };
       loadVoices();
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
+    // Bloquear scroll de la página de fondo
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [lang]);
 
+  // 2. AUTO-SCROLL
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages, loading]);
 
-  const cleanTextForSpeech = (text: string) => {
-    return text.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,]/g, '').replace(/[*#_~]/g, '').trim();
-  };
-
+  // 3. TEXT-TO-SPEECH (HABLAR)
   const speak = (text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis || !isVoiceEnabled) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(cleanTextForSpeech(text));
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*#_~]/g, ''));
     if (voiceRef.current) utterance.voice = voiceRef.current;
-    utterance.lang = lang === 'es' ? 'es-ES' : 'en-US';
-    utterance.rate = 0.95;
+    utterance.lang = lang === 'es' ? 'es-ES' : lang === 'en' ? 'en-US' : lang === 'pt' ? 'pt-BR' : lang === 'ja' ? 'ja-JP' : 'zh-CN';
     window.speechSynthesis.speak(utterance);
   };
 
+  // 4. SPEECH-TO-TEXT (MICRÓFONO)
   const handleListen = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
-    recognition.lang = lang === 'es' ? 'es-AR' : 'en-US';
+    recognition.lang = lang === 'es' ? 'es-AR' : lang === 'en' ? 'en-US' : lang === 'pt' ? 'pt-BR' : lang === 'ja' ? 'ja-JP' : 'zh-CN';
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(prev => prev + (prev ? " " : "") + transcript);
-    };
+    recognition.onresult = (e: any) => setInput(prev => prev + (prev ? " " : "") + e.results[0][0].transcript);
     recognition.start();
   };
 
-  const resetChat = () => {
-    setIsIdentified(false);
-    setIsSent(false);
-    setMessages([]);
-    hasWelcomed.current = false;
-    setInput("");
-  };
-
-  useEffect(() => {
-    if (isIdentified && !hasWelcomed.current && messages.length === 0) {
-      hasWelcomed.current = true;
-      const welcomeText = (t.chat_welcome || "Hola {name}").replace("{name}", userData.name);
-      setMessages([{ role: "assistant", content: welcomeText }]);
-      audioRef.current?.play().catch(() => {});
-    }
-  }, [isIdentified, userData.name, t.chat_welcome]);
-
+  // 5. ENVÍO AL BACKEND
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     setLoading(true);
@@ -98,112 +79,76 @@ export default function AIChat({ lang, t }: AIChatProps) {
       const data = await res.json();
       if (data?.reply) {
         setMessages([...newMessages, { role: "assistant", content: data.reply }]);
-        audioRef.current?.play().catch(() => {});
+        audioRef.current?.play().catch(() => {}); // Sonido de notificación
         speak(data.reply);
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  const sendRequestToRoberto = async () => {
-    if (loading) return;
-    setIsSent(true);
-    setLoading(true);
-    try {
-      const RAW_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, "");
-      await fetch(`${RAW_URL}/api/ai/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatHistory: messages, userData }),
-      });
-    } catch (e) { console.log("Reporte enviado"); } finally { setLoading(false); }
-  };
-
-  // --- VISTA DE ÉXITO ---
-  if (isSent) return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-[100] backdrop-blur-md">
-      <div className="relative w-full max-w-sm bg-gray-900 border border-blue-500/20 p-10 rounded-3xl text-center shadow-2xl animate-in zoom-in duration-300">
-        <button onClick={resetChat} className="absolute top-5 right-5 text-gray-500 hover:text-white transition-colors p-2">✕</button>
-        <div className="flex justify-center mb-6"><img src="/logotrans.png" alt="Logo" className="w-32 h-auto" /></div>
-        <h3 className="text-2xl font-bold text-white uppercase mb-4 tracking-tight">{t.chat_success_title}</h3>
-        <p className="text-gray-400 mb-8 leading-relaxed text-sm">{t.chat_success_desc}</p>
-        <button onClick={resetChat} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl uppercase tracking-widest transition-all">
-          {lang === 'es' ? 'Volver al Inicio' : 'Back to Home'}
-        </button>
-      </div>
-    </div>
-  );
-
-  // --- VISTA DE LOGIN ---
-  if (!isIdentified) return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-gray-900 border border-blue-500/30 p-8 rounded-3xl shadow-2xl">
-        <div className="flex justify-center mb-8"><img src="/logotrans.png" alt="Logo" className="w-44 h-auto" /></div>
-        <div className="space-y-4">
-          <input className="w-full p-4 bg-black border border-gray-700 rounded-xl text-white outline-none focus:border-blue-500 text-lg" placeholder={t.chat_form_name} value={userData.name} onChange={(e) => setUserData({...userData, name: e.target.value})} />
-          <input className="w-full p-4 bg-black border border-gray-700 rounded-xl text-white outline-none focus:border-blue-500 text-lg" placeholder={t.chat_form_email} value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
-          <button onClick={() => setIsIdentified(true)} disabled={!userData.name || !userData.email} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-lg transition-all">{t.chat_button_start}</button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    /* CAMBIO CLAVE: h-[100dvh] asegura que ocupe el alto real del celular sin tapar el header */
-    <div className="fixed inset-0 h-[100dvh] bg-black flex flex-col z-40 md:relative md:inset-auto md:h-[650px] md:max-w-2xl md:mx-auto md:rounded-3xl md:border md:border-blue-500/30 overflow-hidden shadow-2xl">
-      
-      {/* Botón X fuera del flujo para móviles si es necesario */}
-      <button onClick={resetChat} className="absolute top-5 right-20 text-gray-600 hover:text-white z-50 md:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      {/* Header del Chat (Aquí está el parlante) */}
-      <div className="flex justify-between items-center bg-gray-900 px-6 py-4 border-b border-gray-800 flex-none">
-        <div className="flex items-center gap-3">
-          <img src="/logotrans.png" alt="Logo" className="w-8 h-auto" />
-          <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] hidden xs:block">Strategic AI Agent</span>
-        </div>
-        <button onClick={() => { setIsVoiceEnabled(!isVoiceEnabled); window.speechSynthesis.cancel(); }} className={`p-2.5 rounded-xl transition-all ${isVoiceEnabled ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-gray-800 text-gray-500'}`}>
-          {isVoiceEnabled ? '🔊' : '🔈'}
-        </button>
-      </div>
-
-      {/* Cuerpo del Chat */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5 bg-black custom-scrollbar">
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] p-4 rounded-2xl text-[15px] leading-relaxed shadow-xl ${m.role === 'user' ? 'bg-blue-700 text-white rounded-tr-none shadow-blue-900/20' : 'bg-gray-900 text-gray-200 border border-gray-800 rounded-tl-none'}`}>
-              {m.content}
-            </div>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose}></div>
+      <div className="relative z-[10000] w-full max-w-md mx-auto" onClick={(e) => e.stopPropagation()}>
+        
+        {/* STEP 1: WELCOME */}
+        {step === 'welcome' && (
+          <div className="bg-gray-900 border border-white/10 p-10 rounded-[3rem] text-center shadow-2xl relative animate-in zoom-in duration-300">
+            <button onClick={onClose} className="absolute top-6 right-6 text-gray-500 hover:text-white"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <img src="/logotrans.png" alt="Logo" className="w-28 mx-auto mb-8" />
+            <h2 className="text-2xl font-black text-white uppercase mb-10 tracking-tighter">{t.chat_title}</h2>
+            <button onClick={() => setStep('register')} className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl uppercase tracking-widest active:scale-95 shadow-lg shadow-blue-500/20">{t.chat_button_start}</button>
           </div>
-        ))}
-        {loading && <div className="text-blue-500 text-[10px] font-mono tracking-widest uppercase ml-2 animate-pulse">Analizando...</div>}
-      </div>
-      
-      {/* Footer del Chat (Input y Botones) */}
-      <div className="p-4 bg-gray-900 border-t border-gray-800 space-y-4 flex-none">
-        {messages.filter(m => m.role === 'user').length >= 6 && (
-          <button onClick={sendRequestToRoberto} className="w-full py-3 bg-white text-black font-black rounded-xl uppercase text-[11px] tracking-widest shadow-xl hover:bg-gray-200 active:scale-95 transition-all">
-            {t.chat_btn_quote}
-          </button>
         )}
 
-        <div className="flex gap-3 items-center">
-          <button onClick={handleListen} className={`flex-none w-12 h-12 rounded-full flex items-center justify-center transition-all border-2 ${isListening ? 'bg-red-600 border-red-500 animate-pulse text-white' : 'bg-gray-800 border-gray-700 text-gray-400 active:bg-gray-700'}`}>
-            {isListening ? '🛑' : '🎤'}
-          </button>
-          <input 
-            value={input} 
-            onChange={(e) => setInput(e.target.value)} 
-            onKeyDown={(e) => e.key === 'Enter' && sendMessage()} 
-            className="flex-1 bg-black border border-gray-700 p-3 rounded-2xl text-white outline-none focus:border-blue-500 text-base" 
-            placeholder={t.chat_placeholder} 
-          />
-          <button onClick={sendMessage} disabled={loading || !input.trim()} className="flex-none w-12 h-12 bg-blue-600 hover:bg-blue-500 rounded-full flex items-center justify-center text-white transition-all shadow-lg shadow-blue-500/20">
-             <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg>
-          </button>
-        </div>
+        {/* STEP 2: REGISTER */}
+        {step === 'register' && (
+          <div className="bg-gray-900 border border-white/10 p-8 rounded-[2.5rem] shadow-2xl relative animate-in fade-in duration-200">
+            <button onClick={onClose} className="absolute top-6 right-6 text-gray-500"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <div className="space-y-4 pt-6">
+              <input className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-blue-500" placeholder={t.chat_form_name} value={userData.name} onChange={(e) => setUserData({...userData, name: e.target.value})} />
+              <input className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-blue-500" placeholder={t.chat_form_email} value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
+              <button onClick={() => setStep('chat')} disabled={!userData.name || !userData.email} className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl active:scale-95 disabled:opacity-30">{t.chat_button_start}</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: CHAT */}
+        {step === 'chat' && (
+          <div className="h-[85vh] md:h-[650px] bg-black flex flex-col rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl relative animate-in slide-in-from-bottom-4">
+            <div className="flex justify-between items-center bg-gray-900 px-6 py-4 border-b border-white/5">
+              <div className="flex flex-col">
+                <span className="text-white font-bold text-sm">{t.chat_title}</span>
+                <span className="text-[10px] text-blue-500 uppercase font-black italic">Puma AI Agent</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => { setIsVoiceEnabled(!isVoiceEnabled); window.speechSynthesis.cancel(); }} className={`p-2 rounded-lg ${isVoiceEnabled ? 'bg-blue-600 text-white' : 'text-gray-500 bg-white/5'}`}>{isVoiceEnabled ? '🔊' : '🔈'}</button>
+                <button onClick={onClose} className="p-2 text-gray-500 hover:text-white"><svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+              </div>
+            </div>
+            
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-6 bg-black custom-scrollbar scroll-smooth">
+              <div className="flex justify-start">
+                <div className="max-w-[85%] p-4 bg-gray-800/50 border border-blue-500/20 rounded-2xl rounded-tl-none text-[15px] text-gray-200">
+                  {t.chat_welcome.replace("{name}", userData.name)}
+                </div>
+              </div>
+              {messages.map((m, i) => (
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] p-4 rounded-2xl text-[15px] ${m.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-gray-800 text-gray-100 border border-white/5 rounded-tl-none'}`}>{m.content}</div>
+                </div>
+              ))}
+              {loading && <div className="text-blue-500 text-[10px] font-black animate-pulse uppercase tracking-[0.2em] ml-2">Puma thinking...</div>}
+            </div>
+
+            <div className="p-4 bg-gray-900 border-t border-white/5 pb-safe">
+              <div className="flex gap-2 items-center">
+                <button onClick={handleListen} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isListening ? 'bg-red-600 animate-pulse text-white shadow-[0_0_20px_rgba(220,38,38,0.5)]' : 'bg-white/5 border border-white/10 text-gray-400'}`}>🎤</button>
+                <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()} className="flex-1 bg-white/5 border border-white/10 p-3 rounded-2xl text-white outline-none focus:border-blue-500" placeholder={t.chat_placeholder} />
+                <button onClick={sendMessage} className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white active:scale-95 shadow-lg shadow-blue-500/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg></button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
