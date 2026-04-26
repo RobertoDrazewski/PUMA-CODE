@@ -4,20 +4,28 @@ const { Resend } = require('resend');
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// --- 1. CHAT: AYUDA AL CLIENTE SIN SOLTAR PRESUPUESTOS ---
 exports.chatWithAI = async (req, res) => {
     try {
-        const { messages, userData } = req.body;
+        const { messages, userData, language } = req.body;
+
+        const languageNames = { es: "Spanish", en: "English", pt: "Portuguese", ja: "Japanese", zh: "Chinese" };
+        const selectedLanguage = languageNames[language] || "Spanish";
+
         const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 { 
                     role: "system", 
-                    content: `Eres el Asesor Técnico de Puma Code. 
-                    TU MISIÓN: Ayudar a ${userData?.name} a definir las funcionalidades de su software.
-                    REGLA DE ORO: NUNCA des presupuestos, precios ni tiempos de entrega en este chat. 
-                    Si el cliente pregunta por costos, dile que "Roberto (el CEO) analizará los requerimientos y le enviará una propuesta formal por mail".
-                    Habla de forma profesional y cercana (estilo Mendoza). Máximo 2 o 3 frases.` 
+                    content: `You are the Strategic Advisor of Puma Code. 
+                    MISSION: Help ${userData?.name || 'the client'} refine their software idea.
+                    
+                    MANDATORY: ALWAYS respond in ${selectedLanguage}. 
+                    If language is Spanish, use a friendly "Mendocino" style.
+                    
+                    RULES:
+                    1. Be proactive, suggest features like AI, dashboards or WhatsApp bots.
+                    2. Never give prices.
+                    3. Mention the "Estimated Quote" button if the idea is clear.` 
                 },
                 ...messages
             ],
@@ -29,62 +37,51 @@ exports.chatWithAI = async (req, res) => {
     }
 };
 
-// --- 2. ANÁLISIS: REPORTE EXCLUSIVO PARA ROBERTO ---
 exports.analyzeProject = async (req, res) => {
     try {
-        let data = req.body;
-        if (typeof data === 'string') data = JSON.parse(data);
-        const { chatHistory, userData } = data;
+        const { chatHistory, userData } = req.body;
 
         const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 { 
                     role: "system", 
-                    content: `Eres el CTO Analista. Analiza el chat y genera un reporte privado para Roberto.
+                    content: `Eres el CTO Analista de Puma Code. Analiza el chat y genera un reporte para Roberto.
                     ESTRATEGIA: Landings $450+, Gestión $1200-$2500, Sistemas $3000+.
-                    Responde en JSON:
+                    Responde estrictamente en JSON:
                     {
                       "nombre": "string",
                       "precio": "string",
                       "tiempo": "string",
-                      "stack": ["tecnología1", "tecnología2"],
-                      "puntos": ["funcionalidad1", "funcionalidad2"],
-                      "nota": "Breve análisis del perfil del cliente"
+                      "stack": ["tecnología1"],
+                      "puntos": ["funcionalidad1"],
+                      "compromiso": "Nota estratégica"
                     }` 
                 },
-                { role: "user", content: `Analiza: ${JSON.stringify(chatHistory)}` }
+                { role: "user", content: `Analiza este historial: ${JSON.stringify(chatHistory)}` }
             ],
             response_format: { type: "json_object" }
         });
 
         const analysis = JSON.parse(response.choices[0].message.content);
 
-        // Convertimos los arrays a HTML para evitar el [object Object]
-        const stackHtml = analysis.stack.map(s => `<li style="color: #1e40af;">${s}</li>`).join('');
-        const puntosHtml = analysis.puntos.map(p => `<li>${p}</li>`).join('');
+        const fullChatHtml = chatHistory.map(m => `
+            <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #eee; background: ${m.role === 'user' ? '#f0f7ff' : '#fff'};">
+                <small>${m.role === 'user' ? userData.name : 'PUMA IA'}:</small><br/>
+                ${m.content}
+            </div>
+        `).join('');
 
         await resend.emails.send({
             from: 'Puma Code Leads <onboarding@resend.dev>',
             to: process.env.EMAIL_TO,
             replyTo: userData.email,
-            subject: `🚀 NUEVO PROYECTO: ${analysis.nombre} - ${userData.name}`,
-            html: `
-                <div style="font-family: sans-serif; max-width: 600px; border: 2px solid #2563eb; padding: 25px; border-radius: 12px;">
-                    <h2 style="color: #2563eb;">Reporte para Roberto</h2>
-                    <p><strong>Cliente:</strong> ${userData.name} (${userData.email})</p>
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                        <p style="font-size: 18px; color: #059669; font-weight: bold;">Presupuesto Sugerido: ${analysis.precio}</p>
-                        <p><strong>Tiempo:</strong> ${analysis.tiempo}</p>
-                    </div>
-                    <h4>Stack Sugerido:</h4>
-                    <ul>${stackHtml}</ul>
-                    <h4>Funcionalidades Detectadas:</h4>
-                    <ul>${puntosHtml}</ul>
-                    <p><strong>Análisis de la IA:</strong> <em>${analysis.nota}</em></p>
-                    <hr>
-                    <p style="font-size: 12px; color: #94a3b8;">Este reporte es privado. El cliente no ha visto estos números.</p>
-                </div>`
+            subject: `🔥 PROYECTO: ${analysis.nombre} - ${userData.name}`,
+            html: `<h2>Reporte de Proyecto</h2>
+                   <p><strong>Precio sugerido:</strong> ${analysis.precio}</p>
+                   <p><strong>Estrategia:</strong> ${analysis.compromiso}</p>
+                   <h3>Chat completo:</h3>
+                   ${fullChatHtml}`
         });
 
         res.status(200).json({ success: true });
