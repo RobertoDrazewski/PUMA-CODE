@@ -19,16 +19,14 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
   // 1. GESTIÓN DE AUDIO Y VOCES
   useEffect(() => {
     if (typeof window !== "undefined") {
-      audioRef.current = new Audio('/notify.mp3'); // Asegúrate que el archivo esté en public/
+      audioRef.current = new Audio('/notify.mp3');
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices();
-        // Buscamos una voz natural según el idioma
         voiceRef.current = voices.find(v => v.lang.startsWith(lang) && (v.name.includes('Google') || v.name.includes('Natural'))) || voices.find(v => v.lang.startsWith(lang)) || null;
       };
       loadVoices();
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
-    // Bloquear scroll de la página de fondo
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = 'unset'; };
   }, [lang]);
@@ -40,13 +38,39 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
     }
   }, [messages, loading]);
 
-  // 3. TEXT-TO-SPEECH (HABLAR)
+  // --- REPARACIÓN PARA MÓVILES: ACTIVADOR DE VOZ ---
+  const handleStartAudio = () => {
+    // 1. Habilitar la voz con un mensaje vacío (desbloquea el motor en iOS/Android)
+    const silentUtterance = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(silentUtterance);
+    
+    // 2. Habilitar el sonido de notificación
+    if (audioRef.current) {
+        audioRef.current.play().then(() => {
+            audioRef.current?.pause();
+            audioRef.current!.currentTime = 0;
+        }).catch(() => {});
+    }
+    
+    setIsVoiceEnabled(true);
+    setStep('register');
+  };
+
+  // 3. TEXT-TO-SPEECH (REPARADO CON IDIOMAS)
   const speak = (text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis || !isVoiceEnabled) return;
-    window.speechSynthesis.cancel();
+    
+    window.speechSynthesis.cancel(); // Limpia cola de mensajes
     const utterance = new SpeechSynthesisUtterance(text.replace(/[*#_~]/g, ''));
+    
     if (voiceRef.current) utterance.voice = voiceRef.current;
-    utterance.lang = lang === 'es' ? 'es-ES' : lang === 'en' ? 'en-US' : lang === 'pt' ? 'pt-BR' : lang === 'ja' ? 'ja-JP' : 'zh-CN';
+    
+    // Mapeo preciso de idiomas
+    const langCodes: any = { es: 'es-ES', en: 'en-US', pt: 'pt-BR', ja: 'ja-JP', zh: 'zh-CN' };
+    utterance.lang = langCodes[lang] || 'es-ES';
+    utterance.rate = 1.0; // Velocidad normal
+    utterance.volume = 1.0; // Volumen al máximo
+
     window.speechSynthesis.speak(utterance);
   };
 
@@ -55,7 +79,8 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
-    recognition.lang = lang === 'es' ? 'es-AR' : lang === 'en' ? 'en-US' : lang === 'pt' ? 'pt-BR' : lang === 'ja' ? 'ja-JP' : 'zh-CN';
+    const langCodes: any = { es: 'es-AR', en: 'en-US', pt: 'pt-BR', ja: 'ja-JP', zh: 'zh-CN' };
+    recognition.lang = langCodes[lang] || 'es-ES';
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
     recognition.onresult = (e: any) => setInput(prev => prev + (prev ? " " : "") + e.results[0][0].transcript);
@@ -79,7 +104,7 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
       const data = await res.json();
       if (data?.reply) {
         setMessages([...newMessages, { role: "assistant", content: data.reply }]);
-        audioRef.current?.play().catch(() => {}); // Sonido de notificación
+        audioRef.current?.play().catch(() => {});
         speak(data.reply);
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }
@@ -90,13 +115,18 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
       <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose}></div>
       <div className="relative z-[10000] w-full max-w-md mx-auto" onClick={(e) => e.stopPropagation()}>
         
-        {/* STEP 1: WELCOME */}
+        {/* STEP 1: WELCOME (BOTÓN REPARADO) */}
         {step === 'welcome' && (
           <div className="bg-gray-900 border border-white/10 p-10 rounded-[3rem] text-center shadow-2xl relative animate-in zoom-in duration-300">
-            <button onClick={onClose} className="absolute top-6 right-6 text-gray-500 hover:text-white"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <button onClick={onClose} className="absolute top-6 right-6 text-gray-500 hover:text-white">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
             <img src="/logotrans.png" alt="Logo" className="w-28 mx-auto mb-8" />
             <h2 className="text-2xl font-black text-white uppercase mb-10 tracking-tighter">{t.chat_title}</h2>
-            <button onClick={() => setStep('register')} className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl uppercase tracking-widest active:scale-95 shadow-lg shadow-blue-500/20">{t.chat_button_start}</button>
+            {/* ESTE BOTÓN DESBLOQUEA EL AUDIO EN MÓVILES */}
+            <button onClick={handleStartAudio} className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl uppercase tracking-widest active:scale-95 shadow-lg shadow-blue-500/20">
+                {t.chat_button_start}
+            </button>
           </div>
         )}
 
@@ -107,7 +137,9 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
             <div className="space-y-4 pt-6">
               <input className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-blue-500" placeholder={t.chat_form_name} value={userData.name} onChange={(e) => setUserData({...userData, name: e.target.value})} />
               <input className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-blue-500" placeholder={t.chat_form_email} value={userData.email} onChange={(e) => setUserData({...userData, email: e.target.value})} />
-              <button onClick={() => setStep('chat')} disabled={!userData.name || !userData.email} className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl active:scale-95 disabled:opacity-30">{t.chat_button_start}</button>
+              <button onClick={() => setStep('chat')} disabled={!userData.name || !userData.email} className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl active:scale-95 disabled:opacity-30">
+                {t.chat_button_start}
+              </button>
             </div>
           </div>
         )}
