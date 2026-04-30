@@ -2,22 +2,21 @@
 
 @layer base {
   :root {
-    --background: #000000;
-    --foreground: #ffffff;
+    --background: #020203; /* Negro profundo azulado */
+    --foreground: #f8fafc;
     --primary: #2563eb;
-    /* Color de acento para efectos de cristal */
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-bg: rgba(10, 10, 10, 0.8);
+    --primary-glow: rgba(37, 99, 235, 0.5);
+    --accent: #60a5fa;
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(5, 5, 10, 0.75);
+    --grid-color: rgba(37, 99, 235, 0.05);
   }
 
   html {
     scroll-behavior: smooth;
-    /* Evita el desplazamiento horizontal accidental en móviles */
     overflow-x: hidden;
     background-color: var(--background);
-    /* Mejora la renderización de fuentes en MacOS */
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
@@ -28,87 +27,138 @@
     padding: 0;
     overflow-x: hidden;
     width: 100%;
-    /* Previene el "pull-to-refresh" en navegadores móviles que rompe la UI del chat */
     overscroll-behavior-y: none;
+    /* Fondo de rejilla futurista */
+    background-image: 
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center center;
   }
 
-  main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    min-height: 100dvh;
-  }
-
+  /* Animación sutil de entrada para todas las secciones */
   section {
     width: 100%;
-    max-width: 1280px; /* Limita el ancho en pantallas gigantes */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    opacity: 0;
+    animation: reveal 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   }
 
-  /* Mejora de inputs para evitar zoom automático en iOS al hacer foco */
-  input, textarea, select {
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mejora de inputs futuristas */
+  input, textarea {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: white !important;
+    transition: all 0.3s ease;
     font-size: 16px !important;
   }
+
+  input:focus, textarea:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 15px var(--primary-glow) !important;
+    background: rgba(37, 99, 235, 0.05) !important;
+  }
 }
 
-/* --- Scrollbar General --- */
+/* --- Efectos High-Tech --- */
+
+/* Glassmorphism Pro */
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Efecto de borde brillante (Neon border) */
+.neon-border {
+  position: relative;
+  border-radius: 2.5rem;
+  transition: all 0.5s border;
+}
+
+.neon-border::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(var(--primary), transparent, var(--accent));
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0.3;
+}
+
+/* Hover futurista para botones */
+.btn-futuristic {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-futuristic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.btn-futuristic:hover::before {
+  left: 100%;
+}
+
+.btn-futuristic:hover {
+  letter-spacing: 2px;
+  box-shadow: 0 0 30px var(--primary-glow);
+}
+
+/* --- Scrollbar Cyberpunk --- */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #020203;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e1e1e;
-  border: 2px solid #0a0a0a;
-  border-radius: 10px;
+  background: #1e293b;
+  border-radius: 100px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
-/* --- Utilidad para el Chat (Micro-Scroll) --- */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(37, 99, 235, 0.3) transparent;
+/* --- Utilidad de Texto Gradiente Animado --- */
+.text-futuristic {
+  background: linear-gradient(to right, #fff, var(--primary), #fff);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shine 4s linear infinite;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+@keyframes shine {
+  to { background-position: 200% center; }
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.3);
-  border-radius: 20px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(37, 99, 235, 0.6);
-}
-
-/* --- Efectos de Cristal (Glassmorphism) --- */
-.glass-effect {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-}
-
-/* --- Ajuste para el área segura de iPhones (Notch) --- */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.pt-safe {
-  padding-top: env(safe-area-inset-top);
-}
+/* --- Ajuste para Safe Areas --- */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pt-safe { padding-top: env(safe-area-inset-top); }

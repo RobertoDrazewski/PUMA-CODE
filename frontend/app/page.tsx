@@ -5,8 +5,8 @@ import Navbar from '../components/Navbar';
 import AIChat from '../components/AIChat';
 import { translations } from '../constants/translations';
 
-// --- COMPONENTE DE TARJETA DE SERVICIO INTERACTIVA ---
-const ServiceCard = ({ num, index, icon, t }: any) => {
+// --- COMPONENTE DE TARJETA DE SERVICIO ---
+const ServiceCard = ({ num, icon, t, fileName }: any) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -32,11 +32,21 @@ const ServiceCard = ({ num, index, icon, t }: any) => {
           {t[`s${num}_title`]}
         </h3>
 
-        {/* Contenedor con animación de altura (Acordeón) */}
         <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0'}`}>
-          <p className="text-gray-400 leading-relaxed text-sm md:text-base overflow-hidden">
-            {t[`s${num}_desc`]}
-          </p>
+          <div className="overflow-hidden">
+            <p className="text-gray-400 leading-relaxed text-sm md:text-base mb-6">
+              {t[`s${num}_desc`]}
+            </p>
+            
+            <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50">
+              <img 
+                src={`/${fileName}.png`} 
+                alt={t[`s${num}_title`]}
+                loading="lazy"
+                className="w-full h-auto object-cover transform transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
         </div>
         
         {!isExpanded && (
@@ -49,49 +59,46 @@ const ServiceCard = ({ num, index, icon, t }: any) => {
   );
 };
 
-// --- COMPONENTE PRINCIPAL HOME ---
+// --- COMPONENTE PRINCIPAL ---
 export default function Home() {
   const [lang, setLang] = useState('es');
   const [showChat, setShowChat] = useState(false);
-  
   const t = translations[lang] || translations['es'];
 
-  // REPARACIÓN DE SCROLL: Bloquea el scroll del body solo cuando el chat está abierto
   useEffect(() => {
-    if (showChat) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
+    document.body.style.overflow = showChat ? 'hidden' : 'unset';
   }, [showChat]);
 
   const serviceIcons = ["🌐", "📱", "📡", "🧠", "🤖", "💎"];
+  const serviceFileNames = [
+    "desarrollo-web",
+    "apps-nativas",
+    "iot-telemetria",
+    "ia-machine-learning",
+    "optimizacion-eficiencia",
+    "qa-calidad"
+  ];
 
   return (
     <main className="relative min-h-screen bg-black text-white overflow-x-hidden flex flex-col selection:bg-blue-500/30 scroll-smooth">
-      
       <Navbar lang={lang} setLang={setLang} t={t} />
 
-      {/* FONDO DECORATIVO - ESTILO PUMA */}
+      {/* FONDO DECORATIVO */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,_var(--tw-gradient-stops))] from-blue-900/10 via-black to-black -z-10" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[600px] bg-blue-600/5 rounded-full blur-[120px] -z-10" />
 
-      {/* --- SECCIÓN HERO --- */}
+      {/* HERO SECTION */}
       <section className="min-h-screen flex flex-col items-center justify-center p-6 pt-32 text-center">
         <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-6 duration-1000">
           <div className="mb-6 inline-block px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold tracking-widest uppercase">
             {t.hero_badge}
           </div>
-          
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 bg-gradient-to-b from-white via-white to-gray-500 bg-clip-text text-transparent">
             {t.hero_title}
           </h1>
-          
           <p className="text-gray-400 text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed mb-12">
             {t.hero_subtitle}
           </p>
-
           <button 
             onClick={() => setShowChat(true)}
             className="px-12 py-5 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-all duration-300 shadow-[0_0_40px_rgba(37,99,235,0.4)] font-black text-xl active:scale-95 flex items-center gap-3 mx-auto"
@@ -102,27 +109,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SECCIÓN DE SERVICIOS INTERACTIVOS --- */}
+      {/* SERVICES GRID */}
       <section id="services" className="py-32 px-6 max-w-7xl mx-auto w-full border-t border-white/5">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">{t.services_title}</h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.services_subtitle}</p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map((num, index) => (
             <ServiceCard 
-              key={num} 
-              num={num} 
-              index={index} 
+              key={num} num={num} 
               icon={serviceIcons[index]} 
+              fileName={serviceFileNames[index]} 
               t={t} 
             />
           ))}
         </div>
       </section>
 
-      {/* --- SECCIÓN DE CONTACTO & FOOTER --- */}
+      {/* --- SECCIÓN DE CONTACTO RECUPERADA --- */}
       <section id="contact" className="py-32 px-6 bg-gradient-to-t from-blue-900/10 to-black border-t border-white/5">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl md:text-7xl font-black mb-12 tracking-tighter">
@@ -142,7 +147,7 @@ export default function Home() {
               LinkedIn
             </a>
 
-            {/* Instagram - Puma Code */}
+            {/* Instagram */}
             <a href="https://www.instagram.com/puma_code" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 px-10 py-5 bg-gradient-to-tr from-[#f09433] via-[#e6683c] via-[#dc2743] to-[#bc1888] text-white font-black rounded-3xl hover:scale-105 transition-all duration-500 shadow-2xl active:scale-95">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
               Instagram
@@ -157,14 +162,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* COMPONENTE DE CHAT (Capa Superior) */}
-      {showChat && (
-        <AIChat 
-          lang={lang} 
-          t={t} 
-          onClose={() => setShowChat(false)} 
-        />
-      )}
+      {showChat && <AIChat lang={lang} t={t} onClose={() => setShowChat(false)} />}
     </main>
   );
 }
