@@ -11,7 +11,7 @@ exports.chatWithAI = async (req, res) => {
         const selectedLanguage = languageNames[language] || "Spanish";
 
         const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4-turbo",
             messages: [
                 {
                     role: "system",
@@ -44,7 +44,7 @@ exports.analyzeProject = async (req, res) => {
         const { chatHistory, userData } = req.body;
 
         const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4-turbo",
             messages: [
                 { 
                     role: "system", 
