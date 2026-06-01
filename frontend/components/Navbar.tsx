@@ -56,7 +56,10 @@ export default function Navbar({ lang, setLang, t }: any) {
         <div className="hidden xl:flex items-center gap-10">
           {[
             { label: t.nav_home, href: "#" },
+            { label: t.nav_process, href: "#process" },
             { label: t.nav_services, href: "#services" },
+            { label: t.nav_industries, href: "#industries" },
+            { label: t.nav_cases, href: "#cases" },
             { label: t.nav_contact, href: "#contact" }
           ].map((link, i) => (
             <a 

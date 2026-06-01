@@ -1,66 +1,70 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit'); // npm i express-rate-limit
 require('dotenv').config();
 
-// --- RUTAS REPARADAS ---
-// Se agrega './src/' para coincidir con tu estructura de carpetas
-const aiRoutes = require('./src/routes/aiRoutes'); 
+const aiRoutes = require('./src/routes/aiRoutes');
 
 const app = express();
 
-// --- MIDDLEWARES ---
+// Render/Proxy: necesario para que el rate-limit lea la IP real.
+app.set('trust proxy', 1);
 
-// 1. Configuración de CORS Blindada
-app.use(cors({
-    origin: '*', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+// --- CORS ---
+// Definí ALLOWED_ORIGINS en tus variables de entorno, separadas por coma.
+// Ej: ALLOWED_ORIGINS=https://puma-code.com,https://www.puma-code.com
+// Nota: origin '*' + credentials:true es inválido y el navegador lo rechaza.
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : true, // true = refleja el origin (sin '*' literal)
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: true
-}));
+    credentials: false, // El frontend no usa cookies; mantenelo en false salvo que las necesites.
+  })
+);
 
-// 2. Procesamiento de cuerpos de petición
-app.use(express.json()); 
-app.use(express.text({ type: "text/plain", limit: '10mb' })); 
+// --- BODY PARSER ---
+// Estandarizamos en JSON. El frontend ya manda 'application/json',
+// así que no hace falta el truco de text/plain + JSON.parse manual.
+app.use(express.json({ limit: '1mb' }));
 
-// 3. Middleware de Conversión Automática (Optimizado)
-app.use((req, res, next) => {
-    if (req.body && typeof req.body === 'string' && req.body.trim().startsWith('{')) {
-        try {
-            req.body = JSON.parse(req.body);
-        } catch (e) {
-            console.error("⚠️ Error parseando body de texto plano:", e.message);
-        }
-    }
-    next();
+// --- RATE LIMIT (protege tu cuota de OpenAI y tu envío de emails) ---
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 30, // 30 requests por IP por ventana
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes. Probá de nuevo en unos minutos.' },
 });
 
-// --- DEFINICIÓN DE RUTAS ---
-app.use('/api/ai', aiRoutes); 
+// --- RUTAS ---
+app.use('/api/ai', aiLimiter, aiRoutes);
 
-// Ruta de salud del servidor (Health Check)
 app.get('/', (req, res) => {
-    res.status(200).send('🐆 Puma Code API is running smoothly...');
+  res.status(200).send('🐆 Puma Code API is running smoothly...');
 });
 
 // --- MANEJO DE ERRORES GLOBAL ---
+// No exponemos err.message al cliente (puede filtrar detalles internos).
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-    console.error('❌ SERVER ERROR:', err.stack);
-    res.status(500).json({ 
-        success: false, 
-        error: 'Algo salió mal en el servidor de Puma Code',
-        details: err.message 
-    });
+  console.error('❌ SERVER ERROR:', err.stack || err);
+  res.status(500).json({ success: false, error: 'Algo salió mal en el servidor de Puma Code' });
 });
 
-// --- INICIO DEL SERVIDOR ---
-const PORT = process.env.PORT || 10000; 
-
+// --- INICIO ---
+const PORT = process.env.PORT || 10000;
 const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log('-------------------------------------------');
-    console.log(`🚀 Puma Code Server ready on port ${PORT}`);
-    console.log('-------------------------------------------');
+  console.log('-------------------------------------------');
+  console.log(`🚀 Puma Code Server ready on port ${PORT}`);
+  console.log('-------------------------------------------');
 });
 
-// 4. Configuración de Tiempos de Espera (Indispensable para Render + IA)
-server.keepAliveTimeout = 120000; 
+// Timeouts (importante para Render + IA, que puede tardar).
+server.keepAliveTimeout = 120000;
 server.headersTimeout = 125000;
