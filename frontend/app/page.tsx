@@ -133,6 +133,13 @@ export default function Home() {
     { icon: "⚡", title: t.ai_f3_title, desc: t.ai_f3_desc },
   ];
 
+  const securityFeatures = [
+    { icon: "🛡️", title: t.sec_f1_title, desc: t.sec_f1_desc },
+    { icon: "🔍", title: t.sec_f2_title, desc: t.sec_f2_desc },
+    { icon: "🔐", title: t.sec_f3_title, desc: t.sec_f3_desc },
+    { icon: "📑", title: t.sec_f4_title, desc: t.sec_f4_desc },
+  ];
+
   return (
     <main className="relative min-h-screen bg-black text-white overflow-x-hidden flex flex-col selection:bg-blue-500/30 scroll-smooth">
       <Navbar lang={lang} setLang={setLang} t={t} />
@@ -279,6 +286,63 @@ export default function Home() {
                 <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}
+          </div>
+        </section>
+      </div>
+
+      {/* --- CIBERSEGURIDAD (banda completa) --- */}
+      <div className="w-full border-t border-white/5 bg-gradient-to-b from-black to-red-950/10">
+        <section id="security" className="py-28 px-6 max-w-7xl mx-auto w-full">
+          <div className="text-center mb-16">
+            <span className="inline-block mb-4 px-4 py-1.5 border border-red-500/30 rounded-full bg-red-500/10 text-red-400 text-[10px] font-black tracking-[0.25em] uppercase">
+              🛡️ {t.sec_badge}
+            </span>
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-futuristic">{t.sec_title}</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.sec_subtitle}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {securityFeatures.map((f, i) => (
+              <div
+                key={i}
+                className="group relative p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-red-500/[0.06] hover:border-red-500/40 transition-all duration-500 overflow-hidden"
+              >
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-red-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative">
+                  <div className="text-4xl mb-5">{f.icon}</div>
+                  <h3 className="text-xl font-bold mb-3 group-hover:text-red-300 transition-colors">{f.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Banda de riesgo / importancia comercial */}
+          <div className="mt-16 grid lg:grid-cols-2 gap-10 items-center glass-effect rounded-[2.5rem] border-red-500/15 p-8 md:p-12">
+            <div>
+              <span className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-black uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_#ef4444]" />
+                {t.sec_risk_badge}
+              </span>
+              <h3 className="text-2xl md:text-3xl font-black mb-4 tracking-tight leading-tight">{t.sec_risk_title}</h3>
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8">{t.sec_risk_desc}</p>
+              <button
+                onClick={() => setShowChat(true)}
+                className="px-9 py-4 bg-red-600 text-white rounded-full hover:bg-red-500 transition-all font-black active:scale-95 inline-flex items-center gap-3 btn-futuristic shadow-[0_0_30px_rgba(239,68,68,0.3)]"
+              >
+                {t.sec_cta}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            <ul className="space-y-4">
+              {[t.sec_b1, t.sec_b2, t.sec_b3, t.sec_b4].map((b, i) => (
+                <li key={i} className="flex items-start gap-3 text-gray-300 text-sm md:text-base">
+                  <Check />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       </div>

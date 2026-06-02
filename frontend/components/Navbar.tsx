@@ -59,6 +59,7 @@ export default function Navbar({ lang, setLang, t }: any) {
             { label: t.nav_process, href: "#process" },
             { label: t.nav_services, href: "#services" },
             { label: t.nav_industries, href: "#industries" },
+            { label: t.nav_security, href: "#security" },
             { label: t.nav_cases, href: "#cases" },
             { label: t.nav_contact, href: "#contact" }
           ].map((link, i) => (

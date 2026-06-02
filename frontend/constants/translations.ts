@@ -134,6 +134,34 @@ const en: Dict = {
   contact_title: "Let's Talk About Your Project",
   contact_btn_mail: "Send Email",
   contact_btn_linkedin: "LinkedIn",
+
+  // --- SECURITY / CYBERSECURITY ---
+  nav_security: "Security",
+  sec_badge: "Cybersecurity · Pentest",
+  sec_title: "Is your software secure? We'll prove it.",
+  sec_subtitle:
+    "We probe your website, app or SaaS the way a real attacker would — and hand you a clear plan to lock it down.",
+  sec_f1_title: "Professional pentest",
+  sec_f1_desc:
+    "We test your system with real attack techniques (Black Box) to find vulnerabilities before cybercriminals do.",
+  sec_f2_title: "AI security audit",
+  sec_f2_desc:
+    "We review your chatbots and AI assistants for prompt injection and data leakage — one of today's most common and dangerous flaws.",
+  sec_f3_title: "Infrastructure hardening",
+  sec_f3_desc:
+    "Secure setup of servers, headers, certificates and DNS (Cloudflare, DNSSEC, TLS) to close unnecessary doors.",
+  sec_f4_title: "Report & remediation",
+  sec_f4_desc:
+    "You get an executive report with every finding, its severity and concrete steps to fix it. No jargon.",
+  sec_risk_badge: "Real risk",
+  sec_risk_title: "A single vulnerability can cost you your customers.",
+  sec_risk_desc:
+    "Data leaks, brand impersonation, fines and lost trust. Most attacks exploit flaws that could have been found and fixed in advance. Stay ahead.",
+  sec_b1: "Web, API and infrastructure vulnerability detection.",
+  sec_b2: "Specialized audit of AI-powered components.",
+  sec_b3: "Clear report with priorities and an action plan.",
+  sec_b4: "Verification re-test to confirm it's resolved.",
+  sec_cta: "Request your security assessment",
 };
 
 const es: Dict = {
@@ -255,6 +283,34 @@ const es: Dict = {
   contact_title: "Hablemos de tu Proyecto",
   contact_btn_mail: "Enviar Email",
   contact_btn_linkedin: "LinkedIn",
+
+  // --- SECURITY / CIBERSEGURIDAD ---
+  nav_security: "Seguridad",
+  sec_badge: "Ciberseguridad · Pentest",
+  sec_title: "¿Tu software es seguro? Te lo demostramos.",
+  sec_subtitle:
+    "Analizamos tu web, app o SaaS como lo haría un atacante real — y te entregamos un plan claro para blindarlo.",
+  sec_f1_title: "Pentest profesional",
+  sec_f1_desc:
+    "Probamos tu sistema con técnicas reales de ataque (Black Box) para encontrar las vulnerabilidades antes que los ciberdelincuentes.",
+  sec_f2_title: "Auditoría de IA",
+  sec_f2_desc:
+    "Revisamos tus chatbots y asistentes contra prompt injection y fuga de datos: una de las fallas más comunes y peligrosas hoy.",
+  sec_f3_title: "Hardening de infraestructura",
+  sec_f3_desc:
+    "Configuración segura de servidores, headers, certificados y DNS (Cloudflare, DNSSEC, TLS) para cerrar puertas innecesarias.",
+  sec_f4_title: "Informe y remediación",
+  sec_f4_desc:
+    "Recibís un informe ejecutivo con cada hallazgo, su severidad y los pasos concretos para solucionarlo. Sin tecnicismos.",
+  sec_risk_badge: "Riesgo real",
+  sec_risk_title: "Una sola vulnerabilidad puede costarte tus clientes.",
+  sec_risk_desc:
+    "Filtración de datos, suplantación de tu marca, multas y pérdida de confianza. La mayoría de los ataques aprovechan fallas que se podían detectar y arreglar antes. Adelantate.",
+  sec_b1: "Detección de vulnerabilidades web, de API y de infraestructura.",
+  sec_b2: "Auditoría especializada de componentes con IA.",
+  sec_b3: "Informe claro con prioridades y plan de acción.",
+  sec_b4: "Re-test de verificación para confirmar que quedó resuelto.",
+  sec_cta: "Pedí tu análisis de seguridad",
 };
 
 const pt: Dict = {
@@ -375,6 +431,34 @@ const pt: Dict = {
   contact_title: "Vamos Conversar",
   contact_btn_mail: "Enviar Email",
   contact_btn_linkedin: "LinkedIn",
+
+  // --- SECURITY / CIBERSEGURANÇA ---
+  nav_security: "Segurança",
+  sec_badge: "Cibersegurança · Pentest",
+  sec_title: "Seu software é seguro? Nós provamos.",
+  sec_subtitle:
+    "Analisamos seu site, app ou SaaS como um atacante real faria — e entregamos um plano claro para blindá-lo.",
+  sec_f1_title: "Pentest profissional",
+  sec_f1_desc:
+    "Testamos seu sistema com técnicas reais de ataque (Black Box) para encontrar as vulnerabilidades antes dos cibercriminosos.",
+  sec_f2_title: "Auditoria de IA",
+  sec_f2_desc:
+    "Revisamos seus chatbots e assistentes contra prompt injection e vazamento de dados: uma das falhas mais comuns e perigosas hoje.",
+  sec_f3_title: "Hardening de infraestrutura",
+  sec_f3_desc:
+    "Configuração segura de servidores, headers, certificados e DNS (Cloudflare, DNSSEC, TLS) para fechar portas desnecessárias.",
+  sec_f4_title: "Relatório e remediação",
+  sec_f4_desc:
+    "Você recebe um relatório executivo com cada achado, sua severidade e os passos concretos para resolver. Sem tecnicismos.",
+  sec_risk_badge: "Risco real",
+  sec_risk_title: "Uma única vulnerabilidade pode custar seus clientes.",
+  sec_risk_desc:
+    "Vazamento de dados, falsificação da sua marca, multas e perda de confiança. A maioria dos ataques explora falhas que poderiam ter sido detectadas e corrigidas antes. Antecipe-se.",
+  sec_b1: "Detecção de vulnerabilidades web, de API e de infraestrutura.",
+  sec_b2: "Auditoria especializada de componentes com IA.",
+  sec_b3: "Relatório claro com prioridades e plano de ação.",
+  sec_b4: "Re-teste de verificação para confirmar que foi resolvido.",
+  sec_cta: "Solicite sua análise de segurança",
 };
 
 // Idiomas con traducción parcial: conservan lo ya traducido y heredan en inglés
