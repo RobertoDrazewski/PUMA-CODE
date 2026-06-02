@@ -26,7 +26,6 @@ export const metadata: Metadata = {
   title: "Puma Code | Software Factory & AI Solutions",
   description: "Desarrollo de software a medida con inteligencia artificial integrada. Desde Mendoza al mundo.",
   keywords: ["Software Factory", "Inteligencia Artificial", "Mendoza", "Desarrollo Web", "Puma Code"],
-  authors: [{ name: "Roberto Drazewski" }],
   manifest: "/manifest.json", // Importante para Android
   appleWebApp: {
     capable: true,
