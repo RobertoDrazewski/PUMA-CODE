@@ -4,8 +4,9 @@ const { Resend } = require('resend');
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// gpt-4o suele ser más rápido y barato que gpt-4-turbo con calidad similar.
-const MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
+// El modelo se define en la variable de entorno OPENAI_MODEL.
+// Fallback: gpt-4-turbo (rápido y económico, compatible con chat.completions + JSON mode).
+const MODEL = process.env.OPENAI_MODEL || 'gpt-4-turbo';
 
 // Límites para controlar costos y abuso.
 const MAX_MESSAGES = 40;
