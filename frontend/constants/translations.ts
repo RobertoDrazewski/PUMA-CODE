@@ -162,6 +162,25 @@ const en: Dict = {
   sec_b3: "Clear report with priorities and an action plan.",
   sec_b4: "Verification re-test to confirm it's resolved.",
   sec_cta: "Request your security assessment",
+
+  // --- PENTEST AUTHORIZATION FORM ---
+  auth_title: "Pentest authorization",
+  auth_intro: "A penetration test requires your written consent. Fill in the details, sign below and submit — your signed authorization is sent to info@puma-code.com so we have it on record before any testing begins.",
+  auth_f_company: "Company / Full name",
+  auth_f_id: "Tax ID / National ID",
+  auth_f_address: "Address",
+  auth_f_systems: "Systems to test (domains, URLs, apps)",
+  auth_f_window: "Testing window (dates)",
+  auth_f_signer: "Signer",
+  auth_consent: "I declare that I own or am authorized to permit the security assessment of these systems, and I authorize Puma Code to perform the pentest within the stated scope.",
+  auth_sign_label: "Sign in the box",
+  auth_clear: "Clear",
+  auth_submit: "Sign & send authorization",
+  auth_sending: "Sending...",
+  auth_err: "Please fill in the systems, sign and accept the consent.",
+  auth_err_send: "Couldn't send it. Please try again.",
+  auth_skip: "I'll sign it later",
+  chat_success_pentest_note: "We received your request. Note: we can only start the pentest once we have your signed authorization at info@puma-code.com.",
 };
 
 const es: Dict = {
@@ -311,6 +330,25 @@ const es: Dict = {
   sec_b3: "Informe claro con prioridades y plan de acción.",
   sec_b4: "Re-test de verificación para confirmar que quedó resuelto.",
   sec_cta: "Pedí tu análisis de seguridad",
+
+  // --- PENTEST AUTHORIZATION FORM ---
+  auth_title: "Autorización de pentest",
+  auth_intro: "Un penetration test requiere tu consentimiento por escrito. Completá los datos, firmá abajo y enviá — tu autorización firmada se manda a info@puma-code.com para que quede registrada antes de iniciar cualquier prueba.",
+  auth_f_company: "Razón social / Nombre completo",
+  auth_f_id: "CUIT / DNI",
+  auth_f_address: "Domicilio",
+  auth_f_systems: "Sistemas a testear (dominios, URLs, apps)",
+  auth_f_window: "Ventana de pruebas (fechas)",
+  auth_f_signer: "Firmante",
+  auth_consent: "Declaro que soy titular o estoy autorizado a permitir la evaluación de seguridad de estos sistemas, y autorizo a Puma Code a realizar el pentest dentro del alcance indicado.",
+  auth_sign_label: "Firmá en el recuadro",
+  auth_clear: "Borrar",
+  auth_submit: "Firmar y enviar autorización",
+  auth_sending: "Enviando...",
+  auth_err: "Completá los sistemas, firmá y aceptá el consentimiento.",
+  auth_err_send: "No se pudo enviar. Probá de nuevo.",
+  auth_skip: "Lo firmo después",
+  chat_success_pentest_note: "Recibimos tu solicitud. Recordá: solo podemos arrancar el pentest cuando tengamos tu autorización firmada en info@puma-code.com.",
 };
 
 const pt: Dict = {
@@ -459,6 +497,25 @@ const pt: Dict = {
   sec_b3: "Relatório claro com prioridades e plano de ação.",
   sec_b4: "Re-teste de verificação para confirmar que foi resolvido.",
   sec_cta: "Solicite sua análise de segurança",
+
+  // --- PENTEST AUTHORIZATION FORM ---
+  auth_title: "Autorização de pentest",
+  auth_intro: "Um penetration test requer seu consentimento por escrito. Preencha os dados, assine abaixo e envie — sua autorização assinada é enviada a info@puma-code.com para ficar registrada antes de iniciar qualquer teste.",
+  auth_f_company: "Razão social / Nome completo",
+  auth_f_id: "CNPJ / CPF",
+  auth_f_address: "Endereço",
+  auth_f_systems: "Sistemas a testar (domínios, URLs, apps)",
+  auth_f_window: "Janela de testes (datas)",
+  auth_f_signer: "Signatário",
+  auth_consent: "Declaro que sou titular ou estou autorizado a permitir a avaliação de segurança destes sistemas, e autorizo a Puma Code a realizar o pentest dentro do escopo indicado.",
+  auth_sign_label: "Assine no quadro",
+  auth_clear: "Limpar",
+  auth_submit: "Assinar e enviar autorização",
+  auth_sending: "Enviando...",
+  auth_err: "Preencha os sistemas, assine e aceite o consentimento.",
+  auth_err_send: "Não foi possível enviar. Tente novamente.",
+  auth_skip: "Assino depois",
+  chat_success_pentest_note: "Recebemos sua solicitação. Lembre-se: só podemos iniciar o pentest quando tivermos sua autorização assinada em info@puma-code.com.",
 };
 
 // Idiomas con traducción parcial: conservan lo ya traducido y heredan en inglés

@@ -169,6 +169,22 @@ const T = {
     chatTitle: '💬 Conversación con nuestro asistente',
     assistantName: 'Puma Code IA',
     footer: 'Puma Code · Software a medida · Mendoza, Argentina — info@puma-code.com',
+    secIncludedNote: 'Cada entrega de Puma Code incluye un test de seguridad (pentest) del sistema final, sin costo adicional.',
+    pentestReportTitle: 'Evaluación de Seguridad — Propuesta de Pentest',
+    pentestIntro: (proj) => `Esta es tu propuesta de penetration test para <b>${proj}</b>. Abajo tenés qué evaluamos, qué te entregamos, la inversión y el paso de autorización que necesitamos antes de arrancar.`,
+    pentestScopeTitle: '🔍 Qué evaluamos',
+    pentestInvestTitle: '💰 Inversión — pentest (pago único)',
+    pentestIncludedNote: 'Incluye un re-test de verificación tras la remediación. Sin mensualidades a Puma Code por el análisis.',
+    pentestDeliverTitle: '📑 Qué te entregamos',
+    pentestDeliverBullets: [
+      'Un informe ejecutivo con cada hallazgo, su severidad y el impacto real para tu negocio.',
+      'Pasos de remediación concretos y priorizados para cada vulnerabilidad.',
+      'Una revisión dedicada de cualquier componente con IA (prompt injection, fuga de datos) cuando aplique.',
+      'Un re-test de verificación tras aplicar las correcciones, para confirmar que quedaron resueltas.',
+    ],
+    pentestAuthTitle: '🛡️ Autorización necesaria antes de arrancar',
+    pentestAuthText: 'Un penetration test requiere tu autorización por escrito. Justo después de esta solicitud podés completar y firmar el formulario de autorización; una vez firmado se envía a info@puma-code.com para que quede registrado tu consentimiento antes de iniciar cualquier prueba.',
+    pentestWhyTitle: '📈 Por qué esto protege tu negocio',
   },
   en: {
     reportTitle: 'Proposal & Quote',
@@ -222,6 +238,22 @@ const T = {
     chatTitle: '💬 Conversation with our assistant',
     assistantName: 'Puma Code AI',
     footer: 'Puma Code · Custom software · Mendoza, Argentina — info@puma-code.com',
+    secIncludedNote: 'Every Puma Code delivery includes a security test (pentest) of the final system at no extra cost.',
+    pentestReportTitle: 'Security Assessment — Pentest Proposal',
+    pentestIntro: (proj) => `Here is your penetration test proposal for <b>${proj}</b>. Below you'll find what we evaluate, what you receive, the investment and the authorization step we need before starting.`,
+    pentestScopeTitle: '🔍 What we evaluate',
+    pentestInvestTitle: '💰 Investment — pentest (one-time payment)',
+    pentestIncludedNote: 'Includes one verification re-test after remediation. No monthly fees to Puma Code for the assessment.',
+    pentestDeliverTitle: '📑 What you receive',
+    pentestDeliverBullets: [
+      'An executive report with every finding, its severity and clear business impact.',
+      'Concrete, prioritized remediation steps for each vulnerability.',
+      'A dedicated review of any AI component (prompt injection, data leakage) when applicable.',
+      'One verification re-test after you apply the fixes, to confirm they are resolved.',
+    ],
+    pentestAuthTitle: '🛡️ Authorization required before we start',
+    pentestAuthText: 'A penetration test requires your written authorization. Right after this request you can fill in and sign the authorization form; once signed it is sent to info@puma-code.com so we have your consent on record before any testing begins.',
+    pentestWhyTitle: '📈 Why this protects your business',
   },
   pt: {
     reportTitle: 'Proposta & Orçamento',
@@ -275,6 +307,22 @@ const T = {
     chatTitle: '💬 Conversa com nosso assistente',
     assistantName: 'Puma Code IA',
     footer: 'Puma Code · Software sob medida · Mendoza, Argentina — info@puma-code.com',
+    secIncludedNote: 'Cada entrega da Puma Code inclui um teste de segurança (pentest) do sistema final, sem custo adicional.',
+    pentestReportTitle: 'Avaliação de Segurança — Proposta de Pentest',
+    pentestIntro: (proj) => `Esta é sua proposta de penetration test para <b>${proj}</b>. Abaixo você encontra o que avaliamos, o que entregamos, o investimento e a etapa de autorização que precisamos antes de começar.`,
+    pentestScopeTitle: '🔍 O que avaliamos',
+    pentestInvestTitle: '💰 Investimento — pentest (pagamento único)',
+    pentestIncludedNote: 'Inclui um re-teste de verificação após a remediação. Sem mensalidades à Puma Code pela análise.',
+    pentestDeliverTitle: '📑 O que entregamos',
+    pentestDeliverBullets: [
+      'Um relatório executivo com cada achado, sua severidade e o impacto real para o seu negócio.',
+      'Passos de remediação concretos e priorizados para cada vulnerabilidade.',
+      'Uma revisão dedicada de qualquer componente com IA (prompt injection, vazamento de dados) quando aplicável.',
+      'Um re-teste de verificação após aplicar as correções, para confirmar que foram resolvidas.',
+    ],
+    pentestAuthTitle: '🛡️ Autorização necessária antes de começar',
+    pentestAuthText: 'Um penetration test requer sua autorização por escrito. Logo após esta solicitação você pode preencher e assinar o formulário de autorização; uma vez assinado, ele é enviado a info@puma-code.com para que seu consentimento fique registrado antes de iniciar qualquer teste.',
+    pentestWhyTitle: '📈 Por que isso protege o seu negócio',
   },
   it: {
     reportTitle: 'Proposta & Preventivo',
@@ -891,6 +939,7 @@ IMPORTANTE:
 Responde estrictamente en JSON:
 {
   "nombre_proyecto": "string",
+  "tipo_servicio": "desarrollo | pentest",
   "perfil_cliente": "Local Mendoza" | "Global Estándar",
   "resumen_pactado": "Resumen detallado de funciones solicitadas, redactado claro para el cliente y en su idioma",
   "tecnologias": ["lista"],
@@ -917,6 +966,9 @@ Responde estrictamente en JSON:
     const perfil = String(analysis.perfil_cliente || 'Sin perfil');
     const tecnologias = Array.isArray(analysis.tecnologias) ? analysis.tecnologias : [];
     const esLocal = perfil.toLowerCase().includes('local');
+    const tipoRaw = String(analysis.tipo_servicio || '').toLowerCase();
+    const esPentest = tipoRaw.includes('pent') || tipoRaw.includes('segur') || tipoRaw.includes('security');
+    const tipoServicio = esPentest ? 'pentest' : 'desarrollo';
 
     // Idioma del mail: el del chat (con respaldo al inglés). Local sin idioma soportado -> es; global -> en.
     const L = pickT(language, esLocal);
@@ -1053,6 +1105,66 @@ Responde estrictamente en JSON:
       )
       .join('');
 
+    // ============================================================
+    //  RAMA PENTEST: presupuesto separado (mismo sistema de pago/dólar)
+    // ============================================================
+    if (esPentest) {
+      const pentestSubject = `🛡️ Pentest · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
+      const deliverHtml = (L.pentestDeliverBullets || []).map((b) => `<li>${b}</li>`).join('');
+
+      await resend.emails.send({
+        from: 'Puma Code <onboarding@resend.dev>',
+        to: process.env.EMAIL_TO,
+        replyTo: userData.email,
+        subject: pentestSubject,
+        html: `
+          <div style="font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 620px; margin: 0 auto; color: #111827;">
+            <div style="background: linear-gradient(135deg,#b91c1c,#dc2626); padding: 24px; border-radius: 16px 16px 0 0;">
+              <p style="margin: 0; color: #fecaca; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">🐆 Puma Code · Ciberseguridad</p>
+              <h1 style="margin: 6px 0 0; color: #ffffff; font-size: 22px;">${escapeHtml(L.pentestReportTitle)}</h1>
+            </div>
+
+            <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 16px 16px;">
+              <h2 style="margin: 0 0 6px; font-size: 20px; color: #111827;">${escapeHtml(L.greeting(clientName))}</h2>
+              <p style="margin: 0 0 18px; color: #475569; font-size: 14px; line-height: 1.6;">${L.pentestIntro(escapeHtml(proyecto))}</p>
+
+              <h3 style="margin: 0 0 6px; color: #b91c1c; font-size: 15px;">${escapeHtml(L.pentestScopeTitle)}</h3>
+              <p style="margin: 0 0 12px; line-height: 1.6; font-size: 14px; color: #1f2937;">${escapeHtml(analysis.resumen_pactado || '-')}</p>
+              <p style="margin: 0 0 4px; font-size: 13px; color: #64748b;"><b>${escapeHtml(L.stackLabel)}:</b> ${tecnologias.map(escapeHtml).join(' • ')}</p>
+
+              <div style="padding: 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; margin: 18px 0;">
+                <p style="margin: 0; color: #111827; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestInvestTitle)}</p>
+                ${precioHtml}
+                <p style="margin: 12px 0 0; font-size: 11px; color: #64748b; line-height: 1.5;">✅ ${escapeHtml(L.pentestIncludedNote)}</p>
+              </div>
+
+              <div style="padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin: 18px 0;">
+                <p style="margin: 0 0 8px; color: #1d4ed8; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestDeliverTitle)}</p>
+                <ul style="margin: 0; padding-left: 18px; color: #1e3a8a; font-size: 13px; line-height: 1.7;">${deliverHtml}</ul>
+              </div>
+
+              <div style="padding: 16px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; margin: 18px 0;">
+                <p style="margin: 0 0 6px; color: #c2410c; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestAuthTitle)}</p>
+                <p style="margin: 0; color: #9a3412; font-size: 13px; line-height: 1.6;">${escapeHtml(L.pentestAuthText)}</p>
+              </div>
+
+              <div style="padding: 16px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; margin: 18px 0;">
+                <p style="margin: 0 0 6px; color: #047857; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestWhyTitle)}</p>
+                <p style="margin: 0; color: #065f46; font-size: 13px; line-height: 1.6;">${escapeHtml(analysis.estrategia_crecimiento || '-')}</p>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid #eee; margin: 26px 0;">
+              <h4 style="margin: 0 0 10px; color: #9ca3af; font-size: 13px;">${escapeHtml(L.chatTitle)}</h4>
+              ${chatHtml}
+
+              <p style="margin: 24px 0 0; text-align: center; color: #9ca3af; font-size: 11px;">${escapeHtml(L.footer)}</p>
+            </div>
+          </div>`,
+      });
+
+      return res.status(200).json({ success: true, tipo_servicio: tipoServicio });
+    }
+
     // Asunto para vos (Roberto): claro de que está listo para reenviar.
     const subject = `📤 Listo para reenviar · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
 
@@ -1080,6 +1192,7 @@ Responde estrictamente en JSON:
               <p style="margin: 0; color: #111827; font-weight: bold; font-size: 15px;">${escapeHtml(L.investTitle)}</p>
               ${precioHtml}
               <p style="margin: 12px 0 0; font-size: 11px; color: #64748b; line-height: 1.5;">✅ ${escapeHtml(L.includedNote)}</p>
+              <p style="margin: 6px 0 0; font-size: 11px; color: #047857; line-height: 1.5; font-weight: bold;">🛡️ ${escapeHtml(L.secIncludedNote)}</p>
             </div>
 
             ${ownHtml}
@@ -1100,9 +1213,99 @@ Responde estrictamente en JSON:
         </div>`,
     });
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, tipo_servicio: tipoServicio });
   } catch (error) {
     console.error('❌ Error analyzeProject:', error);
     return res.status(500).json({ success: false, error: 'No se pudo generar el análisis.' });
+  }
+};
+// ============================================================
+//  AUTORIZACIÓN DE PENTEST: el cliente firma y se envía a info@puma-code.com
+// ============================================================
+const EMAIL_AUTORIZACION = process.env.EMAIL_AUTORIZACION || 'info@puma-code.com';
+const MAX_FIELD = 600;
+const trimField = (v) => String(v ?? '').slice(0, MAX_FIELD).trim();
+
+exports.submitAuthorization = async (req, res) => {
+  try {
+    const { userData, authorization, signature, language } = req.body || {};
+
+    // Validación de contacto
+    if (!userData || !isValidEmail(userData.email) || typeof userData.name !== 'string' || !userData.name.trim()) {
+      return res.status(400).json({ success: false, error: 'Datos de contacto inválidos.' });
+    }
+
+    // La firma debe ser una imagen PNG en data URL y de tamaño razonable
+    const sig = typeof signature === 'string' ? signature : '';
+    if (!sig.startsWith('data:image/png;base64,') || sig.length > 900000) {
+      return res.status(400).json({ success: false, error: 'Firma inválida o demasiado grande.' });
+    }
+
+    const a = authorization || {};
+    // El consentimiento explícito es obligatorio
+    if (a.acepta !== true) {
+      return res.status(400).json({ success: false, error: 'Falta el consentimiento de autorización.' });
+    }
+
+    const clientName = trimField(userData.name);
+    const campos = {
+      razonSocial: trimField(a.razonSocial),
+      cuitDni: trimField(a.cuitDni),
+      domicilio: trimField(a.domicilio),
+      sistemas: trimField(a.sistemas),
+      ventana: trimField(a.ventana),
+      firmante: trimField(a.firmante) || clientName,
+    };
+
+    const base64 = sig.replace(/^data:image\/png;base64,/, '');
+    const fecha = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+    const row = (label, value) => `
+      <tr style="border-bottom:1px solid #e5e7eb;">
+        <td style="padding:8px 0; color:#6b7280; font-size:13px; width:38%;">${escapeHtml(label)}</td>
+        <td style="padding:8px 0; color:#111827; font-size:13px; font-weight:bold;">${escapeHtml(value || '—')}</td>
+      </tr>`;
+
+    await resend.emails.send({
+      from: 'Puma Code <onboarding@resend.dev>',
+      to: EMAIL_AUTORIZACION,
+      replyTo: userData.email,
+      subject: `🛡️✅ Autorización de pentest FIRMADA · ${escapeHtml(campos.razonSocial || clientName)}`,
+      attachments: [{ filename: 'firma.png', content: base64, content_id: 'firma.png' }],
+      html: `
+        <div style="font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 620px; margin: 0 auto; color: #111827;">
+          <div style="background: linear-gradient(135deg,#047857,#059669); padding: 24px; border-radius: 16px 16px 0 0;">
+            <p style="margin:0; color:#a7f3d0; font-size:11px; font-weight:bold; letter-spacing:2px; text-transform:uppercase;">🐆 Puma Code · Ciberseguridad</p>
+            <h1 style="margin:6px 0 0; color:#fff; font-size:22px;">Autorización de pentest firmada</h1>
+          </div>
+          <div style="padding:24px; background:#fff; border:1px solid #e2e8f0; border-top:none; border-radius:0 0 16px 16px;">
+            <p style="margin:0 0 16px; color:#475569; font-size:14px; line-height:1.6;">
+              El cliente completó y firmó la autorización para realizar el penetration test. Queda como respaldo del consentimiento antes de iniciar las pruebas.
+            </p>
+            <table style="width:100%; border-collapse:collapse;">
+              ${row('Cliente (contacto)', clientName)}
+              ${row('Email', userData.email)}
+              ${row('Razón social / Nombre', campos.razonSocial)}
+              ${row('CUIT / DNI', campos.cuitDni)}
+              ${row('Domicilio', campos.domicilio)}
+              ${row('Sistemas autorizados', campos.sistemas)}
+              ${row('Ventana de pruebas', campos.ventana)}
+              ${row('Firmante', campos.firmante)}
+              ${row('Fecha de firma', fecha)}
+              ${row('Consentimiento', 'ACEPTADO ✅')}
+            </table>
+            <p style="margin:18px 0 6px; color:#6b7280; font-size:12px; font-weight:bold;">Firma:</p>
+            <img src="cid:firma.png" alt="Firma del cliente" style="max-width:320px; border:1px solid #e5e7eb; border-radius:8px; background:#fff;" />
+            <p style="margin:18px 0 0; font-size:11px; color:#9ca3af; line-height:1.5;">
+              Documento generado desde el chat de puma-code.com. La firma adjunta (firma.png) y estos datos constituyen el consentimiento del titular para la evaluación de seguridad.
+            </p>
+          </div>
+        </div>`,
+    });
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('❌ Error submitAuthorization:', error);
+    return res.status(500).json({ success: false, error: 'No se pudo enviar la autorización.' });
   }
 };

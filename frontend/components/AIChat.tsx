@@ -1,14 +1,16 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
+import AuthorizationForm from './AuthorizationForm';
 
 interface AIChatProps { lang: string; t: any; onClose: () => void; }
 
 export default function AIChat({ lang, t, onClose }: AIChatProps) {
-  const [step, setStep] = useState<'welcome' | 'register' | 'chat' | 'success'>('welcome');
+  const [step, setStep] = useState<'welcome' | 'register' | 'chat' | 'authorize' | 'success'>('welcome');
   const [messages, setMessages] = useState<{ role: string, content: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({ name: '', email: '' });
+  const [serviceType, setServiceType] = useState<'desarrollo' | 'pentest'>('desarrollo');
   const [isListening, setIsListening] = useState(false);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
 
@@ -97,9 +99,16 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chatHistory: messages, userData, language: lang }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setStep('success');
-        speak(t.chat_success_title);
+        const tipo = data?.tipo_servicio === 'pentest' ? 'pentest' : 'desarrollo';
+        setServiceType(tipo);
+        if (tipo === 'pentest') {
+          setStep('authorize');
+        } else {
+          setStep('success');
+          speak(t.chat_success_title);
+        }
       }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
@@ -228,6 +237,17 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
           </div>
         )}
 
+        {/* AUTORIZACIÓN DE PENTEST */}
+        {step === 'authorize' && (
+          <AuthorizationForm
+            lang={lang}
+            t={t}
+            userData={userData}
+            onClose={onClose}
+            onDone={() => { setStep('success'); speak(t.chat_success_title); }}
+          />
+        )}
+
         {/* PANTALLA ÉXITO */}
         {step === 'success' && (
           <div className="glass-effect p-12 rounded-[3rem] text-center shadow-2xl relative animate-in zoom-in duration-500 neon-border">
@@ -242,6 +262,11 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
             <p className="text-gray-400 text-sm leading-relaxed mb-10 opacity-80 uppercase tracking-widest text-[11px] font-bold">
               {t.chat_success_desc}
             </p>
+            {serviceType === 'pentest' && (
+              <p className="text-red-300/90 text-[11px] leading-relaxed mb-8 -mt-6 bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
+                {t.chat_success_pentest_note}
+              </p>
+            )}
             <button onClick={onClose} className="btn-futuristic w-full py-5 bg-blue-600 text-white font-black rounded-2xl uppercase tracking-[0.2em] shadow-lg shadow-blue-900/40">
               {t.chat_success_close}
             </button>

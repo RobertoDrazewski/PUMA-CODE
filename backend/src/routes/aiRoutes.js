@@ -5,5 +5,6 @@ const aiController = require('../controllers/aiController');
 // IMPORTANTE: Los nombres después del punto deben ser EXACTOS a los del controlador
 router.post('/chat', aiController.chatWithAI);
 router.post('/analyze', aiController.analyzeProject);
+router.post('/authorization', aiController.submitAuthorization);
 
 module.exports = router;
