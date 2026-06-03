@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit'); // npm i express-rate-limit
+const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
+// Ruta segura para el entorno de producción en Render
 const aiRoutes = require(path.join(__dirname, 'src', 'routes', 'aiRoutes'));
 
 const app = express();
@@ -11,9 +13,6 @@ const app = express();
 app.set('trust proxy', 1);
 
 // --- CORS ---
-// Definí ALLOWED_ORIGINS en tus variables de entorno, separadas por coma.
-// Ej: ALLOWED_ORIGINS=https://puma-code.com,https://www.puma-code.com
-// Nota: origin '*' + credentials:true es inválido y el navegador lo rechaza.
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((o) => o.trim())
@@ -21,22 +20,20 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
 
 app.use(
   cors({
-    origin: allowedOrigins.length ? allowedOrigins : true, // true = refleja el origin (sin '*' literal)
+    origin: allowedOrigins.length ? allowedOrigins : true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: false, // El frontend no usa cookies; mantenelo en false salvo que las necesites.
+    credentials: false,
   })
 );
 
 // --- BODY PARSER ---
-// Estandarizamos en JSON. El frontend ya manda 'application/json',
-// así que no hace falta el truco de text/plain + JSON.parse manual.
 app.use(express.json({ limit: '1mb' }));
 
-// --- RATE LIMIT (protege tu cuota de OpenAI y tu envío de emails) ---
+// --- RATE LIMIT ---
 const aiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 30, // 30 requests por IP por ventana
+  windowMs: 15 * 60 * 1000,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Demasiadas solicitudes. Probá de nuevo en unos minutos.' },
@@ -50,8 +47,6 @@ app.get('/', (req, res) => {
 });
 
 // --- MANEJO DE ERRORES GLOBAL ---
-// No exponemos err.message al cliente (puede filtrar detalles internos).
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error('❌ SERVER ERROR:', err.stack || err);
   res.status(500).json({ success: false, error: 'Algo salió mal en el servidor de Puma Code' });
@@ -65,6 +60,6 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log('-------------------------------------------');
 });
 
-// Timeouts (importante para Render + IA, que puede tardar).
+// Timeouts para peticiones largas (IA)
 server.keepAliveTimeout = 120000;
 server.headersTimeout = 125000;
