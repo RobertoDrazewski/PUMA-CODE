@@ -2,12 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs'); // Importamos para diagnosticar
 require('dotenv').config();
 
-// Ruta segura para el entorno de producción en Render
-const aiRoutes = require(path.join(__dirname, 'src', 'routes', 'aiRoutes'));
+// --- DIAGNÓSTICO ---
+const rutaAi = path.join(__dirname, 'src', 'routes', 'aiRoutes.js');
+console.log('--- DIAGNÓSTICO DE RUTA ---');
+console.log('Directorio actual (__dirname):', __dirname);
+console.log('¿Existe el archivo aiRoutes.js en:', rutaAi, '?', fs.existsSync(rutaAi));
+console.log('---------------------------');
+
+// Si esto falla, el archivo no existe donde crees que existe
+const aiRoutes = require(rutaAi);
 
 const app = express();
+// ... resto de tu código
 
 // Render/Proxy: necesario para que el rate-limit lea la IP real.
 app.set('trust proxy', 1);
