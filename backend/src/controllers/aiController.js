@@ -113,6 +113,111 @@ const buildPlanes = (totalArs) => ({
   plan6: { total: totalArs * (1 + RECARGO_6_CUOTAS), cuota: (totalArs * (1 + RECARGO_6_CUOTAS)) / 6, recargo: `${RECARGO_6_CUOTAS * 100}%` },
 });
 
+// --- PLANES FIJOS DE PENTEST (según propuesta de ciberseguridad de Puma Code) ---
+const PENTEST_PLANES = { basico: 80, profesional: 180, enterprise: 420 };
+const PENTEST_DIAS = { basico: 5, profesional: 7, enterprise: 10 };
+const PENTEST_MONITOREO_USD = 80; // por mes
+const normalizePlan = (p) => {
+  const v = String(p || '').toLowerCase();
+  if (v.includes('enter')) return 'enterprise';
+  if (v.includes('prof')) return 'profesional';
+  return 'basico';
+};
+// Contenido de cada plan por idioma (es/en/pt; el resto hereda inglés).
+const PENTEST_INFO = {
+  es: {
+    nombres: { basico: 'Plan Básico', profesional: 'Plan Profesional', enterprise: 'Plan Enterprise' },
+    incluye: {
+      basico: [
+        'Reconocimiento pasivo completo (WHOIS, DNS, infraestructura)',
+        'Identificación de tecnologías y versiones expuestas',
+        'Análisis de cabeceras HTTP y configuración de seguridad',
+        'Informe técnico con hallazgos y recomendaciones',
+      ],
+      profesional: [
+        'Todo lo del Plan Básico',
+        'Escaneo activo de vulnerabilidades (nikto, wpscan)',
+        'Enumeración de plugins, temas y usuarios',
+        'Análisis de API REST y endpoints expuestos',
+        'Verificación de versiones desactualizadas',
+        'Informe con nivel de severidad por hallazgo',
+        'Retest de verificación tras las correcciones',
+      ],
+      enterprise: [
+        'Todo lo del Plan Profesional',
+        'Análisis de lógica de negocio y flujos de autenticación',
+        'Evaluación de componentes de IA integrados',
+        'Pruebas de control de acceso y gestión de sesiones',
+        'Análisis de configuración del servidor y SSL',
+        'Informe ejecutivo + informe técnico detallado',
+        'Retest incluido hasta 60 días desde la entrega',
+        'Soporte post-entrega por 30 días',
+      ],
+    },
+  },
+  en: {
+    nombres: { basico: 'Basic Plan', profesional: 'Professional Plan', enterprise: 'Enterprise Plan' },
+    incluye: {
+      basico: [
+        'Full passive reconnaissance (WHOIS, DNS, infrastructure)',
+        'Identification of exposed technologies and versions',
+        'HTTP headers and security configuration analysis',
+        'Technical report with findings and recommendations',
+      ],
+      profesional: [
+        'Everything in the Basic Plan',
+        'Active vulnerability scanning (nikto, wpscan)',
+        'Enumeration of plugins, themes and users',
+        'REST API and exposed endpoints analysis',
+        'Outdated versions check',
+        'Report with severity level per finding',
+        'Verification retest after fixes',
+      ],
+      enterprise: [
+        'Everything in the Professional Plan',
+        'Business logic and authentication flow analysis',
+        'Evaluation of integrated AI components',
+        'Access control and session management testing',
+        'Server configuration and SSL analysis',
+        'Executive report + detailed technical report',
+        'Retest included up to 60 days after delivery',
+        'Post-delivery support for 30 days',
+      ],
+    },
+  },
+  pt: {
+    nombres: { basico: 'Plano Básico', profesional: 'Plano Profissional', enterprise: 'Plano Enterprise' },
+    incluye: {
+      basico: [
+        'Reconhecimento passivo completo (WHOIS, DNS, infraestrutura)',
+        'Identificação de tecnologias e versões expostas',
+        'Análise de cabeçalhos HTTP e configuração de segurança',
+        'Relatório técnico com achados e recomendações',
+      ],
+      profesional: [
+        'Tudo do Plano Básico',
+        'Varredura ativa de vulnerabilidades (nikto, wpscan)',
+        'Enumeração de plugins, temas e usuários',
+        'Análise de API REST e endpoints expostos',
+        'Verificação de versões desatualizadas',
+        'Relatório com nível de severidade por achado',
+        'Reteste de verificação após as correções',
+      ],
+      enterprise: [
+        'Tudo do Plano Profissional',
+        'Análise de lógica de negócio e fluxos de autenticação',
+        'Avaliação de componentes de IA integrados',
+        'Testes de controle de acesso e gestão de sessões',
+        'Análise de configuração do servidor e SSL',
+        'Relatório executivo + relatório técnico detalhado',
+        'Reteste incluído até 60 dias após a entrega',
+        'Suporte pós-entrega por 30 dias',
+      ],
+    },
+  },
+};
+const pentestInfo = (lang) => PENTEST_INFO[lang] || PENTEST_INFO.en;
+
 // ============================================================
 //  TEXTOS DEL PRESUPUESTO (i18n) — el mail se escribe en el idioma del chat
 // ============================================================
@@ -169,12 +274,12 @@ const T = {
     chatTitle: '💬 Conversación con nuestro asistente',
     assistantName: 'Puma Code IA',
     footer: 'Puma Code · Software a medida · Mendoza, Argentina — info@puma-code.com',
-    secIncludedNote: 'Cada entrega de Puma Code incluye un test de seguridad (pentest) del sistema final, sin costo adicional.',
+    secIncludedNote: 'Cada entrega de Puma Code incluye de regalo un test de seguridad (pentest Plan Básico) del sistema final, sin costo adicional.',
     pentestReportTitle: 'Evaluación de Seguridad — Propuesta de Pentest',
     pentestIntro: (proj) => `Esta es tu propuesta de penetration test para <b>${proj}</b>. Abajo tenés qué evaluamos, qué te entregamos, la inversión y el paso de autorización que necesitamos antes de arrancar.`,
     pentestScopeTitle: '🔍 Qué evaluamos',
     pentestInvestTitle: '💰 Inversión — pentest (pago único)',
-    pentestIncludedNote: 'Incluye un re-test de verificación tras la remediación. Sin mensualidades a Puma Code por el análisis.',
+    pentestIncludedNote: 'El alcance y los entregables corresponden al plan elegido. Sin mensualidades obligatorias a Puma Code.',
     pentestDeliverTitle: '📑 Qué te entregamos',
     pentestDeliverBullets: [
       'Un informe ejecutivo con cada hallazgo, su severidad y el impacto real para tu negocio.',
@@ -185,6 +290,9 @@ const T = {
     pentestAuthTitle: '🛡️ Autorización necesaria antes de arrancar',
     pentestAuthText: 'Un penetration test requiere tu autorización por escrito. Justo después de esta solicitud podés completar y firmar el formulario de autorización; una vez firmado se envía a info@puma-code.com para que quede registrado tu consentimiento antes de iniciar cualquier prueba.',
     pentestWhyTitle: '📈 Por qué esto protege tu negocio',
+    businessDays: 'días hábiles',
+    pentestMonitoreoTitle: '🛰️ Opcional: monitoreo mensual',
+    pentestMonitoreoText: 'Vigilancia continua para sitios en producción (actualizaciones pendientes, nuevas vulnerabilidades, alerta temprana e informe mensual de estado):',
   },
   en: {
     reportTitle: 'Proposal & Quote',
@@ -238,12 +346,12 @@ const T = {
     chatTitle: '💬 Conversation with our assistant',
     assistantName: 'Puma Code AI',
     footer: 'Puma Code · Custom software · Mendoza, Argentina — info@puma-code.com',
-    secIncludedNote: 'Every Puma Code delivery includes a security test (pentest) of the final system at no extra cost.',
+    secIncludedNote: 'Every Puma Code delivery includes a Basic-plan security test (pentest) of the final system as a gift — at no extra cost.',
     pentestReportTitle: 'Security Assessment — Pentest Proposal',
     pentestIntro: (proj) => `Here is your penetration test proposal for <b>${proj}</b>. Below you'll find what we evaluate, what you receive, the investment and the authorization step we need before starting.`,
     pentestScopeTitle: '🔍 What we evaluate',
     pentestInvestTitle: '💰 Investment — pentest (one-time payment)',
-    pentestIncludedNote: 'Includes one verification re-test after remediation. No monthly fees to Puma Code for the assessment.',
+    pentestIncludedNote: 'Scope and deliverables match the selected plan. No mandatory monthly fees to Puma Code.',
     pentestDeliverTitle: '📑 What you receive',
     pentestDeliverBullets: [
       'An executive report with every finding, its severity and clear business impact.',
@@ -254,6 +362,9 @@ const T = {
     pentestAuthTitle: '🛡️ Authorization required before we start',
     pentestAuthText: 'A penetration test requires your written authorization. Right after this request you can fill in and sign the authorization form; once signed it is sent to info@puma-code.com so we have your consent on record before any testing begins.',
     pentestWhyTitle: '📈 Why this protects your business',
+    businessDays: 'business days',
+    pentestMonitoreoTitle: '🛰️ Optional: monthly monitoring',
+    pentestMonitoreoText: 'Continuous monitoring for sites in production (pending updates, new vulnerabilities, early alerts and a monthly status report):',
   },
   pt: {
     reportTitle: 'Proposta & Orçamento',
@@ -307,12 +418,12 @@ const T = {
     chatTitle: '💬 Conversa com nosso assistente',
     assistantName: 'Puma Code IA',
     footer: 'Puma Code · Software sob medida · Mendoza, Argentina — info@puma-code.com',
-    secIncludedNote: 'Cada entrega da Puma Code inclui um teste de segurança (pentest) do sistema final, sem custo adicional.',
+    secIncludedNote: 'Cada entrega da Puma Code inclui de presente um teste de segurança (pentest Plano Básico) do sistema final, sem custo adicional.',
     pentestReportTitle: 'Avaliação de Segurança — Proposta de Pentest',
     pentestIntro: (proj) => `Esta é sua proposta de penetration test para <b>${proj}</b>. Abaixo você encontra o que avaliamos, o que entregamos, o investimento e a etapa de autorização que precisamos antes de começar.`,
     pentestScopeTitle: '🔍 O que avaliamos',
     pentestInvestTitle: '💰 Investimento — pentest (pagamento único)',
-    pentestIncludedNote: 'Inclui um re-teste de verificação após a remediação. Sem mensalidades à Puma Code pela análise.',
+    pentestIncludedNote: 'O escopo e os entregáveis correspondem ao plano escolhido. Sem mensalidades obrigatórias à Puma Code.',
     pentestDeliverTitle: '📑 O que entregamos',
     pentestDeliverBullets: [
       'Um relatório executivo com cada achado, sua severidade e o impacto real para o seu negócio.',
@@ -323,6 +434,9 @@ const T = {
     pentestAuthTitle: '🛡️ Autorização necessária antes de começar',
     pentestAuthText: 'Um penetration test requer sua autorização por escrito. Logo após esta solicitação você pode preencher e assinar o formulário de autorização; uma vez assinado, ele é enviado a info@puma-code.com para que seu consentimento fique registrado antes de iniciar qualquer teste.',
     pentestWhyTitle: '📈 Por que isso protege o seu negócio',
+    businessDays: 'dias úteis',
+    pentestMonitoreoTitle: '🛰️ Opcional: monitoramento mensal',
+    pentestMonitoreoText: 'Vigilância contínua para sites em produção (atualizações pendentes, novas vulnerabilidades, alerta antecipado e relatório mensal de status):',
   },
   it: {
     reportTitle: 'Proposta & Preventivo',
@@ -911,12 +1025,14 @@ MÉTODO DE PRECIO — DESARROLLO (en USD, mercado internacional):
 - A partir de la base, SUMÁ por cada herramienta, módulo o integración con IA, según el mercado internacional. Guía aproximada por ítem: panel de administración +300/600; gestión de stock/flota/inventario +400/800; reservas/turnos +400/700; pagos online +300/600; multi-idioma +150/300; integración con mapas/APIs externas +200/500; cada integración o función con IA +400/900; reportes/analítica +300/600; app móvil +600/1.500.
 - Calculá un MONTO EXACTO sumando base + ítems detectados en el chat.
 
-MÉTODO DE PRECIO — PENTEST / SEGURIDAD (en USD, mercado internacional):
-- BASE: USD 1.500 para un análisis de un sitio o app chico (una landing o pocas funciones, sin login).
-- A partir de la base, SUMÁ según la superficie de ataque a evaluar. Guía aproximada por ítem: autenticación / login / roles +400/800; panel de administración o dashboard +400/800; API pública o endpoints expuestos +500/1.000; pagos online o datos sensibles +400/900; auditoría de componente con IA / chatbot (prompt injection, fuga de datos) +500/1.200; infraestructura / cloud / múltiples servidores +600/1.500; app móvil +800/2.000.
-- El pentest incluye UN re-test de verificación tras la remediación. Si el cliente pide acompañar la remediación o re-tests extra, sumá +25/35% sobre el total.
-- En "tecnologias" listá las herramientas/áreas del análisis (ej: "Reconocimiento", "Análisis de vulnerabilidades web", "Auditoría de IA", "Hardening de infraestructura", "Informe ejecutivo").
-- El monto de un pentest nunca baja de USD 1.500.
+MÉTODO DE PRECIO — PENTEST / SEGURIDAD (planes fijos de Puma Code, en USD):
+- Elegí UNO de estos tres planes según el sitio del cliente y devolvelo en "plan_pentest":
+  · "basico" (USD 80): sitios vitrina y landing pages, sin login ni pagos.
+  · "profesional" (USD 180): tiendas online, WordPress y sitios con login / usuarios.
+  · "enterprise" (USD 420): e-commerce con pagos, apps con usuarios y datos sensibles, o sistemas con componentes de IA.
+- "monitoreo_mensual": true SOLO si el cliente tiene un sitio en producción y le interesa vigilancia continua (USD 80/mes). Si no, false.
+- presupuesto_usd: poné el valor exacto del plan elegido (80, 180 o 420). El sistema igual fija el precio según el plan.
+- En "tecnologias" listá a alto nivel las áreas del análisis (ej: "Reconocimiento", "Vulnerabilidades web", "Auditoría de IA", "Configuración y SSL", "Informe").
 
 AJUSTE POR PERFIL:
 - LOCAL (pymes/emprendimientos de Mendoza/Argentina): acomodá el precio al bolsillo de una empresa chica. Si es algo simple o que ya tenemos hecho, quedate cerca de la base (USD 1.200) o moderado.
@@ -940,6 +1056,8 @@ Responde estrictamente en JSON:
 {
   "nombre_proyecto": "string",
   "tipo_servicio": "desarrollo | pentest",
+  "plan_pentest": "basico | profesional | enterprise",
+  "monitoreo_mensual": false,
   "perfil_cliente": "Local Mendoza" | "Global Estándar",
   "resumen_pactado": "Resumen detallado de funciones solicitadas, redactado claro para el cliente y en su idioma",
   "tecnologias": ["lista"],
@@ -970,18 +1088,29 @@ Responde estrictamente en JSON:
     const esPentest = tipoRaw.includes('pent') || tipoRaw.includes('segur') || tipoRaw.includes('security');
     const tipoServicio = esPentest ? 'pentest' : 'desarrollo';
 
+    // Plan fijo de pentest (precio y plazo según la propuesta de ciberseguridad).
+    const planPent = normalizePlan(analysis.plan_pentest);
+    const quiereMonitoreo = analysis.monitoreo_mensual === true;
+    const pentestDias = PENTEST_DIAS[planPent];
+
     // Idioma del mail: el del chat (con respaldo al inglés). Local sin idioma soportado -> es; global -> en.
     const L = pickT(language, esLocal);
     const clientName = String(userData.name).trim();
     const proyecto = analysis.nombre_proyecto || (esLocal ? 'tu proyecto' : 'your project');
 
-    // Monto EXACTO (un solo valor). Nunca por debajo de 1200.
-    const usd = Math.max(1200, Math.round(Number(analysis.presupuesto_usd) || 1200));
+    // Monto EXACTO. Desarrollo: nunca por debajo de 1200. Pentest: precio fijo del plan.
+    const usd = esPentest
+      ? PENTEST_PLANES[planPent]
+      : Math.max(1200, Math.round(Number(analysis.presupuesto_usd) || 1200));
 
-    // Semanas: entero entre 1 y 4 (máximo de entrega).
+    // Semanas: entero entre 1 y 4 (máximo de entrega) — para desarrollo.
     const wkMatch = String(analysis.tiempo_entrega || '').match(/\d+/);
     const weeksNum = Math.min(4, Math.max(1, wkMatch ? parseInt(wkMatch[0], 10) : 2));
     const weeksDisplay = String(weeksNum);
+
+    // Plazo a mostrar en el bloque de precio: semanas (desarrollo) o días hábiles (pentest).
+    const plazoValue = esPentest ? String(pentestDias) : weeksDisplay;
+    const plazoUnit = esPentest ? L.businessDays : L.weeks;
 
     const railwayUsd = RAILWAY_USD_MES; // fijo, plan estándar
     const openaiUsd = numOr(analysis.costo_openai_usd_mensual, FALLBACK_OPENAI_USD_MES);
@@ -1005,7 +1134,7 @@ Responde estrictamente en JSON:
       precioHtml = `
         <div style="margin-top: 14px;">
           <span style="font-size: 24px; font-weight: 900; color: #059669;">${escapeHtml(fmtARS(ars))}</span>
-          <span style="margin-left: 8px; color: #64748b; font-size: 13px;">| ${escapeHtml(L.contado)} · ${escapeHtml(L.plazoLabel)}: ${escapeHtml(weeksDisplay)} ${escapeHtml(L.weeks)}</span>
+          <span style="margin-left: 8px; color: #64748b; font-size: 13px;">| ${escapeHtml(L.contado)} · ${escapeHtml(L.plazoLabel)}: ${escapeHtml(plazoValue)} ${escapeHtml(plazoUnit)}</span>
         </div>
         <p style="margin: 6px 0 0; font-size: 11px; color: #94a3b8;">
           ${escapeHtml(L.equivale)} ${escapeHtml(fmtUSD(usd))} · ${escapeHtml(L.tcLabel)}: ${escapeHtml(fmtARS(dolar.value))}${dolar.fallback ? escapeHtml(L.fallbackTC) : ''}
@@ -1033,7 +1162,7 @@ Responde estrictamente en JSON:
       precioHtml = `
         <div style="margin-top: 14px;">
           <span style="font-size: 26px; font-weight: 900; color: #059669;">${escapeHtml(fmtUSD(usd))}</span>
-          <span style="margin-left: 10px; color: #64748b; font-size: 13px;">| ${escapeHtml(L.plazoLabel)}: ${escapeHtml(weeksDisplay)} ${escapeHtml(L.weeks)}</span>
+          <span style="margin-left: 10px; color: #64748b; font-size: 13px;">| ${escapeHtml(L.plazoLabel)}: ${escapeHtml(plazoValue)} ${escapeHtml(plazoUnit)}</span>
         </div>
         <p style="margin: 10px 0 0; font-size: 12px; color: #475569;">${L.pago5050(escapeHtml(fmtUSD(anticipo)))}</p>`;
     }
@@ -1109,8 +1238,17 @@ Responde estrictamente en JSON:
     //  RAMA PENTEST: presupuesto separado (mismo sistema de pago/dólar)
     // ============================================================
     if (esPentest) {
-      const pentestSubject = `🛡️ Pentest · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
-      const deliverHtml = (L.pentestDeliverBullets || []).map((b) => `<li>${b}</li>`).join('');
+      const pinfo = pentestInfo(language);
+      const planNombre = pinfo.nombres[planPent];
+      const pentestSubject = `🛡️ Pentest · ${escapeHtml(planNombre)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
+      const deliverHtml = (pinfo.incluye[planPent] || []).map((b) => `<li>${escapeHtml(b)}</li>`).join('');
+      const monitoreoHtml = quiereMonitoreo
+        ? `
+              <div style="padding: 16px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; margin: 18px 0;">
+                <p style="margin: 0 0 6px; color: #1d4ed8; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestMonitoreoTitle)}</p>
+                <p style="margin: 0; color: #1e3a8a; font-size: 13px; line-height: 1.6;">${escapeHtml(L.pentestMonitoreoText)} <b>${dual(PENTEST_MONITOREO_USD)} ${escapeHtml(L.perMonth)}</b>.</p>
+              </div>`
+        : '';
 
       await resend.emails.send({
         from: 'Puma Code <onboarding@resend.dev>',
@@ -1134,6 +1272,7 @@ Responde estrictamente en JSON:
 
               <div style="padding: 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; margin: 18px 0;">
                 <p style="margin: 0; color: #111827; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestInvestTitle)}</p>
+                <p style="margin: 2px 0 0; color: #b91c1c; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(planNombre)}</p>
                 ${precioHtml}
                 <p style="margin: 12px 0 0; font-size: 11px; color: #64748b; line-height: 1.5;">✅ ${escapeHtml(L.pentestIncludedNote)}</p>
               </div>
@@ -1142,6 +1281,7 @@ Responde estrictamente en JSON:
                 <p style="margin: 0 0 8px; color: #1d4ed8; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestDeliverTitle)}</p>
                 <ul style="margin: 0; padding-left: 18px; color: #1e3a8a; font-size: 13px; line-height: 1.7;">${deliverHtml}</ul>
               </div>
+              ${monitoreoHtml}
 
               <div style="padding: 16px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; margin: 18px 0;">
                 <p style="margin: 0 0 6px; color: #c2410c; font-weight: bold; font-size: 15px;">${escapeHtml(L.pentestAuthTitle)}</p>
