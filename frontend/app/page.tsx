@@ -18,56 +18,38 @@ const ArrowRight = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
-/* ---------- Tarjeta de servicio (con imagen expandible) ---------- */
+/* ---------- Tarjeta de servicio (imagen fija + descripción, grid uniforme) ---------- */
 const ServiceCard = ({ num, icon, t, fileName }: any) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   return (
-    <div
-      onClick={() => setIsExpanded(!isExpanded)}
-      className={`group p-8 rounded-[2.5rem] bg-gradient-to-br from-white/5 to-transparent border transition-all duration-500 cursor-pointer overflow-hidden ${
-        isExpanded
-          ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_40px_rgba(37,99,235,0.15)]'
-          : 'border-white/10 hover:border-blue-500/50 hover:-translate-y-2'
-      }`}
-    >
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between mb-4">
-          <div className={`text-5xl transition-all duration-500 ${isExpanded ? 'scale-110 grayscale-0' : 'grayscale group-hover:grayscale-0'}`}>
-            {icon}
-          </div>
-          <div className={`text-blue-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-          </div>
+    <div className="group relative flex flex-col p-6 md:p-8 rounded-[2.5rem] bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-blue-500/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden hover:shadow-[0_0_40px_rgba(37,99,235,0.15)]">
+      {/* Glow decorativo al pasar el mouse */}
+      <div className="pointer-events-none absolute -right-12 -top-12 w-44 h-44 bg-blue-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+      <div className="relative flex items-center justify-between mb-5">
+        {/* Efecto del icono: gris -> color + leve zoom al hover (conservado) */}
+        <div className="text-5xl transition-all duration-500 grayscale group-hover:grayscale-0 group-hover:scale-110">
+          {icon}
         </div>
+        <span className="text-[11px] font-black text-blue-500/40 tracking-[0.3em] tabular-nums">0{num}</span>
+      </div>
 
-        <h3 className={`text-2xl font-bold mb-2 transition-colors ${isExpanded ? 'text-blue-400' : 'group-hover:text-blue-400'}`}>
-          {t[`s${num}_title`]}
-        </h3>
+      <h3 className="relative text-xl md:text-2xl font-bold mb-3 group-hover:text-blue-400 transition-colors">
+        {t[`s${num}_title`]}
+      </h3>
 
-        <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0'}`}>
-          <div className="overflow-hidden">
-            <p className="text-gray-400 leading-relaxed text-sm md:text-base mb-6">
-              {t[`s${num}_desc`]}
-            </p>
+      <p className="relative text-gray-400 leading-relaxed text-sm mb-6 flex-1">
+        {t[`s${num}_desc`]}
+      </p>
 
-            <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/${fileName}.PNG`}
-                alt={t[`s${num}_title`]}
-                loading="lazy"
-                className="w-full h-auto object-cover transform transition-transform duration-700 hover:scale-105"
-              />
-            </div>
-          </div>
-        </div>
-
-        {!isExpanded && (
-          <p className="text-gray-400 text-sm leading-relaxed mt-1 line-clamp-2">
-            {t[`s${num}_desc`]}
-          </p>
-        )}
+      {/* Imagen fija, siempre visible, con relación de aspecto uniforme */}
+      <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50 aspect-[16/10]">
+        <img
+          src={`/${fileName}.PNG`}
+          alt={t[`s${num}_title`]}
+          loading="lazy"
+          className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       </div>
     </div>
   );

@@ -162,3 +162,59 @@
 /* --- Ajuste para Safe Areas --- */
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 .pt-safe { padding-top: env(safe-area-inset-top); }
+/* ===========================================================
+   MEJORAS ESTÉTICAS (v2) — efectos sutiles, móvil + laptop
+   =========================================================== */
+
+/* Resplandor ambiental: da profundidad detrás del contenido sin saturar */
+body::before {
+  content: "";
+  position: fixed;
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90vw;
+  max-width: 1100px;
+  height: 70vh;
+  background: radial-gradient(closest-side, rgba(37, 99, 235, 0.14), transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(30px);
+}
+@media (max-width: 768px) {
+  body::before { height: 45vh; background: radial-gradient(closest-side, rgba(37, 99, 235, 0.10), transparent 72%); }
+}
+
+/* Neon-border un poco más vivo y con respiración muy sutil */
+.neon-border::after {
+  opacity: 0.35;
+  animation: neonBreath 6s ease-in-out infinite;
+}
+@keyframes neonBreath {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.45; }
+}
+
+/* Tarjetas con leve elevación reutilizable (opcional) */
+.lift {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+}
+.lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px var(--primary-glow);
+}
+
+/* Aparición suave de imágenes al cargar */
+/* (Se omite una animación global en <img> para no pisar los efectos de hover
+   con transform de las tarjetas; el zoom al pasar el mouse se conserva.) */
+
+/* Respeto por usuarios que prefieren menos movimiento (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  section { opacity: 1 !important; }
+}

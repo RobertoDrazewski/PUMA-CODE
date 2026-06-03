@@ -122,10 +122,16 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
     </button>
   );
 
+  // Tocar el fondo solo cierra en pasos sin datos cargados (bienvenida/éxito).
+  // En registro, chat y autorización se ignora para no perder lo escrito.
+  const handleBackdrop = () => {
+    if (step === 'welcome' || step === 'success') onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
       {/* Overlay con blur profundo */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-[20px]" onClick={onClose}></div>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-[20px]" onClick={handleBackdrop}></div>
       
       <div className="relative z-[10000] w-full max-w-md mx-auto" onClick={(e) => e.stopPropagation()}>
         
