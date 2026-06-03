@@ -3,7 +3,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit'); // npm i express-rate-limit
 require('dotenv').config();
 
-const aiRoutes = require('./src/routes/aiRoutes');
+const aiRoutes = require(path.join(__dirname, 'src', 'routes', 'aiRoutes'));
 
 const app = express();
 
