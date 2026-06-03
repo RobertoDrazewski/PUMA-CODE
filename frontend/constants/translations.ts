@@ -522,6 +522,10 @@ const pt: Dict = {
 // las claves de marketing nuevas (process_*, industries_*, ai_*, case_*, etc.).
 const it: Dict = {
   nav_home: "Inizio",
+  nav_process: "Processo",
+  nav_industries: "Settori",
+  nav_security: "Sicurezza",
+  nav_cases: "Casi",
   nav_services: "Servizi",
   nav_contact: "Contatto",
   hero_badge: "Software Factory · Servizio Globale",
@@ -561,6 +565,10 @@ const it: Dict = {
 
 const ca: Dict = {
   nav_home: "Inici",
+  nav_process: "Procés",
+  nav_industries: "Indústries",
+  nav_security: "Seguretat",
+  nav_cases: "Casos",
   nav_services: "Serveis",
   nav_contact: "Contacte",
   hero_badge: "Software Factory · Servei Global",
@@ -600,6 +608,10 @@ const ca: Dict = {
 
 const de: Dict = {
   nav_home: "Startseite",
+  nav_process: "Ablauf",
+  nav_industries: "Branchen",
+  nav_security: "Sicherheit",
+  nav_cases: "Referenzen",
   nav_services: "Leistungen",
   nav_contact: "Kontakt",
   hero_badge: "Software Factory · Weltweiter Service",
@@ -639,6 +651,10 @@ const de: Dict = {
 
 const ru: Dict = {
   nav_home: "Главная",
+  nav_process: "Процесс",
+  nav_industries: "Отрасли",
+  nav_security: "Безопасность",
+  nav_cases: "Кейсы",
   nav_services: "Услуги",
   nav_contact: "Контакты",
   hero_badge: "Software Factory · Весь мир",
@@ -678,6 +694,10 @@ const ru: Dict = {
 
 const pl: Dict = {
   nav_home: "Start",
+  nav_process: "Proces",
+  nav_industries: "Branże",
+  nav_security: "Bezpieczeństwo",
+  nav_cases: "Realizacje",
   nav_services: "Usługi",
   nav_contact: "Kontakt",
   hero_badge: "Software Factory · Zasięg globalny",
@@ -717,6 +737,10 @@ const pl: Dict = {
 
 const sv: Dict = {
   nav_home: "Hem",
+  nav_process: "Process",
+  nav_industries: "Branscher",
+  nav_security: "Säkerhet",
+  nav_cases: "Case",
   nav_services: "Tjänster",
   nav_contact: "Kontakt",
   hero_badge: "Software Factory · Global service",
@@ -756,6 +780,10 @@ const sv: Dict = {
 
 const no: Dict = {
   nav_home: "Hjem",
+  nav_process: "Prosess",
+  nav_industries: "Bransjer",
+  nav_security: "Sikkerhet",
+  nav_cases: "Referanser",
   nav_services: "Tjenester",
   nav_contact: "Kontakt",
   hero_badge: "Software Factory · Global tjeneste",
@@ -795,6 +823,10 @@ const no: Dict = {
 
 const ja: Dict = {
   nav_home: "ホーム",
+  nav_process: "プロセス",
+  nav_industries: "業種",
+  nav_security: "セキュリティ",
+  nav_cases: "実績",
   nav_services: "サービス",
   nav_contact: "お問い合わせ",
   hero_badge: "ソフトウェアファクトリー · グローバルサービス",
@@ -834,6 +866,10 @@ const ja: Dict = {
 
 const zh: Dict = {
   nav_home: "首页",
+  nav_process: "流程",
+  nav_industries: "行业",
+  nav_security: "安全",
+  nav_cases: "案例",
   nav_services: "服务",
   nav_contact: "联系我们",
   hero_badge: "软件工厂 · 全球服务",

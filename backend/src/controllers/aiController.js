@@ -1,8 +1,25 @@
 const { OpenAI } = require('openai');
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// --- EMAIL vía Google Workspace (SMTP + App Password de 2 pasos) ---
+// Variables de entorno necesarias:
+//   GMAIL_USER          = info@puma-code.com  (cuenta que envía)
+//   GMAIL_APP_PASSWORD  = la App Password de 16 caracteres de esa cuenta
+//   EMAIL_INFO          = info@puma-code.com  (recibe todas las cotizaciones)
+//   EMAIL_SECURITY      = security@puma-code.com (recibe además las de pentest)
+const GMAIL_USER = process.env.GMAIL_USER || 'info@puma-code.com';
+const MAIL_FROM = `Puma Code <${GMAIL_USER}>`;
+const EMAIL_INFO = process.env.EMAIL_INFO || 'info@puma-code.com';
+const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
+
+const mailer = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: { user: GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+});
 
 // El modelo se define en la variable de entorno OPENAI_MODEL.
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4-turbo';
@@ -1250,9 +1267,9 @@ Responde estrictamente en JSON:
               </div>`
         : '';
 
-      await resend.emails.send({
-        from: 'Puma Code <onboarding@resend.dev>',
-        to: process.env.EMAIL_TO,
+      await mailer.sendMail({
+        from: MAIL_FROM,
+        to: [EMAIL_INFO, EMAIL_SECURITY],
         replyTo: userData.email,
         subject: pentestSubject,
         html: `
@@ -1308,9 +1325,9 @@ Responde estrictamente en JSON:
     // Asunto para vos (Roberto): claro de que está listo para reenviar.
     const subject = `📤 Listo para reenviar · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
 
-    await resend.emails.send({
-      from: 'Puma Code <onboarding@resend.dev>',
-      to: process.env.EMAIL_TO,
+    await mailer.sendMail({
+      from: MAIL_FROM,
+      to: EMAIL_INFO,
       replyTo: userData.email,
       subject,
       html: `
@@ -1362,7 +1379,6 @@ Responde estrictamente en JSON:
 // ============================================================
 //  AUTORIZACIÓN DE PENTEST: el cliente firma y se envía a info@puma-code.com
 // ============================================================
-const EMAIL_AUTORIZACION = process.env.EMAIL_AUTORIZACION || 'info@puma-code.com';
 const MAX_FIELD = 600;
 const trimField = (v) => String(v ?? '').slice(0, MAX_FIELD).trim();
 
@@ -1406,12 +1422,12 @@ exports.submitAuthorization = async (req, res) => {
         <td style="padding:8px 0; color:#111827; font-size:13px; font-weight:bold;">${escapeHtml(value || '—')}</td>
       </tr>`;
 
-    await resend.emails.send({
-      from: 'Puma Code <onboarding@resend.dev>',
-      to: EMAIL_AUTORIZACION,
+    await mailer.sendMail({
+      from: MAIL_FROM,
+      to: [EMAIL_INFO, EMAIL_SECURITY],
       replyTo: userData.email,
       subject: `🛡️✅ Autorización de pentest FIRMADA · ${escapeHtml(campos.razonSocial || clientName)}`,
-      attachments: [{ filename: 'firma.png', content: base64, content_id: 'firma.png' }],
+      attachments: [{ filename: 'firma.png', content: base64, encoding: 'base64', cid: 'firma.png' }],
       html: `
         <div style="font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 620px; margin: 0 auto; color: #111827;">
           <div style="background: linear-gradient(135deg,#047857,#059669); padding: 24px; border-radius: 16px 16px 0 0;">
