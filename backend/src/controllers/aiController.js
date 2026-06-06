@@ -1039,22 +1039,27 @@ TIPO DE SERVICIO (detectalo del chat):
 - DESARROLLO: el cliente quiere construir o mejorar un sistema más grande o a medida, una app, un SaaS complejo, IoT/telemetría, o un proyecto de empresa/startup. Usá el "MÉTODO DE PRECIO — DESARROLLO".
 - SEGURIDAD / PENTEST: el cliente quiere auditar, testear o asegurar un sistema YA existente (pentest, análisis de vulnerabilidades, auditoría de seguridad o de IA, hardening). Usá el "MÉTODO DE PRECIO — PENTEST".
 
-CÓMO ELEGIR ENTRE EXPRESS Y DESARROLLO:
-- Si es un comercio/emprendimiento chico que pide una web simple, una tienda básica o un panelcito de gestión → EXPRESS (mucho más barato y rápido; así no perdemos al cliente chico).
-- Si el alcance crece (varios módulos, lógica compleja, gestión avanzada de stock/flota/reservas a gran escala, app móvil, IoT, multi-sucursal, integraciones pesadas, cliente del exterior o startup) → DESARROLLO.
-- Ante la duda con un negocio chico local, preferí EXPRESS.
+CÓMO ELEGIR ENTRE EXPRESS Y DESARROLLO (REGLA IMPORTANTE):
+- POR DEFECTO, si el cliente es un comercio, emprendimiento, profesional independiente, consultoría, estudio, local o pyme chica que pide una WEB, una TIENDA o un PANEL para administrar su negocio → es EXPRESS. Aunque pida varios módulos (blog, reservas/turnos, multi-idioma, formularios, galería, etc.), SIGUE SIENDO EXPRESS: esos módulos se cobran como add-ons de +100, NO te pases a desarrollo.
+- Tener varias secciones, blog, sistema de reservas simple, multi-idioma o un panel para gestionar el negocio NO convierte el proyecto en DESARROLLO. Eso es lo normal de un proyecto Express.
+- SOLO usá DESARROLLO si aparece algo claramente más pesado: app móvil nativa, IoT/telemetría, sistema multi-sucursal o multi-empresa, lógica de negocio compleja a gran escala (ej: gestión de flota grande, ERP, integraciones pesadas con sistemas externos/ERP/contabilidad), o un cliente que es una startup/empresa de software/cliente del exterior con un sistema a medida ambicioso.
+- ANTE CUALQUIER DUDA, especialmente con un negocio chico o local → EXPRESS. Es preferible cotizar Express y no perder al cliente chico.
 
 MÉTODO DE PRECIO — EXPRESS (en USD, pago único, para pequeños negocios):
 - Elegí el ESCALÓN BASE (se toma UNO, el mayor que aplique; NO se suman entre sí):
   · Landing page (una sola página, vitrina + contacto): USD 600.
   · Web institucional (varias secciones: inicio, servicios, nosotros, contacto, etc.): USD 650.
   · Web o tienda CON PAGOS (integración de Mercado Pago u otra pasarela): USD 700.
-  · SaaS básico CON PANEL DE CONTROL para administrar el negocio (login + dashboard): USD 800.
-- ADD-ONS que se SUMAN al escalón base:
-  · +100 USD por CADA herramienta/módulo extra dentro del dashboard que pida el cliente (ej: gestión de turnos, control de stock, reportes, gestión de clientes, etc.). Contá cuántas pide y sumá 100 por cada una.
-  · +300 USD por la función de IA básica (chatbot, generación de banners, interpretación de imágenes, o cualquier función que use IA).
-- Calculá el MONTO EXACTO = escalón base + add-ons detectados en el chat.
-- Para EXPRESS, presupuesto_usd NUNCA baja de 600.
+  · SaaS básico CON PANEL DE CONTROL para administrar el negocio (login + dashboard): USD 1.000.
+- ADD-ONS que se SUMAN al escalón base (+100 USD CADA UNO):
+  · Sistema de reservas / turnos: +100.
+  · Multi-idioma: +100.
+  · Blog / sección de noticias: +100.
+  · Cada herramienta/módulo extra del panel (control de stock, reportes, gestión de clientes, etc.): +100 cada una.
+  · Cualquier otra funcionalidad chica que pida y no esté en el escalón base: +100 cada una.
+- ADD-ON DE IA: +300 USD por función con IA (chatbot, generación de banners, interpretación de imágenes, o cualquier función que use IA).
+- Calculá el MONTO EXACTO = escalón base + add-ons detectados en el chat. Ejemplo: web institucional (650) + reservas (100) + multi-idioma (100) + blog (100) = USD 950.
+- Para EXPRESS, presupuesto_usd NUNCA baja de 600 y, salvo que haya MUCHOS add-ons, lo normal es que quede entre 600 y 1.500. Si un SaaS necesita lógica compleja, muchos módulos pesados o integraciones serias, ya NO es Express: pasalo a DESARROLLO (base 1.200, y un SaaS a medida más ambicioso ronda 1.600+).
 - Para EXPRESS poné "perfil_cliente" según corresponda, pero el tono debe ser cercano y accesible.
 
 MÉTODO DE PRECIO — DESARROLLO (en USD, mercado internacional):

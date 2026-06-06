@@ -41,6 +41,13 @@ const ServiceCard = ({ num, icon, t, fileName }: any) => {
         {t[`s${num}_desc`]}
       </p>
 
+      {t.services_from && (
+        <div className="relative mb-5 flex items-baseline gap-1.5">
+          <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{t.services_from}</span>
+          <span className="text-2xl font-black text-blue-400">US$ 1.200</span>
+        </div>
+      )}
+
       {/* Imagen fija, siempre visible, con relación de aspecto uniforme */}
       <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50 aspect-[16/10]">
         <img
@@ -126,12 +133,37 @@ export default function Home() {
     { icon: "🌐", price: "600", title: t.exp_p1_title, desc: t.exp_p1_desc },
     { icon: "🏪", price: "650", title: t.exp_p2_title, desc: t.exp_p2_desc },
     { icon: "🛒", price: "700", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
-    { icon: "📊", price: "800", title: t.exp_p4_title, desc: t.exp_p4_desc },
+    { icon: "📊", price: "1.000", title: t.exp_p4_title, desc: t.exp_p4_desc },
   ];
 
   const expressAddons = [
     { icon: "🧩", title: t.exp_addon1_title, desc: t.exp_addon1_desc },
     { icon: "🤖", title: t.exp_addon2_title, desc: t.exp_addon2_desc },
+  ];
+
+  const securityPlans = [
+    {
+      price: "80",
+      title: t.sec_plan1_title,
+      ideal: t.sec_plan1_ideal,
+      days: t.sec_plan1_days,
+      items: [t.sec_plan1_i1, t.sec_plan1_i2, t.sec_plan1_i3, t.sec_plan1_i4],
+    },
+    {
+      price: "180",
+      title: t.sec_plan2_title,
+      ideal: t.sec_plan2_ideal,
+      days: t.sec_plan2_days,
+      featured: true,
+      items: [t.sec_plan2_i1, t.sec_plan2_i2, t.sec_plan2_i3, t.sec_plan2_i4, t.sec_plan2_i5, t.sec_plan2_i6],
+    },
+    {
+      price: "420",
+      title: t.sec_plan3_title,
+      ideal: t.sec_plan3_ideal,
+      days: t.sec_plan3_days,
+      items: [t.sec_plan3_i1, t.sec_plan3_i2, t.sec_plan3_i3, t.sec_plan3_i4, t.sec_plan3_i5, t.sec_plan3_i6],
+    },
   ];
 
   return (
@@ -378,6 +410,58 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Planes de seguridad con precio (del PDF de propuesta) */}
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {securityPlans.map((p, i) => (
+              <div
+                key={i}
+                className={`group relative flex flex-col p-7 rounded-[2rem] border transition-all duration-500 overflow-hidden hover:-translate-y-2 ${
+                  p.featured
+                    ? "border-red-500/50 bg-red-500/[0.06] shadow-[0_0_40px_rgba(239,68,68,0.12)]"
+                    : "border-white/10 bg-white/[0.02] hover:border-red-500/40 hover:bg-red-500/[0.04]"
+                }`}
+              >
+                {p.featured && (
+                  <span className="absolute top-5 right-5 text-[9px] font-black bg-red-500 text-white px-2.5 py-1 rounded-full uppercase tracking-widest">
+                    {t.exp_popular}
+                  </span>
+                )}
+                <h3 className="text-lg font-black mb-1 group-hover:text-red-300 transition-colors uppercase tracking-tight">{p.title}</h3>
+                <p className="text-gray-500 text-xs mb-4 leading-relaxed min-h-[32px]">{p.ideal}</p>
+                <div className="flex items-baseline gap-1 mb-5">
+                  <span className="text-3xl font-black text-red-400">USD {p.price}</span>
+                </div>
+                <ul className="space-y-2.5 flex-1 mb-4">
+                  {p.items.map((it, j) => (
+                    <li key={j} className="flex items-start gap-2.5 text-gray-300 text-[13px] leading-snug">
+                      <Check />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-gray-500 font-bold uppercase tracking-wider border-t border-white/5 pt-3">⏱ {p.days}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Monitoreo mensual */}
+          <div className="mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 p-7 rounded-[2rem] border border-red-500/20 bg-gradient-to-r from-red-950/20 to-transparent">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl shrink-0">🛰️</div>
+              <div>
+                <h4 className="font-black mb-1 uppercase tracking-tight">{t.sec_monitor_title} · <span className="text-red-400">USD 80/{t.sec_monitor_per}</span></h4>
+                <p className="text-gray-400 text-sm leading-relaxed">{t.sec_monitor_desc}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowChat(true)}
+              className="shrink-0 px-7 py-3.5 bg-red-600 text-white rounded-full hover:bg-red-500 transition-all font-black text-sm active:scale-95 inline-flex items-center gap-2 btn-futuristic"
+            >
+              {t.sec_cta}
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Banda de riesgo / importancia comercial */}
