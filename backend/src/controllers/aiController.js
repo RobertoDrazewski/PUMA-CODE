@@ -282,9 +282,9 @@ const T = {
     processIntro: (weeks) => `El proyecto se divide en sprints semanales: son <b>${weeks} semanas</b> de desarrollo y cada cierre de semana es un sprint.`,
     processBullets: [
       'Al cerrar cada sprint te <b>contactamos</b> para mostrarte los avances y qué quedó hecho hasta ese momento.',
-      'Durante el desarrollo podés dar <b>feedback</b>: si necesitás cambiar una herramienta, ajustar el backend o la base de datos, lo resolvemos en el sprint que corresponda.',
+      'Durante las <b>primeras dos semanas</b> podés dar <b>feedback</b> sobre las pantallas mostradas para hacer ajustes menores en la lógica o en cómo se visualizan los datos. Cambios de fondo (otra base de datos, otra integración, otro alcance) se cotizan aparte.',
       'En la <b>última semana</b> solo se aceptan cambios de <b>estilo y apariencia</b> (ya no de backend ni base de datos).',
-      'También en la última semana ya tenés que <b>comprar el dominio</b>, así renderizamos, hacemos el test final y te entregamos el proyecto funcionando.',
+      'También en la última semana ya tenés que <b>comprar el dominio</b>, así realizamos la <b>puesta en marcha</b> en el servidor definitivo, hacemos el test final y te entregamos el proyecto funcionando.',
     ],
     scopeNote: '📌 Todos los viernes subimos un informe con el avance. Cualquier funcionalidad o cambio extra que pidas fuera de lo presupuestado se cotiza como un agregado aparte.',
     growthTitle: '📈 Estrategia comercial de crecimiento para tu empresa',
@@ -354,9 +354,9 @@ const T = {
     processIntro: (weeks) => `The project is split into weekly sprints: <b>${weeks} weeks</b> of development, and each week closes a sprint.`,
     processBullets: [
       'At the end of each sprint we <b>reach out</b> to show you the progress and what has been completed so far.',
-      'Throughout development you can give <b>feedback</b>: if you need to change a tool, adjust the backend or the database, we handle it in the matching sprint.',
+      'During the <b>first two weeks</b> you can give <b>feedback</b> on the screens shown, for minor adjustments to the logic or how data is displayed. Major changes (a different database, integration or scope) are quoted separately.',
       'In the <b>final week</b> only <b>style and appearance</b> changes are accepted (no longer backend or database).',
-      'Also in the final week you need to <b>buy the domain</b>, so we can render, run the final test and deliver the project up and running.',
+      'Also in the final week you need to <b>buy the domain</b>, so we can <b>go live</b> on the final server, run the final test and deliver the project up and running.',
     ],
     scopeNote: '📌 Every Friday we upload a progress report. Any extra feature or change you request beyond this quote is billed separately as an add-on.',
     growthTitle: '📈 Commercial growth strategy for your company',
@@ -426,9 +426,9 @@ const T = {
     processIntro: (weeks) => `O projeto é dividido em sprints semanais: são <b>${weeks} semanas</b> de desenvolvimento e cada fechamento de semana é um sprint.`,
     processBullets: [
       'Ao fechar cada sprint nós <b>entramos em contato</b> para mostrar os avanços e o que ficou pronto até aquele momento.',
-      'Durante o desenvolvimento você pode dar <b>feedback</b>: se precisar trocar uma ferramenta, ajustar o backend ou o banco de dados, resolvemos no sprint correspondente.',
+      'Durante as <b>duas primeiras semanas</b> você pode dar <b>feedback</b> sobre as telas mostradas, para ajustes menores na lógica ou em como os dados são exibidos. Mudanças de fundo (outro banco de dados, outra integração, outro escopo) são orçadas à parte.',
       'Na <b>última semana</b> só são aceitas mudanças de <b>estilo e aparência</b> (não mais de backend nem banco de dados).',
-      'Também na última semana você já precisa <b>comprar o domínio</b>, para que possamos renderizar, fazer o teste final e entregar o projeto funcionando.',
+      'Também na última semana você já precisa <b>comprar o domínio</b>, para que possamos fazer a <b>colocação no ar</b> no servidor definitivo, o teste final e entregar o projeto funcionando.',
     ],
     scopeNote: '📌 Toda sexta-feira enviamos um relatório de progresso. Qualquer funcionalidade ou alteração extra solicitada fora deste orçamento é cobrada à parte como um adicional.',
     growthTitle: '📈 Estratégia comercial de crescimento para sua empresa',
@@ -1047,10 +1047,10 @@ CÓMO ELEGIR ENTRE EXPRESS Y DESARROLLO (REGLA IMPORTANTE):
 
 MÉTODO DE PRECIO — EXPRESS (en USD, pago único, para pequeños negocios):
 - Elegí el ESCALÓN BASE (se toma UNO, el mayor que aplique; NO se suman entre sí):
-  · Landing page (una sola página, vitrina + contacto): USD 600.
-  · Web institucional (varias secciones: inicio, servicios, nosotros, contacto, etc.): USD 650.
-  · Web o tienda CON PAGOS (integración de Mercado Pago u otra pasarela): USD 700.
-  · SaaS básico CON PANEL DE CONTROL para administrar el negocio (login + dashboard): USD 1.000.
+  · Landing page (una sola página, vitrina + contacto): USD 550.
+  · Web institucional (varias secciones: inicio, servicios, nosotros, contacto, etc.): USD 750.
+  · Web o tienda CON PAGOS (integración de Mercado Pago u otra pasarela): USD 1.100.
+  · SaaS básico CON PANEL DE CONTROL para administrar el negocio (login + dashboard): USD 1.600.
 - ADD-ONS que se SUMAN al escalón base (+100 USD CADA UNO):
   · Sistema de reservas / turnos: +100.
   · Multi-idioma: +100.
@@ -1058,8 +1058,9 @@ MÉTODO DE PRECIO — EXPRESS (en USD, pago único, para pequeños negocios):
   · Cada herramienta/módulo extra del panel (control de stock, reportes, gestión de clientes, etc.): +100 cada una.
   · Cualquier otra funcionalidad chica que pida y no esté en el escalón base: +100 cada una.
 - ADD-ON DE IA: +300 USD por función con IA (chatbot, generación de banners, interpretación de imágenes, o cualquier función que use IA).
-- Calculá el MONTO EXACTO = escalón base + add-ons detectados en el chat. Ejemplo: web institucional (650) + reservas (100) + multi-idioma (100) + blog (100) = USD 950.
-- Para EXPRESS, presupuesto_usd NUNCA baja de 600 y, salvo que haya MUCHOS add-ons, lo normal es que quede entre 600 y 1.500. Si un SaaS necesita lógica compleja, muchos módulos pesados o integraciones serias, ya NO es Express: pasalo a DESARROLLO (base 1.200, y un SaaS a medida más ambicioso ronda 1.600+).
+- Calculá el MONTO EXACTO = escalón base + add-ons detectados en el chat. Ejemplo: web institucional (750) + reservas (100) + multi-idioma (100) + blog (100) = USD 1.050. Otro ejemplo: web con pagos (1.100) + panel de ventas con un módulo (incluido en el escalón) = USD 1.100.
+- Para EXPRESS, presupuesto_usd NUNCA baja de 550. Los escalones ya contemplan el grueso del trabajo; sumá add-ons solo por funcionalidades realmente extra al escalón elegido.
+- La diferencia entre EXPRESS y DESARROLLO NO es el precio (pueden solaparse), sino la NATURALEZA del trabajo: Express son soluciones estándar y rápidas para un negocio chico (web, tienda, panel simple); Desarrollo es un sistema a medida ambicioso, con lógica compleja o integraciones pesadas. Si es un comercio/pyme con necesidades estándar, es EXPRESS aunque el monto sea alto.
 - Para EXPRESS poné "perfil_cliente" según corresponda, pero el tono debe ser cercano y accesible.
 
 MÉTODO DE PRECIO — DESARROLLO (en USD, mercado internacional):
@@ -1093,6 +1094,7 @@ IMPORTANTE:
 - Para EXPRESS y DESARROLLO, estima los costos recurrentes que pagará el cliente directamente a los proveedores: costo_openai_usd_mensual (consumo mensual de IA según la cantidad de consultas a la API; típico 5-40; usa 0 si el proyecto NO usa IA — en EXPRESS sin función de IA va 0) y costo_dominio_usd_anual (típico 12-20). El costo de Railway lo fija el sistema, no lo estimes. Para PENTEST/SEGURIDAD ambos costos van en 0.
 - resumen_pactado y estrategia_crecimiento DEBEN estar redactados en el idioma del cliente: ${LANGUAGE_NAMES[language] || 'Spanish'}.
 - estrategia_crecimiento: DIRIGIDA AL CLIENTE, en segunda persona, tono comercial y concreto. Para EXPRESS: cómo tener presencia online profesional (web/tienda/panel) le trae más clientes, le ahorra tiempo y le da imagen seria frente a la competencia del barrio, con un tono cercano y motivador para un emprendedor. Para DESARROLLO: cómo este software lo ayuda a crecer, escalar y profesionalizar su empresa. Para PENTEST/SEGURIDAD: por qué asegurar su sistema protege su negocio, sus clientes y su reputación, y qué riesgos concretos evita.
+- ACLARACIÓN OBLIGATORIA SOBRE FACTURACIÓN / ARCA / AFIP: si el cliente menciona "registrar ventas", "declarar", "facturación", "ARCA" o "AFIP", incluí SIEMPRE dentro de resumen_pactado una aclaración explícita de alcance, con este sentido textual: "El sistema incluye un registro interno de ventas exportable para tu contador; NO realiza facturación electrónica automática ni se conecta a los servidores de ARCA/AFIP." Esto evita malentendidos: la facturación electrónica oficial NO está incluida y sería un desarrollo aparte. No prometas conexión con ARCA bajo ninguna circunstancia.
 
 Responde estrictamente en JSON:
 {
@@ -1141,8 +1143,8 @@ Responde estrictamente en JSON:
     const clientName = String(userData.name).trim();
     const proyecto = analysis.nombre_proyecto || (esLocal ? 'tu proyecto' : 'your project');
 
-    // Monto EXACTO. Express: nunca por debajo de 600. Desarrollo: nunca por debajo de 1200. Pentest: precio fijo del plan.
-    const minUsd = esExpress ? 600 : 1200;
+    // Monto EXACTO. Express: nunca por debajo de 550. Desarrollo: nunca por debajo de 1200. Pentest: precio fijo del plan.
+    const minUsd = esExpress ? 550 : 1200;
     const usd = esPentest
       ? PENTEST_PLANES[planPent]
       : Math.max(minUsd, Math.round(Number(analysis.presupuesto_usd) || minUsd));
@@ -1161,6 +1163,28 @@ Responde estrictamente en JSON:
     const dominioUsd = numOr(analysis.costo_dominio_usd_anual, FALLBACK_DOMINIO_USD_ANIO);
     const dominioMensual = dominioUsd / 12;
     const totalMensual = railwayUsd + openaiUsd + dominioMensual;
+    const usaIA = openaiUsd > 0;
+
+    // Si el proyecto NO usa IA, eliminamos toda mención a OpenAI de los textos
+    // (evita "fantasmas" de plantilla que confundan al cliente sin IA).
+    const limpiarOpenAI = (texto) =>
+      String(texto || '')
+        .replace(/\s*\+\s*OpenAI/gi, '')        // "Railway + OpenAI" -> "Railway"
+        .replace(/\s+y\s+OpenAI/gi, '')          // "Railway y OpenAI" -> "Railway"
+        .replace(/\s+e\s+OpenAI/gi, '')          // pt/it "Railway e OpenAI"
+        .replace(/\s+i\s+OpenAI/gi, '')          // ca/pl
+        .replace(/\s+og\s+OpenAI/gi, '')         // no
+        .replace(/\s+och\s+OpenAI/gi, '')        // sv
+        .replace(/\s+und\s+OpenAI/gi, '')        // de
+        .replace(/\s+и\s+OpenAI/gi, '')          // ru
+        .replace(/OpenAI[\s・]*[とと]/gi, '')     // ja
+        .replace(/\s*与\s*OpenAI/gi, '')          // zh
+        .replace(/[^.。]*OpenAI[^.。]*[.。]/g, '') // como respaldo: borra cualquier oración que mencione OpenAI
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+
+    const includedNoteFinal = usaIA ? L.includedNote : limpiarOpenAI(L.includedNote);
+    const totalSubFinal = usaIA ? L.totalSub : limpiarOpenAI(L.totalSub);
 
     // Dólar (solo necesario para mostrar pesos en clientes locales).
     let dolar = null;
@@ -1252,7 +1276,7 @@ Responde estrictamente en JSON:
             <td style="padding: 9px 0 0; text-align: right; color: #1d4ed8; font-weight: 900; font-size: 16px;">${dual(totalMensual)} <span style="font-size:11px; font-weight:normal;">${escapeHtml(L.perMonth)}</span></td>
           </tr>
         </table>
-        <p style="margin: 8px 0 0; font-size: 11px; color: #64748b; line-height:1.5;">${escapeHtml(L.totalSub)}</p>
+        <p style="margin: 8px 0 0; font-size: 11px; color: #64748b; line-height:1.5;">${escapeHtml(totalSubFinal)}</p>
         <p style="margin: 6px 0 0; font-size: 11px; color: #64748b; line-height:1.5;">${escapeHtml(L.usageNote)}</p>
       </div>`;
 
@@ -1377,7 +1401,7 @@ Responde estrictamente en JSON:
             <div style="padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin: 18px 0;">
               <p style="margin: 0; color: #111827; font-weight: bold; font-size: 15px;">${escapeHtml(L.investTitle)}</p>
               ${precioHtml}
-              <p style="margin: 12px 0 0; font-size: 11px; color: #64748b; line-height: 1.5;">✅ ${escapeHtml(L.includedNote)}</p>
+              <p style="margin: 12px 0 0; font-size: 11px; color: #64748b; line-height: 1.5;">✅ ${escapeHtml(includedNoteFinal)}</p>
               <p style="margin: 6px 0 0; font-size: 11px; color: #047857; line-height: 1.5; font-weight: bold;">🛡️ ${escapeHtml(L.secIncludedNote)}</p>
             </div>
 

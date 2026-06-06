@@ -130,10 +130,10 @@ export default function Home() {
   ];
 
   const expressPlans = [
-    { icon: "🌐", price: "600", title: t.exp_p1_title, desc: t.exp_p1_desc },
-    { icon: "🏪", price: "650", title: t.exp_p2_title, desc: t.exp_p2_desc },
-    { icon: "🛒", price: "700", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
-    { icon: "📊", price: "1.000", title: t.exp_p4_title, desc: t.exp_p4_desc },
+    { icon: "🌐", price: "550", title: t.exp_p1_title, desc: t.exp_p1_desc },
+    { icon: "🏪", price: "750", title: t.exp_p2_title, desc: t.exp_p2_desc },
+    { icon: "🛒", price: "1.100", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
+    { icon: "📊", price: "1.600", title: t.exp_p4_title, desc: t.exp_p4_desc },
   ];
 
   const expressAddons = [
