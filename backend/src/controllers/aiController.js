@@ -968,7 +968,8 @@ QUÉ HACE PUMA CODE (tu rubro):
 - SaaS a medida: sistemas de gestión y reservas, paneles de administración, multi-idioma, pagos online e IA integrada.
 - IoT y telemetría, e integraciones con IA / Machine Learning.
 - Ciberseguridad: pentest (penetration testing), análisis de vulnerabilidades de webs, apps y SaaS, auditoría de seguridad de componentes con IA (prompt injection, fuga de datos), y hardening de infraestructura.
-- Trabajamos con pymes y empresas de distintos rubros (comercio, producción, logística, servicios y más).
+- SOLUCIONES EXPRESS PARA PEQUEÑOS NEGOCIOS: webs y tiendas rápidas y accesibles para emprendedores y comercios chicos (panaderías, barberías, talleres mecánicos, kioscos, estudios, profesionales, etc.). Landing pages, webs institucionales, tiendas con pagos por Mercado Pago y pequeños SaaS con panel de control para administrar el negocio. Listas rápido y a precio de entrada. Si la persona tiene un comercio chico o un emprendimiento, OFRECELE ESTO con entusiasmo: es la puerta de entrada ideal para profesionalizar su negocio sin gastar una fortuna.
+- Trabajamos con pymes y empresas de distintos rubros (comercio, producción, logística, servicios y más), desde el emprendedor de barrio hasta clientes del exterior.
 
 ALCANCE (REGLA ESTRICTA E INVIOLABLE):
 - SOLO conversás sobre proyectos de software, ciberseguridad y los servicios de Puma Code, y sobre entender qué necesita el cliente para su web/app/sistema.
@@ -1034,8 +1035,27 @@ exports.analyzeProject = async (req, res) => {
           content: `Eres el CTO Analista de Puma Code (estudio de software a medida y ciberseguridad de Mendoza, Argentina). Analiza el chat y arma los datos para un presupuesto EXACTO en USD (un único monto, sin rangos), calculado según la complejidad y el tiempo de trabajo.
 
 TIPO DE SERVICIO (detectalo del chat):
-- DESARROLLO: el cliente quiere construir o mejorar una web, app, sistema o SaaS. Usá el "MÉTODO DE PRECIO — DESARROLLO".
+- EXPRESS: pequeño negocio / emprendedor / comercio chico (panadería, barbería, taller mecánico, kiosco, peluquería, profesional independiente, etc.) que quiere algo simple y rápido: una landing, una web institucional, una tienda con pagos, o un SaaS chico con panel para administrar su negocio. Es la puerta de entrada accesible. Usá el "MÉTODO DE PRECIO — EXPRESS".
+- DESARROLLO: el cliente quiere construir o mejorar un sistema más grande o a medida, una app, un SaaS complejo, IoT/telemetría, o un proyecto de empresa/startup. Usá el "MÉTODO DE PRECIO — DESARROLLO".
 - SEGURIDAD / PENTEST: el cliente quiere auditar, testear o asegurar un sistema YA existente (pentest, análisis de vulnerabilidades, auditoría de seguridad o de IA, hardening). Usá el "MÉTODO DE PRECIO — PENTEST".
+
+CÓMO ELEGIR ENTRE EXPRESS Y DESARROLLO:
+- Si es un comercio/emprendimiento chico que pide una web simple, una tienda básica o un panelcito de gestión → EXPRESS (mucho más barato y rápido; así no perdemos al cliente chico).
+- Si el alcance crece (varios módulos, lógica compleja, gestión avanzada de stock/flota/reservas a gran escala, app móvil, IoT, multi-sucursal, integraciones pesadas, cliente del exterior o startup) → DESARROLLO.
+- Ante la duda con un negocio chico local, preferí EXPRESS.
+
+MÉTODO DE PRECIO — EXPRESS (en USD, pago único, para pequeños negocios):
+- Elegí el ESCALÓN BASE (se toma UNO, el mayor que aplique; NO se suman entre sí):
+  · Landing page (una sola página, vitrina + contacto): USD 600.
+  · Web institucional (varias secciones: inicio, servicios, nosotros, contacto, etc.): USD 650.
+  · Web o tienda CON PAGOS (integración de Mercado Pago u otra pasarela): USD 700.
+  · SaaS básico CON PANEL DE CONTROL para administrar el negocio (login + dashboard): USD 800.
+- ADD-ONS que se SUMAN al escalón base:
+  · +100 USD por CADA herramienta/módulo extra dentro del dashboard que pida el cliente (ej: gestión de turnos, control de stock, reportes, gestión de clientes, etc.). Contá cuántas pide y sumá 100 por cada una.
+  · +300 USD por la función de IA básica (chatbot, generación de banners, interpretación de imágenes, o cualquier función que use IA).
+- Calculá el MONTO EXACTO = escalón base + add-ons detectados en el chat.
+- Para EXPRESS, presupuesto_usd NUNCA baja de 600.
+- Para EXPRESS poné "perfil_cliente" según corresponda, pero el tono debe ser cercano y accesible.
 
 MÉTODO DE PRECIO — DESARROLLO (en USD, mercado internacional):
 - BASE: USD 1.200 para un proyecto básico (algo simple, una sola pantalla/función, o que reutiliza componentes que Puma Code ya tiene hechos).
@@ -1057,7 +1077,7 @@ AJUSTE POR PERFIL:
 - El monto nunca baja de USD 1.200.
 
 TIEMPO DE ENTREGA:
-- tiempo_entrega es el número de SEMANAS, ENTERO, entre 1 y 4 (máximo 4 semanas incluso para un proyecto difícil). Cada semana es un sprint.
+- tiempo_entrega es el número de SEMANAS, ENTERO. Para EXPRESS: entre 1 y 3 semanas (el escalón más simple arranca en 3 semanas o menos; sube con los add-ons). Para DESARROLLO: entre 1 y 4 semanas (máximo 4 incluso para un proyecto difícil). Cada semana es un sprint.
 
 CRITERIO DE PERFIL:
 - "Local Mendoza" si el cliente es de Argentina / Mendoza, menciona negocios locales o pagaría en pesos.
@@ -1065,14 +1085,14 @@ CRITERIO DE PERFIL:
 
 IMPORTANTE:
 - presupuesto_usd debe ser UN NÚMERO entero exacto en USD (sin símbolos ni separadores). NO devuelvas rangos.
-- Solo para DESARROLLO, estima los costos recurrentes que pagará el cliente directamente a los proveedores: costo_openai_usd_mensual (consumo mensual de IA según la cantidad de consultas a la API; típico 5-40; usa 0 si el proyecto NO usa IA) y costo_dominio_usd_anual (típico 12-20). El costo de Railway lo fija el sistema, no lo estimes. Para PENTEST/SEGURIDAD ambos costos van en 0.
+- Para EXPRESS y DESARROLLO, estima los costos recurrentes que pagará el cliente directamente a los proveedores: costo_openai_usd_mensual (consumo mensual de IA según la cantidad de consultas a la API; típico 5-40; usa 0 si el proyecto NO usa IA — en EXPRESS sin función de IA va 0) y costo_dominio_usd_anual (típico 12-20). El costo de Railway lo fija el sistema, no lo estimes. Para PENTEST/SEGURIDAD ambos costos van en 0.
 - resumen_pactado y estrategia_crecimiento DEBEN estar redactados en el idioma del cliente: ${LANGUAGE_NAMES[language] || 'Spanish'}.
-- estrategia_crecimiento: DIRIGIDA AL CLIENTE, en segunda persona, tono comercial y concreto. Para DESARROLLO: cómo este software lo ayuda a crecer, escalar y profesionalizar su empresa. Para PENTEST/SEGURIDAD: por qué asegurar su sistema protege su negocio, sus clientes y su reputación, y qué riesgos concretos evita.
+- estrategia_crecimiento: DIRIGIDA AL CLIENTE, en segunda persona, tono comercial y concreto. Para EXPRESS: cómo tener presencia online profesional (web/tienda/panel) le trae más clientes, le ahorra tiempo y le da imagen seria frente a la competencia del barrio, con un tono cercano y motivador para un emprendedor. Para DESARROLLO: cómo este software lo ayuda a crecer, escalar y profesionalizar su empresa. Para PENTEST/SEGURIDAD: por qué asegurar su sistema protege su negocio, sus clientes y su reputación, y qué riesgos concretos evita.
 
 Responde estrictamente en JSON:
 {
   "nombre_proyecto": "string",
-  "tipo_servicio": "desarrollo | pentest",
+  "tipo_servicio": "express | desarrollo | pentest",
   "plan_pentest": "basico | profesional | enterprise",
   "monitoreo_mensual": false,
   "perfil_cliente": "Local Mendoza" | "Global Estándar",
@@ -1103,7 +1123,8 @@ Responde estrictamente en JSON:
     const esLocal = perfil.toLowerCase().includes('local');
     const tipoRaw = String(analysis.tipo_servicio || '').toLowerCase();
     const esPentest = tipoRaw.includes('pent') || tipoRaw.includes('segur') || tipoRaw.includes('security');
-    const tipoServicio = esPentest ? 'pentest' : 'desarrollo';
+    const esExpress = !esPentest && (tipoRaw.includes('express') || tipoRaw.includes('expres'));
+    const tipoServicio = esPentest ? 'pentest' : (esExpress ? 'express' : 'desarrollo');
 
     // Plan fijo de pentest (precio y plazo según la propuesta de ciberseguridad).
     const planPent = normalizePlan(analysis.plan_pentest);
@@ -1115,10 +1136,11 @@ Responde estrictamente en JSON:
     const clientName = String(userData.name).trim();
     const proyecto = analysis.nombre_proyecto || (esLocal ? 'tu proyecto' : 'your project');
 
-    // Monto EXACTO. Desarrollo: nunca por debajo de 1200. Pentest: precio fijo del plan.
+    // Monto EXACTO. Express: nunca por debajo de 600. Desarrollo: nunca por debajo de 1200. Pentest: precio fijo del plan.
+    const minUsd = esExpress ? 600 : 1200;
     const usd = esPentest
       ? PENTEST_PLANES[planPent]
-      : Math.max(1200, Math.round(Number(analysis.presupuesto_usd) || 1200));
+      : Math.max(minUsd, Math.round(Number(analysis.presupuesto_usd) || minUsd));
 
     // Semanas: entero entre 1 y 4 (máximo de entrega) — para desarrollo.
     const wkMatch = String(analysis.tiempo_entrega || '').match(/\d+/);
@@ -1323,7 +1345,9 @@ Responde estrictamente en JSON:
     }
 
     // Asunto para vos (Roberto): claro de que está listo para reenviar.
-    const subject = `📤 Listo para reenviar · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
+    const subject = esExpress
+      ? `⚡ EXPRESS · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`
+      : `📤 Listo para reenviar · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
 
     await mailer.sendMail({
       from: MAIL_FROM,

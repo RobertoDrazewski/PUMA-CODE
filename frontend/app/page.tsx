@@ -122,6 +122,18 @@ export default function Home() {
     { icon: "📑", title: t.sec_f4_title, desc: t.sec_f4_desc },
   ];
 
+  const expressPlans = [
+    { icon: "🌐", price: "600", title: t.exp_p1_title, desc: t.exp_p1_desc },
+    { icon: "🏪", price: "650", title: t.exp_p2_title, desc: t.exp_p2_desc },
+    { icon: "🛒", price: "700", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
+    { icon: "📊", price: "800", title: t.exp_p4_title, desc: t.exp_p4_desc },
+  ];
+
+  const expressAddons = [
+    { icon: "🧩", title: t.exp_addon1_title, desc: t.exp_addon1_desc },
+    { icon: "🤖", title: t.exp_addon2_title, desc: t.exp_addon2_desc },
+  ];
+
   return (
     <main className="relative min-h-screen bg-black text-white overflow-x-hidden flex flex-col selection:bg-blue-500/30 scroll-smooth">
       <Navbar lang={lang} setLang={setLang} t={t} />
@@ -268,6 +280,75 @@ export default function Home() {
                 <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}
+          </div>
+        </section>
+      </div>
+
+      {/* --- EXPRESS · PEQUEÑO NEGOCIO (banda completa) --- */}
+      <div className="w-full border-t border-white/5 bg-gradient-to-b from-black to-emerald-950/10">
+        <section id="express" className="py-28 px-6 max-w-7xl mx-auto w-full">
+          <div className="text-center mb-16">
+            <span className="inline-block mb-4 px-4 py-1.5 border border-emerald-500/30 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-[0.25em] uppercase">
+              ⚡ {t.exp_badge}
+            </span>
+            <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-futuristic">{t.exp_title}</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.exp_subtitle}</p>
+          </div>
+
+          {/* Grilla de planes con precio */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {expressPlans.map((p, i) => (
+              <div
+                key={i}
+                className={`group relative flex flex-col p-7 rounded-[2rem] border transition-all duration-500 overflow-hidden hover:-translate-y-2 ${
+                  p.featured
+                    ? "border-emerald-500/50 bg-emerald-500/[0.06] shadow-[0_0_40px_rgba(16,185,129,0.12)]"
+                    : "border-white/10 bg-white/[0.02] hover:border-emerald-500/40 hover:bg-emerald-500/[0.04]"
+                }`}
+              >
+                {p.featured && (
+                  <span className="absolute top-5 right-5 text-[9px] font-black bg-emerald-500 text-black px-2.5 py-1 rounded-full uppercase tracking-widest">
+                    {t.exp_popular}
+                  </span>
+                )}
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-emerald-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative">
+                  <div className="text-4xl mb-5">{p.icon}</div>
+                  <h3 className="text-lg font-bold mb-2 group-hover:text-emerald-300 transition-colors">{p.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6 min-h-[60px]">{p.desc}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[11px] text-gray-500 font-bold">{t.exp_from}</span>
+                    <span className="text-3xl font-black text-emerald-400">${p.price}</span>
+                    <span className="text-[11px] text-gray-500 font-bold">USD</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add-ons */}
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {expressAddons.map((a, i) => (
+              <div key={i} className="flex items-start gap-4 p-6 rounded-[1.75rem] border border-white/10 bg-white/[0.02]">
+                <div className="text-3xl shrink-0">{a.icon}</div>
+                <div>
+                  <h4 className="font-bold mb-1">{a.title}</h4>
+                  <p className="text-gray-400 text-sm leading-relaxed">{a.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Nota + CTA */}
+          <div className="mt-12 text-center">
+            <p className="text-gray-500 text-sm max-w-2xl mx-auto mb-8 leading-relaxed">{t.exp_note}</p>
+            <button
+              onClick={() => setShowChat(true)}
+              className="px-10 py-5 bg-emerald-600 text-white rounded-full hover:bg-emerald-500 transition-all duration-300 shadow-[0_0_40px_rgba(16,185,129,0.35)] font-black text-lg active:scale-95 inline-flex items-center gap-3 btn-futuristic"
+            >
+              {t.exp_cta}
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
         </section>
       </div>
