@@ -180,7 +180,7 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_8px_#2563eb]"></div>
                 <div className="flex flex-col">
                   <span className="text-white font-black text-xs uppercase tracking-widest italic">{t.chat_title}</span>
-                  <span className="text-[9px] text-blue-500 font-bold tracking-widest uppercase opacity-80">AI Neural Link</span>
+                  <span className="text-[9px] text-blue-500 font-bold tracking-widest uppercase opacity-80">{t.chat_subtitle}</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -217,14 +217,14 @@ export default function AIChat({ lang, t, onClose }: AIChatProps) {
                     <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                     <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
                   </div>
-                  <span className="text-blue-500/60 text-[9px] font-black uppercase tracking-[0.2em]">Processing link...</span>
+                  <span className="text-blue-500/60 text-[9px] font-black uppercase tracking-[0.2em]">{t.chat_processing}</span>
                 </div>
               )}
 
               {messages.length >= 6 && step === 'chat' && (
                 <div className="flex justify-center pt-4 animate-in zoom-in duration-500">
                    <button onClick={handleQuoteRequest} disabled={loading} className="w-full py-5 bg-gradient-to-r from-blue-700 to-blue-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20 active:scale-95 disabled:opacity-50 transition-all border border-blue-400/20">
-                      {loading ? "ANALYZING DATA..." : t.chat_btn_quote}
+                      {loading ? t.chat_analyzing : t.chat_btn_quote}
                    </button>
                 </div>
               )}
