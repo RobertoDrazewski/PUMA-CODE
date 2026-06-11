@@ -54,13 +54,6 @@ const ServiceCard = ({ num, icon, t, fileName }: any) => {
         {t[`s${num}_desc`]}
       </p>
 
-      {t.services_from && (
-        <div className="relative mb-5 flex items-baseline gap-1.5">
-          <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{t.services_from}</span>
-          <span className="text-2xl font-black text-blue-400">US$ 1.200</span>
-        </div>
-      )}
-
       <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50 aspect-[16/10]">
         <img
           src={`/${fileName}.PNG`}
@@ -163,10 +156,10 @@ export default function Home() {
   ];
 
   const expressPlans = [
-    { icon: "🌐", price: "550", title: t.exp_p1_title, desc: t.exp_p1_desc },
-    { icon: "🏪", price: "750", title: t.exp_p2_title, desc: t.exp_p2_desc },
-    { icon: "🛒", price: "1.100", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
-    { icon: "📊", price: "1.600", title: t.exp_p4_title, desc: t.exp_p4_desc },
+    { icon: "🌐", title: t.exp_p1_title, desc: t.exp_p1_desc },
+    { icon: "🏪", title: t.exp_p2_title, desc: t.exp_p2_desc },
+    { icon: "🛒", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
+    { icon: "📊", title: t.exp_p4_title, desc: t.exp_p4_desc },
   ];
 
   const expressAddons = [
@@ -348,11 +341,13 @@ export default function Home() {
                   <div className="icon-fx text-4xl mb-5">{p.icon}</div>
                   <h3 className="text-lg font-bold mb-2 group-hover:text-emerald-300 transition-colors">{p.title}</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-6 min-h-[60px]">{p.desc}</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[11px] text-gray-500 font-bold">{t.exp_from}</span>
-                    <span className="text-3xl font-black text-emerald-400">${p.price}</span>
-                    <span className="text-[11px] text-gray-500 font-bold">USD</span>
-                  </div>
+                  <button
+                    onClick={() => setShowChat(true)}
+                    className="inline-flex items-center gap-2 text-emerald-400 font-black text-sm hover:text-emerald-300 transition-colors group/cta"
+                  >
+                    {t.exp_cta}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover/cta:translate-x-1" />
+                  </button>
                 </div>
               </div>
             ))}
