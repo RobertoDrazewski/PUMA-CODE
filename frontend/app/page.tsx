@@ -4,6 +4,37 @@ import { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import AIChat from '../components/AIChat';
 import { translations } from '../constants/translations';
+import {
+  Globe, Smartphone, Radio, Cpu, Bot, Gem,
+  MessageCircle, ScanEye, ClipboardList, Settings,
+  TrendingUp, Zap, Sprout, Gauge, Truck, Package,
+  Shield, Search, Lock, FileText, Radar,
+  Store, ShoppingCart, LayoutDashboard, GridPlus, Star, Clock,
+} from '../components/Icons';
+
+/* ---------- Contenedor de ícono profesional (reemplaza emojis) ----------
+   Hereda el glow/flotación de .icon-fx y tiñe según la sección. */
+const ICON_TONES: Record<string, string> = {
+  blue: 'bg-blue-500/10 border-blue-500/25 text-blue-400',
+  emerald: 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400',
+  red: 'bg-red-500/10 border-red-500/25 text-red-400',
+};
+
+/* El ícono LLENA todo el tile: svg a w-full/h-full, el padding marca el respiro. */
+const ICON_SIZES: Record<string, { tile: string; svg: string }> = {
+  sm: { tile: 'w-12 h-12 p-2.5 rounded-xl', svg: 'w-full h-full' },
+  md: { tile: 'w-16 h-16 p-3 rounded-2xl', svg: 'w-full h-full' },
+  lg: { tile: 'w-20 h-20 p-3.5 rounded-[1.4rem]', svg: 'w-full h-full' },
+};
+
+const IconTile = ({ icon: I, tone = 'blue', size = 'md', className = '' }: { icon: any; tone?: string; size?: string; className?: string }) => {
+  const s = ICON_SIZES[size] || ICON_SIZES.md;
+  return (
+    <span className={`icon-fx inline-flex items-center justify-center border ${s.tile} ${ICON_TONES[tone] || ICON_TONES.blue} ${className}`}>
+      <I className={s.svg} />
+    </span>
+  );
+};
 
 /* ---------- Iconos inline reutilizables ---------- */
 const Check = () => (
@@ -40,9 +71,7 @@ const ServiceCard = ({ num, icon, t, fileName }: any) => {
       <div className="pointer-events-none absolute -right-12 -top-12 w-44 h-44 bg-blue-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
       <div className="relative flex items-center justify-between mb-5">
-        <div className="icon-fx text-5xl transition-all duration-500 grayscale group-hover:grayscale-0">
-          {icon}
-        </div>
+        <IconTile icon={icon} size="lg" />
         <span className="text-[11px] font-black text-blue-500/40 tracking-[0.3em] tabular-nums">0{num}</span>
       </div>
 
@@ -68,11 +97,11 @@ const ServiceCard = ({ num, icon, t, fileName }: any) => {
 };
 
 /* ---------- Tarjeta de industria / telemetría (más grande) ---------- */
-const IndustryCard = ({ icon, title, desc }: { icon: string; title: string; desc: string }) => (
+const IndustryCard = ({ icon, title, desc }: { icon: any; title: string; desc: string }) => (
   <div className="card-glow group relative p-9 md:p-10 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-blue-500/[0.06] hover:border-blue-500/40 transition-all duration-500 overflow-hidden">
     <div className="absolute -right-8 -top-8 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     <div className="relative">
-      <div className="icon-fx text-5xl md:text-6xl mb-6">{icon}</div>
+      <IconTile icon={icon} size="lg" className="mb-6" />
       <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-blue-400 transition-colors">{title}</h3>
       <p className="text-gray-400 text-sm md:text-base leading-relaxed">{desc}</p>
     </div>
@@ -117,7 +146,7 @@ export default function Home() {
     document.body.style.overflow = showChat ? 'hidden' : 'unset';
   }, [showChat]);
 
-  const serviceIcons = ["🌐", "📱", "📡", "🧠", "🤖", "💎"];
+  const serviceIcons = [Globe, Smartphone, Radio, Cpu, Bot, Gem];
   const serviceFileNames = [
     "desarrollo-web", "apps-nativas", "iot-telemetria",
     "ia-machine-learning", "optimizacion-eficiencia", "qa-calidad",
@@ -129,42 +158,42 @@ export default function Home() {
   ];
 
   const steps = [
-    { icon: "💬", title: t.p1_title, desc: t.p1_desc },
-    { icon: "🧩", title: t.p2_title, desc: t.p2_desc },
-    { icon: "📋", title: t.p3_title, desc: t.p3_desc },
-    { icon: "⚙️", title: t.p4_title, desc: t.p4_desc },
+    { icon: MessageCircle, title: t.p1_title, desc: t.p1_desc },
+    { icon: ScanEye, title: t.p2_title, desc: t.p2_desc },
+    { icon: ClipboardList, title: t.p3_title, desc: t.p3_desc },
+    { icon: Settings, title: t.p4_title, desc: t.p4_desc },
   ];
 
   const industries = [
-    { icon: "🍇", title: t.ind1_title, desc: t.ind1_desc },
-    { icon: "⛏️", title: t.ind2_title, desc: t.ind2_desc },
-    { icon: "🚚", title: t.ind3_title, desc: t.ind3_desc },
-    { icon: "📦", title: t.ind4_title, desc: t.ind4_desc },
+    { icon: Sprout, title: t.ind1_title, desc: t.ind1_desc },
+    { icon: Gauge, title: t.ind2_title, desc: t.ind2_desc },
+    { icon: Truck, title: t.ind3_title, desc: t.ind3_desc },
+    { icon: Package, title: t.ind4_title, desc: t.ind4_desc },
   ];
 
   const aiFeatures = [
-    { icon: "🤖", title: t.ai_f1_title, desc: t.ai_f1_desc },
-    { icon: "📈", title: t.ai_f2_title, desc: t.ai_f2_desc },
-    { icon: "⚡", title: t.ai_f3_title, desc: t.ai_f3_desc },
+    { icon: Bot, title: t.ai_f1_title, desc: t.ai_f1_desc },
+    { icon: TrendingUp, title: t.ai_f2_title, desc: t.ai_f2_desc },
+    { icon: Zap, title: t.ai_f3_title, desc: t.ai_f3_desc },
   ];
 
   const securityFeatures = [
-    { icon: "🛡️", title: t.sec_f1_title, desc: t.sec_f1_desc },
-    { icon: "🔍", title: t.sec_f2_title, desc: t.sec_f2_desc },
-    { icon: "🔐", title: t.sec_f3_title, desc: t.sec_f3_desc },
-    { icon: "📑", title: t.sec_f4_title, desc: t.sec_f4_desc },
+    { icon: Shield, title: t.sec_f1_title, desc: t.sec_f1_desc },
+    { icon: Search, title: t.sec_f2_title, desc: t.sec_f2_desc },
+    { icon: Lock, title: t.sec_f3_title, desc: t.sec_f3_desc },
+    { icon: FileText, title: t.sec_f4_title, desc: t.sec_f4_desc },
   ];
 
   const expressPlans = [
-    { icon: "🌐", title: t.exp_p1_title, desc: t.exp_p1_desc },
-    { icon: "🏪", title: t.exp_p2_title, desc: t.exp_p2_desc },
-    { icon: "🛒", title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
-    { icon: "📊", title: t.exp_p4_title, desc: t.exp_p4_desc },
+    { icon: Globe, title: t.exp_p1_title, desc: t.exp_p1_desc },
+    { icon: Store, title: t.exp_p2_title, desc: t.exp_p2_desc },
+    { icon: ShoppingCart, title: t.exp_p3_title, desc: t.exp_p3_desc, featured: true },
+    { icon: LayoutDashboard, title: t.exp_p4_title, desc: t.exp_p4_desc },
   ];
 
   const expressAddons = [
-    { icon: "🧩", title: t.exp_addon1_title, desc: t.exp_addon1_desc },
-    { icon: "🤖", title: t.exp_addon2_title, desc: t.exp_addon2_desc },
+    { icon: GridPlus, title: t.exp_addon1_title, desc: t.exp_addon1_desc },
+    { icon: Bot, title: t.exp_addon2_title, desc: t.exp_addon2_desc },
   ];
 
   const securityPlans = [
@@ -252,7 +281,7 @@ export default function Home() {
             {steps.map((step, i) => (
               <div key={i} className="card-glow group relative p-8 md:p-10 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/40 transition-all duration-500">
                 <div className="flex items-center justify-between mb-6">
-                  <span className="icon-fx text-4xl md:text-5xl">{step.icon}</span>
+                  <IconTile icon={step.icon} size="lg" />
                   <span className="text-5xl md:text-6xl font-black text-blue-500/15 leading-none">{i + 1}</span>
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold mb-2">{step.title}</h3>
@@ -290,8 +319,8 @@ export default function Home() {
           {/* Banda IA & Machine Learning */}
           <div className="mt-20 pt-16 border-t border-white/5">
             <div className="text-center mb-12">
-              <span className="inline-block mb-4 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
-                🧠 AI · Machine Learning
+              <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
+                <Cpu className="w-3.5 h-3.5" /> AI · Machine Learning
               </span>
               <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tighter text-futuristic">{t.ai_title}</h2>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.ai_subtitle}</p>
@@ -300,7 +329,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {aiFeatures.map((f, i) => (
                 <div key={i} className="card-glow group p-8 rounded-[2rem] glass-effect border-blue-500/10">
-                  <div className="icon-fx text-4xl mb-5">{f.icon}</div>
+                  <IconTile icon={f.icon} className="mb-5" />
                   <h3 className="text-xl font-bold mb-3">{f.title}</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
                 </div>
@@ -314,8 +343,8 @@ export default function Home() {
       <View id="express" active={activeView === 'express'} accent="rgba(16,185,129,0.5)">
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-14">
-            <span className="inline-block mb-4 px-4 py-1.5 border border-emerald-500/30 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-[0.25em] uppercase">
-              ⚡ {t.exp_badge}
+            <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-emerald-500/30 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-[0.25em] uppercase">
+              <Zap className="w-3.5 h-3.5" /> {t.exp_badge}
             </span>
             <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-futuristic">{t.exp_title}</h2>
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.exp_subtitle}</p>
@@ -338,7 +367,7 @@ export default function Home() {
                 )}
                 <div className="absolute -right-8 -top-8 w-32 h-32 bg-emerald-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative">
-                  <div className="icon-fx text-4xl mb-5">{p.icon}</div>
+                  <IconTile icon={p.icon} tone="emerald" className="mb-5" />
                   <h3 className="text-lg font-bold mb-2 group-hover:text-emerald-300 transition-colors">{p.title}</h3>
                   <p className="text-gray-400 text-sm leading-relaxed mb-6 min-h-[60px]">{p.desc}</p>
                   <button
@@ -356,7 +385,7 @@ export default function Home() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
             {expressAddons.map((a, i) => (
               <div key={i} className="flex items-start gap-4 p-6 rounded-[1.75rem] border border-white/10 bg-white/[0.02]">
-                <div className="icon-fx text-3xl shrink-0">{a.icon}</div>
+                <IconTile icon={a.icon} tone="emerald" size="sm" className="shrink-0" />
                 <div>
                   <h4 className="font-bold mb-1">{a.title}</h4>
                   <p className="text-gray-400 text-sm leading-relaxed">{a.desc}</p>
@@ -382,8 +411,8 @@ export default function Home() {
       <View id="industries" active={activeView === 'industries'}>
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-14">
-            <span className="inline-block mb-4 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
-              📡 IoT · Telemetría
+            <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
+              <Radio className="w-3.5 h-3.5" /> IoT · Telemetría
             </span>
             <h2 className="text-4xl md:text-7xl font-black mb-6 tracking-tighter">{t.industries_title}</h2>
             <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto">{t.industries_subtitle}</p>
@@ -401,8 +430,8 @@ export default function Home() {
       <View id="security" active={activeView === 'security'} accent="rgba(239,68,68,0.5)">
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-16">
-            <span className="inline-block mb-4 px-4 py-1.5 border border-red-500/30 rounded-full bg-red-500/10 text-red-400 text-[10px] font-black tracking-[0.25em] uppercase">
-              🛡️ {t.sec_badge}
+            <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-red-500/30 rounded-full bg-red-500/10 text-red-400 text-[10px] font-black tracking-[0.25em] uppercase">
+              <Shield className="w-3.5 h-3.5" /> {t.sec_badge}
             </span>
             <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-futuristic">{t.sec_title}</h2>
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.sec_subtitle}</p>
@@ -413,7 +442,7 @@ export default function Home() {
               <div key={i} className="card-glow group relative p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-red-500/[0.06] hover:border-red-500/40 transition-all duration-500 overflow-hidden">
                 <div className="absolute -right-8 -top-8 w-32 h-32 bg-red-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative">
-                  <div className="icon-fx text-4xl mb-5">{f.icon}</div>
+                  <IconTile icon={f.icon} tone="red" className="mb-5" />
                   <h3 className="text-xl font-bold mb-3 group-hover:text-red-300 transition-colors">{f.title}</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
                 </div>
@@ -449,14 +478,14 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <p className="text-[11px] text-gray-500 font-bold uppercase tracking-wider border-t border-white/5 pt-3">⏱ {p.days}</p>
+                <p className="flex items-center gap-1.5 text-[11px] text-gray-500 font-bold uppercase tracking-wider border-t border-white/5 pt-3"><Clock className="w-3.5 h-3.5 shrink-0" /> {p.days}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 p-7 rounded-[2rem] border border-red-500/20 bg-gradient-to-r from-red-950/20 to-transparent">
             <div className="flex items-start gap-4">
-              <div className="icon-fx text-3xl shrink-0">🛰️</div>
+              <IconTile icon={Radar} tone="red" size="sm" className="shrink-0" />
               <div>
                 <h4 className="font-black mb-1 uppercase tracking-tight">{t.sec_monitor_title} · <span className="text-red-400">USD 80/{t.sec_monitor_per}</span></h4>
                 <p className="text-gray-400 text-sm leading-relaxed">{t.sec_monitor_desc}</p>
@@ -505,8 +534,8 @@ export default function Home() {
         <section className="max-w-6xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-block mb-5 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
-                ⭐ {t.case_badge}
+              <span className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
+                <Star className="w-3.5 h-3.5" /> {t.case_badge}
               </span>
               <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tighter leading-tight">{t.case_title}</h2>
               <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-8">{t.case_desc}</p>
@@ -540,7 +569,7 @@ export default function Home() {
                 </div>
 
                 <div className="relative rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 p-4 mb-4 overflow-hidden">
-                  <div className="absolute top-2 right-2 text-[8px] font-black bg-black/30 px-2 py-0.5 rounded-full uppercase tracking-widest">⏳ 02:14:55</div>
+                  <div className="absolute top-2 right-2 inline-flex items-center gap-1 text-[8px] font-black bg-black/30 px-2 py-0.5 rounded-full uppercase tracking-widest"><Clock className="w-2.5 h-2.5" /> 02:14:55</div>
                   <p className="text-xs font-black uppercase tracking-wider">-20% Fin de semana</p>
                   <p className="text-[10px] text-blue-100 mt-1">Banner auto-expirable</p>
                 </div>
