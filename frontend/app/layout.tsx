@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+
+// ⬇️ ID real de GA4 de Puma Code
+const GA_MEASUREMENT_ID = "G-3JV99THSGN";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -132,6 +136,8 @@ export default function RootLayout({
           {children}
         </div>
       </body>
+      {/* Google Analytics 4 - carga después de que la página es interactiva */}
+      <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
     </html>
   );
 }
