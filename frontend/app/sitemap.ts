@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 
+// Requerido por Next 16 con output: "export" para generar /sitemap.xml estático.
+export const dynamic = "force-static";
+
 // Con output: "export", Next.js genera /sitemap.xml como archivo estático en el build.
 // Declaramos SOLO la URL canónica para que Google no rastree variantes (www, http, /trailing).
 const BASE_URL = "https://puma-code.com";
