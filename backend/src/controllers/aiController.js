@@ -1,76 +1,51 @@
 const { OpenAI } = require('openai');
-const nodemailer = require('nodemailer');
-const dns = require('dns');
-
-// Railway no tiene salida por IPv6: forzamos que las resoluciones DNS
-// devuelvan IPv4 primero. Esto evita el error "ENETUNREACH ...:465" al
-// conectar con smtp.gmail.com.
-dns.setDefaultResultOrder('ipv4first');
+const { Resend } = require('resend');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- EMAIL vía Google Workspace (SMTP + App Password de 2 pasos) ---
+// --- EMAIL vía Resend (API HTTP, sale por 443 — funciona en Railway) ---
 // Variables de entorno necesarias:
-//   GMAIL_USER          = info@puma-code.com  (cuenta que envía)
-//   GMAIL_APP_PASSWORD  = la App Password de 16 caracteres de esa cuenta
-//   EMAIL_INFO          = info@puma-code.com  (recibe todas las cotizaciones)
-//   EMAIL_SECURITY      = security@puma-code.com (recibe además las de pentest)
-const GMAIL_USER = process.env.GMAIL_USER || 'info@puma-code.com';
-const MAIL_FROM = `Puma Code <${GMAIL_USER}>`;
+//   RESEND_API_KEY   = re_xxxxx  (API key de Resend)
+//   EMAIL_FROM       = info@puma-code.com  (remitente; debe ser del dominio verificado en Resend)
+//   EMAIL_INFO       = info@puma-code.com  (recibe todas las cotizaciones)
+//   EMAIL_SECURITY   = security@puma-code.com (recibe además las de pentest)
+const FROM_ADDRESS = process.env.EMAIL_FROM || process.env.GMAIL_USER || 'info@puma-code.com';
+const MAIL_FROM = `Puma Code <${FROM_ADDRESS}>`;
 const EMAIL_INFO = process.env.EMAIL_INFO || 'info@puma-code.com';
 const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
 
-// --- Transporter SMTP con IPv4 forzado ---
-// En Railway no hay salida IPv6. Nodemailer a veces ignora 'ipv4first' y
-// resuelve smtp.gmail.com a una IPv6 (-> ENETUNREACH). Para evitarlo,
-// resolvemos el host a una IPv4 concreta y se la pasamos en 'host',
-// manteniendo el SNI/certificado correcto con servername.
-const dnsPromises = require('dns').promises;
-let cachedTransport = null;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-async function getMailer() {
-  if (cachedTransport) return cachedTransport;
-
-  let smtpHost = 'smtp.gmail.com';
-  try {
-    const { address } = await dnsPromises.lookup('smtp.gmail.com', { family: 4 });
-    smtpHost = address; // IPv4 concreta, ej: 64.233.x.x
-  } catch (e) {
-    console.error('⚠️ No se pudo resolver IPv4 de smtp.gmail.com:', e.message);
+// Helper único de envío. Mantiene la misma "forma" que usábamos con nodemailer
+// (to, replyTo, subject, html, attachments) para no tocar el resto del código.
+// attachments: [{ filename, content }]  (content = base64 string o Buffer)
+async function sendEmail({ to, replyTo, subject, html, attachments }) {
+  const payload = {
+    from: MAIL_FROM,
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    html,
+  };
+  if (replyTo) payload.replyTo = replyTo;
+  if (attachments && attachments.length) {
+    // Resend solo usa { filename, content }; descartamos campos de nodemailer (encoding/cid).
+    payload.attachments = attachments.map((a) => ({ filename: a.filename, content: a.content }));
   }
 
-  cachedTransport = nodemailer.createTransport({
-    host: smtpHost,
-    port: 587,            // STARTTLS
-    secure: false,
-    requireTLS: true,
-    name: 'puma-code.com',
-    connectionTimeout: 15000,
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
-    tls: {
-      servername: 'smtp.gmail.com', // el certificado se valida contra el dominio real
-      minVersion: 'TLSv1.2',
-    },
-    auth: {
-      user: GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
-
-  return cachedTransport;
+  const { data, error } = await resend.emails.send(payload);
+  if (error) {
+    // Lanzamos para que el catch del endpoint lo registre y devuelva 500.
+    throw new Error(error.message || JSON.stringify(error));
+  }
+  return data;
 }
 
-// Chequeo de conexión al arrancar (queda en los logs de Railway).
-(async () => {
-  try {
-    const m = await getMailer();
-    await m.verify();
-    console.log('✅ SMTP listo para enviar correos.');
-  } catch (err) {
-    console.error('❌ SMTP no disponible:', err.message);
-  }
-})();
+// Aviso temprano en los logs si falta la API key.
+if (!process.env.RESEND_API_KEY) {
+  console.error('❌ Falta RESEND_API_KEY — los correos NO se enviarán.');
+} else {
+  console.log('✅ Resend configurado para enviar correos.');
+}
 
 // El modelo se define en la variable de entorno OPENAI_MODEL.
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4-turbo';
@@ -1381,7 +1356,7 @@ Responde estrictamente en JSON:
               </div>`
         : '';
 
-      await (await getMailer()).sendMail({
+      await sendEmail({
         from: MAIL_FROM,
         to: [EMAIL_INFO, EMAIL_SECURITY],
         replyTo: userData.email,
@@ -1441,7 +1416,7 @@ Responde estrictamente en JSON:
       ? `⚡ EXPRESS · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`
       : `📤 Listo para reenviar · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
 
-    await (await getMailer()).sendMail({
+    await sendEmail({
       from: MAIL_FROM,
       to: EMAIL_INFO,
       replyTo: userData.email,
@@ -1538,7 +1513,7 @@ exports.submitAuthorization = async (req, res) => {
         <td style="padding:8px 0; color:#111827; font-size:13px; font-weight:bold;">${escapeHtml(value || '—')}</td>
       </tr>`;
 
-    await (await getMailer()).sendMail({
+    await sendEmail({
       from: MAIL_FROM,
       to: [EMAIL_INFO, EMAIL_SECURITY],
       replyTo: userData.email,
@@ -1567,7 +1542,7 @@ exports.submitAuthorization = async (req, res) => {
               ${row('Consentimiento', 'ACEPTADO ✅')}
             </table>
             <p style="margin:18px 0 6px; color:#6b7280; font-size:12px; font-weight:bold;">Firma:</p>
-            <img src="cid:firma.png" alt="Firma del cliente" style="max-width:320px; border:1px solid #e5e7eb; border-radius:8px; background:#fff;" />
+            <img src="data:image/png;base64,${base64}" alt="Firma del cliente" style="max-width:320px; border:1px solid #e5e7eb; border-radius:8px; background:#fff;" />
             <p style="margin:18px 0 0; font-size:11px; color:#9ca3af; line-height:1.5;">
               Documento generado desde el chat de puma-code.com. La firma adjunta (firma.png) y estos datos constituyen el consentimiento del titular para la evaluación de seguridad.
             </p>
