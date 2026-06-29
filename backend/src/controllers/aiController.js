@@ -1,5 +1,11 @@
 const { OpenAI } = require('openai');
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+
+// Railway no tiene salida por IPv6: forzamos que las resoluciones DNS
+// devuelvan IPv4 primero. Esto evita el error "ENETUNREACH ...:465" al
+// conectar con smtp.gmail.com.
+dns.setDefaultResultOrder('ipv4first');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -16,21 +22,30 @@ const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
 
 const mailer = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  // Estas propiedades fuerzan el comportamiento de la red:
-  family: 4, 
+  port: 587,            // STARTTLS — Railway deja salir este puerto sin problema
+  secure: false,        // false en 587 (la conexión se cifra con requireTLS)
+  requireTLS: true,
+  family: 4,            // fuerza IPv4 en la conexión
   tls: {
-    rejectUnauthorized: true,
-    minVersion: 'TLSv1.2'
+    minVersion: 'TLSv1.2',
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 5000,
-  socketTimeout: 10000,
-  auth: { 
-    user: GMAIL_USER, 
-    pass: process.env.GMAIL_APP_PASSWORD 
+  connectionTimeout: 15000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000,
+  auth: {
+    user: GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
+});
+
+// Al arrancar, verificamos la conexión SMTP y lo dejamos en los logs.
+// Si las credenciales o la red fallan, vas a ver el motivo exacto acá.
+mailer.verify((err) => {
+  if (err) {
+    console.error('❌ SMTP no disponible:', err.message);
+  } else {
+    console.log('✅ SMTP listo para enviar correos.');
+  }
 });
 
 // El modelo se define en la variable de entorno OPENAI_MODEL.
