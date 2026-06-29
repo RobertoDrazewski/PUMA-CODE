@@ -2,23 +2,23 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const fs = require('fs'); // Importamos para diagnosticar
 require('dotenv').config();
 
-// --- DIAGNÓSTICO ---
-const rutaAi = path.join(__dirname, 'src', 'routes', 'aiRoutes.js');
-console.log('--- DIAGNÓSTICO DE RUTA ---');
-console.log('Directorio actual (__dirname):', __dirname);
-console.log('¿Existe el archivo aiRoutes.js en:', rutaAi, '?', fs.existsSync(rutaAi));
-console.log('---------------------------');
+const { testConnection } = require('./src/config/db');
+const { initDb } = require('./src/config/initDb');
 
-// Si esto falla, el archivo no existe donde crees que existe
-const aiRoutes = require(rutaAi);
+// --- Rutas ---
+const aiRoutes = require('./src/routes/aiRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const usersRoutes = require('./src/routes/usersRoutes');
+const clientsRoutes = require('./src/routes/clientsRoutes');
+const projectsRoutes = require('./src/routes/projectsRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes');
+const sentinelRoutes = require('./src/routes/sentinelRoutes');
 
 const app = express();
-// ... resto de tu código
 
-// Render/Proxy: necesario para que el rate-limit lea la IP real.
+// Railway/Proxy: necesario para que el rate-limit lea la IP real.
 app.set('trust proxy', 1);
 
 // --- CORS ---
@@ -30,7 +30,7 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
 app.use(
   cors({
     origin: allowedOrigins.length ? allowedOrigins : true,
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: false,
   })
@@ -39,36 +39,59 @@ app.use(
 // --- BODY PARSER ---
 app.use(express.json({ limit: '1mb' }));
 
-// --- RATE LIMIT ---
+// --- RATE LIMIT (solo IA, para controlar costos) ---
 const aiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Demasiadas solicitudes. Probá de nuevo en unos minutos.' },
+  message: { error: 'Demasiadas solicitudes. Proba de nuevo en unos minutos.' },
 });
 
-// --- RUTAS ---
+// --- RUTAS PUBLICAS / IA ---
 app.use('/api/ai', aiLimiter, aiRoutes);
 
+// --- RUTAS DEL PANEL DE CONTROL ---
+app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/clients', clientsRoutes);
+app.use('/api/projects', projectsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/sentinel', sentinelRoutes);
+
 app.get('/', (req, res) => {
-  res.status(200).send('🐆 Puma Code API is running smoothly...');
+  res.status(200).send('Puma Code API is running smoothly...');
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ ok: true });
 });
 
 // --- MANEJO DE ERRORES GLOBAL ---
 app.use((err, req, res, next) => {
-  console.error('❌ SERVER ERROR:', err.stack || err);
-  res.status(500).json({ success: false, error: 'Algo salió mal en el servidor de Puma Code' });
+  console.error('SERVER ERROR:', err.stack || err);
+  res.status(500).json({ success: false, error: 'Algo salio mal en el servidor de Puma Code' });
 });
 
 // --- INICIO ---
 const PORT = process.env.PORT || 10000;
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log('-------------------------------------------');
-  console.log(`🚀 Puma Code Server ready on port ${PORT}`);
-  console.log('-------------------------------------------');
-});
 
-// Timeouts para peticiones largas (IA)
-server.keepAliveTimeout = 120000;
-server.headersTimeout = 125000;
+async function start() {
+  try {
+    await testConnection();
+    await initDb();
+  } catch (err) {
+    console.error('No se pudo inicializar la base de datos:', err.message);
+  }
+
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log('-------------------------------------------');
+    console.log('Puma Code Server ready on port ' + PORT);
+    console.log('-------------------------------------------');
+  });
+
+  server.keepAliveTimeout = 120000;
+  server.headersTimeout = 125000;
+}
+
+start();

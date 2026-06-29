@@ -148,6 +148,23 @@ export default function Navbar({ lang, setLang, t, activeView = 'home', onNaviga
               )}
             </div>
 
+            {/* ACCESO AL PANEL ADMIN */}
+            <a
+              href="/admin"
+              aria-label="Acceso al panel de administración"
+              title="Panel de administración"
+              className="flex items-center gap-2 bg-white/5 hover:bg-blue-600/10 px-3 sm:px-4 py-2 rounded-full border border-white/10 transition-all group active:scale-90"
+            >
+              <svg
+                className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform"
+                fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+              >
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 018 0v4" />
+              </svg>
+              <span className="text-white text-[10px] font-black uppercase hidden sm:inline tracking-widest">Admin</span>
+            </a>
+
             {/* HAMBURGUESA (visible debajo de xl) */}
             <button
               type="button"
@@ -192,6 +209,19 @@ export default function Navbar({ lang, setLang, t, activeView = 'home', onNaviga
                 </button>
               );
             })}
+
+            {/* ACCESO AL PANEL ADMIN (móvil) */}
+            <a
+              href="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="mobile-link flex items-center gap-3"
+            >
+              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 018 0v4" />
+              </svg>
+              Admin
+            </a>
           </div>
         </div>
       )}
