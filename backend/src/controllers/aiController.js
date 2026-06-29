@@ -17,6 +17,8 @@ const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
 const mailer = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
+  family: 4,
+  connectionTimeout: 15000,
   secure: true,
   auth: { user: GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
 });
