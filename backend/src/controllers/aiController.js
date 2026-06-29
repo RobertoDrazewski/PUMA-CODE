@@ -17,10 +17,20 @@ const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
 const mailer = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
-  family: 4,
-  connectionTimeout: 15000,
   secure: true,
-  auth: { user: GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+  // Estas propiedades fuerzan el comportamiento de la red:
+  family: 4, 
+  tls: {
+    rejectUnauthorized: true,
+    minVersion: 'TLSv1.2'
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
+  auth: { 
+    user: GMAIL_USER, 
+    pass: process.env.GMAIL_APP_PASSWORD 
+  },
 });
 
 // El modelo se define en la variable de entorno OPENAI_MODEL.
