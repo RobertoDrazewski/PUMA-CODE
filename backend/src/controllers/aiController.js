@@ -20,33 +20,57 @@ const MAIL_FROM = `Puma Code <${GMAIL_USER}>`;
 const EMAIL_INFO = process.env.EMAIL_INFO || 'info@puma-code.com';
 const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
 
-const mailer = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,            // STARTTLS — Railway deja salir este puerto sin problema
-  secure: false,        // false en 587 (la conexión se cifra con requireTLS)
-  requireTLS: true,
-  family: 4,            // fuerza IPv4 en la conexión
-  tls: {
-    minVersion: 'TLSv1.2',
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 10000,
-  socketTimeout: 20000,
-  auth: {
-    user: GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+// --- Transporter SMTP con IPv4 forzado ---
+// En Railway no hay salida IPv6. Nodemailer a veces ignora 'ipv4first' y
+// resuelve smtp.gmail.com a una IPv6 (-> ENETUNREACH). Para evitarlo,
+// resolvemos el host a una IPv4 concreta y se la pasamos en 'host',
+// manteniendo el SNI/certificado correcto con servername.
+const dnsPromises = require('dns').promises;
+let cachedTransport = null;
 
-// Al arrancar, verificamos la conexión SMTP y lo dejamos en los logs.
-// Si las credenciales o la red fallan, vas a ver el motivo exacto acá.
-mailer.verify((err) => {
-  if (err) {
-    console.error('❌ SMTP no disponible:', err.message);
-  } else {
-    console.log('✅ SMTP listo para enviar correos.');
+async function getMailer() {
+  if (cachedTransport) return cachedTransport;
+
+  let smtpHost = 'smtp.gmail.com';
+  try {
+    const { address } = await dnsPromises.lookup('smtp.gmail.com', { family: 4 });
+    smtpHost = address; // IPv4 concreta, ej: 64.233.x.x
+  } catch (e) {
+    console.error('⚠️ No se pudo resolver IPv4 de smtp.gmail.com:', e.message);
   }
-});
+
+  cachedTransport = nodemailer.createTransport({
+    host: smtpHost,
+    port: 587,            // STARTTLS
+    secure: false,
+    requireTLS: true,
+    name: 'puma-code.com',
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
+    tls: {
+      servername: 'smtp.gmail.com', // el certificado se valida contra el dominio real
+      minVersion: 'TLSv1.2',
+    },
+    auth: {
+      user: GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+
+  return cachedTransport;
+}
+
+// Chequeo de conexión al arrancar (queda en los logs de Railway).
+(async () => {
+  try {
+    const m = await getMailer();
+    await m.verify();
+    console.log('✅ SMTP listo para enviar correos.');
+  } catch (err) {
+    console.error('❌ SMTP no disponible:', err.message);
+  }
+})();
 
 // El modelo se define en la variable de entorno OPENAI_MODEL.
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4-turbo';
@@ -1357,7 +1381,7 @@ Responde estrictamente en JSON:
               </div>`
         : '';
 
-      await mailer.sendMail({
+      await (await getMailer()).sendMail({
         from: MAIL_FROM,
         to: [EMAIL_INFO, EMAIL_SECURITY],
         replyTo: userData.email,
@@ -1417,7 +1441,7 @@ Responde estrictamente en JSON:
       ? `⚡ EXPRESS · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`
       : `📤 Listo para reenviar · ${escapeHtml(proyecto)} · ${escapeHtml(clientName)} (${escapeHtml(perfil)})`;
 
-    await mailer.sendMail({
+    await (await getMailer()).sendMail({
       from: MAIL_FROM,
       to: EMAIL_INFO,
       replyTo: userData.email,
@@ -1514,7 +1538,7 @@ exports.submitAuthorization = async (req, res) => {
         <td style="padding:8px 0; color:#111827; font-size:13px; font-weight:bold;">${escapeHtml(value || '—')}</td>
       </tr>`;
 
-    await mailer.sendMail({
+    await (await getMailer()).sendMail({
       from: MAIL_FROM,
       to: [EMAIL_INFO, EMAIL_SECURITY],
       replyTo: userData.email,
