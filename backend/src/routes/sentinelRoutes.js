@@ -17,6 +17,7 @@ router.get('/projects/:id/audits', s.listAudits);
 
 // Auditorías
 router.get('/audits/:id', s.getAudit);
+router.get('/audits/:id/report', s.downloadReport);
 
 // Analizador IA
 router.post('/analyze', s.analyze);

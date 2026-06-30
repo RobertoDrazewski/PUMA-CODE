@@ -16,6 +16,7 @@
     "mysql2": "^3.22.5",
     "nodemailer": "^8.0.10",
     "openai": "^6.34.0",
+    "pdfkit": "^0.19.1",
     "resend": "^6.12.2"
   },
   "devDependencies": {

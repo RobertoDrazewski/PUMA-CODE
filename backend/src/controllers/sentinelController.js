@@ -7,6 +7,7 @@ const { pool } = require('../config/db');
 const { analizarSalida, calcularScore, obtenerTests, evaluarRespuestaChatbot } = require('../core/sentinelAI');
 const { generarToken, calcularEstadoSello, generarBadgeSVG, generarPaginaVerificacion } = require('../core/sentinelBadge');
 const { PLANES, normalizarPlan, comandosPara } = require('../core/sentinelCommands');
+const { crearDocInforme } = require('../core/sentinelReport');
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 const fmtFecha = (d) => (d ? new Date(d).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Nunca');
@@ -197,6 +198,29 @@ exports.commands = async (req, res, next) => {
     if (!p) return res.status(404).json({ success: false, error: 'Proyecto no encontrado.' });
     const comandos = comandosPara(p.plan, p.domain);
     res.json({ success: true, cliente: p.name, dominio: p.domain, plan: p.plan, total_pasos: comandos.length, comandos });
+  } catch (err) { next(err); }
+};
+
+// GET /api/sentinel/audits/:id/report  → genera y descarga el PDF del informe
+exports.downloadReport = async (req, res, next) => {
+  try {
+    const [aRows] = await pool.query('SELECT * FROM sentinel_audits WHERE id = ?', [req.params.id]);
+    const audit = aRows[0];
+    if (!audit) return res.status(404).json({ success: false, error: 'Auditoría no encontrada.' });
+
+    const [pRows] = await pool.query('SELECT * FROM sentinel_projects WHERE id = ?', [audit.project_id]);
+    const project = pRows[0];
+    if (!project) return res.status(404).json({ success: false, error: 'Proyecto no encontrado.' });
+
+    const safe = String(project.name).toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const filename = `Informe_Sentinel_${safe || 'CLIENTE'}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const doc = crearDocInforme({ project, audit });
+    doc.pipe(res);
+    doc.end();
   } catch (err) { next(err); }
 };
 

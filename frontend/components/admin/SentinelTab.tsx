@@ -1,8 +1,30 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { api, API_BASE, formatDate } from '../../lib/adminApi';
+import { api, API_BASE, formatDate, getToken } from '../../lib/adminApi';
 import { Card, Button, Input, Select, Modal } from './ui';
+
+/* Abre un archivo desde un endpoint protegido (manda el token, trae el blob
+   y lo abre en una pestaña nueva; si el navegador la bloquea, lo descarga). */
+async function descargarArchivoAuth(path: string, fallbackName: string) {
+  const res = await fetch(`${API_BASE}${path}`, { headers: { Authorization: `Bearer ${getToken()}` } });
+  if (!res.ok) {
+    let msg = `No se pudo generar el informe (HTTP ${res.status}).`;
+    try { const j = await res.json(); msg = j.error || msg; } catch { /* binario */ }
+    throw new Error(msg);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    // Pestaña bloqueada por el navegador -> caemos a descarga directa.
+    const a = document.createElement('a');
+    a.href = url; a.download = fallbackName;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  // Damos tiempo a que la pestaña/descarga tome el blob antes de liberarlo.
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
 
 /* ===================== Tipos ===================== */
 interface SProject {
@@ -114,10 +136,20 @@ function PanelView({ stats, projects, reload }: { stats: Stats | null; projects:
     if (!confirm('¿Quitar este proyecto de Sentinel? Se borran sus auditorías.')) return;
     await api(`/api/sentinel/projects/${id}`, { method: 'DELETE' }); reload();
   }
+  async function descargarUltimoInforme(p: SProject) {
+    setError('');
+    try {
+      const res = await api<{ audits: { id: number }[] }>(`/api/sentinel/projects/${p.id}/audits`);
+      if (!res.audits.length) { setError(`"${p.nombre}" todavía no tiene auditorías para informar.`); return; }
+      await descargarArchivoAuth(`/api/sentinel/audits/${res.audits[0].id}/report`, `Informe_Sentinel_${p.nombre}.pdf`);
+    } catch (e) { setError(e instanceof Error ? e.message : 'Error'); }
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-end"><Button variant="danger" onClick={() => setOpen(true)}>+ Nuevo proyecto</Button></div>
+
+      {error && <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
 
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -145,7 +177,10 @@ function PanelView({ stats, projects, reload }: { stats: Stats | null; projects:
               <div><p className="text-slate-600">Plan</p><p className="text-slate-300 capitalize">{p.plan}</p></div>
               <div><p className="text-slate-600">Última auditoría</p><p className="text-slate-300">{p.fecha}</p></div>
             </div>
-            <div className="flex justify-end mt-3"><button onClick={() => remove(p.id)} className="text-red-400/70 hover:text-red-300 text-xs">Quitar</button></div>
+            <div className="flex justify-between items-center mt-3">
+              <button onClick={() => descargarUltimoInforme(p)} className="text-blue-400 hover:text-blue-300 text-xs">📄 Último informe PDF</button>
+              <button onClick={() => remove(p.id)} className="text-red-400/70 hover:text-red-300 text-xs">Quitar</button>
+            </div>
           </Card>
         ))}
         {projects.length === 0 && <p className="text-slate-600 text-sm">No hay proyectos en Sentinel todavía.</p>}
@@ -178,7 +213,8 @@ function AnalyzerView({ projects }: { projects: SProject[]; reload: () => void }
   const [raw, setRaw] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [result, setResult] = useState<{ score: { score: number; nivel: string }; detalle: { hallazgos: Hallazgo[]; infraestructura: { parametro: string; valor: string }[]; controles_ok: { control: string; observacion: string }[]; nota?: string; datos_insuficientes?: boolean } } | null>(null);
+  const [result, setResult] = useState<{ audit_id: number; score: { score: number; nivel: string }; detalle: { hallazgos: Hallazgo[]; infraestructura: { parametro: string; valor: string }[]; controles_ok: { control: string; observacion: string }[]; nota?: string; datos_insuficientes?: boolean } } | null>(null);
+  const [dlError, setDlError] = useState('');
 
   const proj = projects.find((p) => String(p.id) === projectId);
   const tools = proj ? TOOLS_BY_PLAN[proj.plan] || TOOLS_BY_PLAN.profesional : TOOLS_BY_PLAN.enterprise;
@@ -214,10 +250,18 @@ function AnalyzerView({ projects }: { projects: SProject[]; reload: () => void }
 
       {result && (
         <div className="space-y-4">
-          <Card className="p-5 flex items-center justify-between">
+          <Card className="p-5 flex items-center justify-between gap-4 flex-wrap">
             <div><p className="text-xs uppercase tracking-wide text-slate-500">Score de postura</p><p className="text-3xl font-bold text-white mt-1 capitalize">{result.score.score}<span className="text-base text-slate-500">/100 · {result.score.nivel}</span></p></div>
-            <div className="text-right text-sm text-slate-400">{result.detalle.hallazgos.length} hallazgo(s)</div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-slate-400">{result.detalle.hallazgos.length} hallazgo(s)</span>
+              <Button onClick={async () => {
+                setDlError('');
+                try { await descargarArchivoAuth(`/api/sentinel/audits/${result.audit_id}/report`, 'Informe_Sentinel.pdf'); }
+                catch (e) { setDlError(e instanceof Error ? e.message : 'Error'); }
+              }}>📄 Descargar informe PDF</Button>
+            </div>
           </Card>
+          {dlError && <p className="text-sm text-red-400">{dlError}</p>}
 
           {result.detalle.datos_insuficientes && <Card className="p-4 text-amber-300 text-sm">⚠ Datos insuficientes: {result.detalle.nota}</Card>}
 
