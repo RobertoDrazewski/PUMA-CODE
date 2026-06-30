@@ -66,42 +66,43 @@ CREATE TABLE IF NOT EXISTS projects (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------------------------------------------
---  SENTINEL · proyectos monitoreados (cybersecurity)
---  status: SEGURO | ACEPTABLE | MEJORABLE | CRITICO
+--  SENTINEL · proyectos monitoreados (= "clientes" de seguridad)
+--  Cada proyecto tiene un sello (badge) con token público propio.
+--  plan: basico | profesional | enterprise
 -- ----------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS sentinel_projects (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  name        VARCHAR(160) NOT NULL,
-  domain      VARCHAR(200) DEFAULT NULL,
-  plan        ENUM('Basico','Profesional','Enterprise') NOT NULL DEFAULT 'Profesional',
-  score       INT NOT NULL DEFAULT 0,           -- 0..100
-  status      ENUM('SEGURO','ACEPTABLE','MEJORABLE','CRITICO') NOT NULL DEFAULT 'ACEPTABLE',
-  monitored   TINYINT(1) NOT NULL DEFAULT 1,
-  last_audit  DATE DEFAULT NULL,
-  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  name          VARCHAR(160) NOT NULL,
+  domain        VARCHAR(200) DEFAULT NULL,
+  contact       VARCHAR(160) DEFAULT NULL,
+  country       VARCHAR(8)  NOT NULL DEFAULT 'AR',
+  plan          ENUM('basico','profesional','enterprise') NOT NULL DEFAULT 'profesional',
+  score         DECIMAL(5,1) NOT NULL DEFAULT 0,    -- último score 0..100
+  badge_token   VARCHAR(80) DEFAULT NULL UNIQUE,    -- token público del sello
+  badge_active  TINYINT(1) NOT NULL DEFAULT 1,
+  last_audit    DATETIME DEFAULT NULL,
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_sproj_token (badge_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------------------------------------------
---  SENTINEL · hallazgos (findings) por proyecto
---  severity: low | medium | high | critical   ·   status: open | resolved
+--  SENTINEL · auditorías (cada análisis IA de salida de pentest)
+--  result_json guarda la salida completa del analizador (infra,
+--  hallazgos con CVSS, controles_ok, score determinístico).
 -- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS sentinel_findings (
-  id                   INT AUTO_INCREMENT PRIMARY KEY,
-  sentinel_project_id  INT NOT NULL,
-  title                VARCHAR(200) NOT NULL,
-  severity             ENUM('low','medium','high','critical') NOT NULL DEFAULT 'medium',
-  status               ENUM('open','resolved') NOT NULL DEFAULT 'open',
-  created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_findings_project FOREIGN KEY (sentinel_project_id) REFERENCES sentinel_projects(id) ON DELETE CASCADE,
-  INDEX idx_findings_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------------------------------------------
---  SENTINEL · actividad reciente (feed)
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS sentinel_activity (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  message     VARCHAR(400) NOT NULL,
-  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS sentinel_audits (
+  id             INT AUTO_INCREMENT PRIMARY KEY,
+  project_id     INT NOT NULL,
+  plan           VARCHAR(40) NOT NULL,
+  tool           VARCHAR(60) DEFAULT NULL,        -- herramienta analizada (nmap, nikto, ...)
+  score          DECIMAL(5,1) NOT NULL DEFAULT 0,
+  level          VARCHAR(20) DEFAULT NULL,         -- excelente | bueno | regular | critico
+  findings_count INT NOT NULL DEFAULT 0,
+  status         VARCHAR(20) NOT NULL DEFAULT 'completada',
+  result_json    LONGTEXT,
+  created_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_audits_project FOREIGN KEY (project_id) REFERENCES sentinel_projects(id) ON DELETE CASCADE,
+  INDEX idx_audits_project (project_id),
+  INDEX idx_audits_date (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

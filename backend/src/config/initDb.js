@@ -48,42 +48,54 @@ async function seedSentinel() {
   const [rows] = await pool.query('SELECT COUNT(*) AS n FROM sentinel_projects');
   if (rows[0].n > 0) return;
 
+  const { generarToken } = require('../core/sentinelBadge');
+
+  // [name, domain, plan, score, last_audit]
   const projects = [
-    ['Botas Blancas Studio', 'botasblancasstudio.com', 'Profesional', 92, 'SEGURO', '2026-06-12'],
-    ['Agrotech Mendoza', 'agrotech-pumacode.com.ar', 'Enterprise', 78, 'ACEPTABLE', '2026-06-18'],
-    ['Good Trip Car Rentals', 'goodtrip.com', 'Enterprise', 42, 'MEJORABLE', '2026-06-29'],
-    ['Puma Code (self-audit)', 'puma-code.com', 'Enterprise', 95, 'SEGURO', '2026-06-10'],
+    ['Botas Blancas Studio', 'botasblancasstudio.com', 'profesional', 92, '2026-06-12 10:00:00'],
+    ['Agrotech Mendoza', 'agrotech-pumacode.com.ar', 'enterprise', 78, '2026-06-18 15:30:00'],
+    ['Good Trip Car Rentals', 'goodtrip.com', 'enterprise', 42, '2026-06-29 09:00:00'],
+    ['Puma Code (self-audit)', 'puma-code.com', 'enterprise', 95, '2026-06-10 12:00:00'],
   ];
-  for (const p of projects) {
+
+  for (const [name, domain, plan, score, lastAudit] of projects) {
+    const [res] = await pool.query(
+      `INSERT INTO sentinel_projects (name, domain, plan, score, badge_token, badge_active, last_audit)
+       VALUES (?, ?, ?, ?, ?, 1, ?)`,
+      [name, domain, plan, score, generarToken(name, domain), lastAudit]
+    );
+    const projectId = res.insertId;
+
+    // Una auditoría demo asociada (con un par de hallazgos para "Good Trip").
+    const findings =
+      name.startsWith('Good Trip')
+        ? [
+            { titulo: 'Inyección de prompt directa en chatbot', severidad: 'alto', cvss: '7.5', owasp: 'LLM01:2025 - Prompt Injection', descripcion: 'El chatbot revela parte de sus instrucciones ante un ataque de inyección directa.', evidencia: 'Respuesta del chatbot al ataque LLM01-A.', impacto: 'Exposición de lógica interna y posible evasión de controles.', recomendacion: 'Reforzar el system prompt y filtrar entradas de usuario.' },
+            { titulo: 'Generación de contenido fuera de alcance', severidad: 'medio', cvss: '5.3', owasp: 'LLM09:2025 - Misinformation', descripcion: 'El chatbot genera contenido fuera de su dominio autorizado.', evidencia: 'Respuesta al ataque LLM05.', impacto: 'Uso indebido del asistente para fines no previstos.', recomendacion: 'Acotar el dominio de respuestas y rechazar pedidos fuera de alcance.' },
+          ]
+        : [];
+
+    const result = {
+      herramienta: name.startsWith('Good Trip') ? 'chatbot' : 'nmap',
+      datos_insuficientes: false,
+      nota: '',
+      infraestructura: [{ parametro: 'Auditoría inicial', valor: 'Datos de demostración' }],
+      hallazgos: findings,
+      controles_ok: findings.length === 0 ? [{ control: 'Postura general', observacion: 'Sin hallazgos relevantes en la auditoría inicial.' }] : [],
+    };
+
     await pool.query(
-      'INSERT INTO sentinel_projects (name, domain, plan, score, status, monitored, last_audit) VALUES (?, ?, ?, ?, ?, 1, ?)',
-      p
+      `INSERT INTO sentinel_audits (project_id, plan, tool, score, level, findings_count, status, result_json, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'completada', ?, ?)`,
+      [
+        projectId, plan, result.herramienta, score,
+        score >= 85 ? 'excelente' : score >= 70 ? 'bueno' : score >= 50 ? 'regular' : 'critico',
+        findings.length, JSON.stringify(result), lastAudit,
+      ]
     );
   }
 
-  // Hallazgos demo para "Good Trip" (id 3)
-  const findings = [
-    [3, 'Inyección de prompt directa', 'high', 'open'],
-    [3, 'Generación de contenido fuera de alcance', 'medium', 'open'],
-    [3, 'Jailbreak por rol parcial', 'high', 'open'],
-    [2, 'Fuga de instrucciones del sistema', 'medium', 'open'],
-  ];
-  for (const f of findings) {
-    await pool.query(
-      'INSERT INTO sentinel_findings (sentinel_project_id, title, severity, status) VALUES (?, ?, ?, ?)',
-      f
-    );
-  }
-
-  const activity = [
-    'Good Trip — re-pentest detectó 7 hallazgos, score bajó a 42.',
-    'Agrotech — test de chatbot con IA encontró 1 vulnerabilidad de alcance.',
-    'Botas Blancas — monitoreo diario OK. Score estable en 92.',
-  ];
-  for (const m of activity) {
-    await pool.query('INSERT INTO sentinel_activity (message) VALUES (?)', [m]);
-  }
-  console.log('🛡️  Datos demo de Sentinel cargados.');
+  console.log('🛡️  Datos demo de Sentinel cargados (proyectos + sellos + auditorías).');
 }
 
 async function initDb() {

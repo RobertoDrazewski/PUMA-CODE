@@ -15,6 +15,7 @@ const clientsRoutes = require('./src/routes/clientsRoutes');
 const projectsRoutes = require('./src/routes/projectsRoutes');
 const dashboardRoutes = require('./src/routes/dashboardRoutes');
 const sentinelRoutes = require('./src/routes/sentinelRoutes');
+const sentinelPublicRoutes = require('./src/routes/sentinelPublicRoutes');
 
 const app = express();
 
@@ -58,6 +59,9 @@ app.use('/api/clients', clientsRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/sentinel', sentinelRoutes);
+
+// Sellos Sentinel: endpoints PUBLICOS (se embeben en sitios de clientes, sin auth)
+app.use('/', sentinelPublicRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).send('Puma Code API is running smoothly...');

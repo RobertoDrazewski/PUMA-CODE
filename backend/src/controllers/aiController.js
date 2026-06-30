@@ -1,7 +1,7 @@
 const { OpenAI } = require('openai');
 const { Resend } = require('resend');
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'sk-missing-key' });
 
 // --- EMAIL vía Resend (API HTTP, sale por 443 — funciona en Railway) ---
 // Variables de entorno necesarias:
@@ -14,7 +14,9 @@ const MAIL_FROM = `Puma Code <${FROM_ADDRESS}>`;
 const EMAIL_INFO = process.env.EMAIL_INFO || 'info@puma-code.com';
 const EMAIL_SECURITY = process.env.EMAIL_SECURITY || 'security@puma-code.com';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// El SDK lanza si la key falta; pasamos un placeholder para no tumbar el
+// arranque y avisamos por logs. El envío real fallará claro si no hay key.
+const resend = new Resend(process.env.RESEND_API_KEY || 're_missing_key');
 
 // Helper único de envío. Mantiene la misma "forma" que usábamos con nodemailer
 // (to, replyTo, subject, html, attachments) para no tocar el resto del código.

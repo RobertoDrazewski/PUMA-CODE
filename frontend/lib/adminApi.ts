@@ -1,6 +1,6 @@
 // --- Cliente de API del panel de control ---
 // Usa el mismo patron que el resto del front: NEXT_PUBLIC_API_URL o localhost.
-const API_BASE =
+export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const TOKEN_KEY = 'puma_admin_token';

@@ -1,16 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const sentinel = require('../controllers/sentinelController');
+const s = require('../controllers/sentinelController');
 const { requireAuth } = require('../middleware/auth');
 
 router.use(requireAuth);
 
-router.get('/', sentinel.overview);
-router.post('/projects', sentinel.createProject);
-router.put('/projects/:id', sentinel.updateProject);
-router.delete('/projects/:id', sentinel.removeProject);
-router.get('/projects/:id/findings', sentinel.listFindings);
-router.post('/projects/:id/findings', sentinel.addFinding);
-router.put('/findings/:id', sentinel.updateFinding);
+// Panel
+router.get('/', s.overview);
+router.get('/planes', s.planes);
+
+// Proyectos
+router.post('/projects', s.createProject);
+router.put('/projects/:id', s.updateProject);
+router.delete('/projects/:id', s.removeProject);
+router.get('/projects/:id/audits', s.listAudits);
+
+// Auditorías
+router.get('/audits/:id', s.getAudit);
+
+// Analizador IA
+router.post('/analyze', s.analyze);
+
+// Test de chatbots (IA vs IA)
+router.get('/chatbot/tests', s.chatbotTests);
+router.post('/chatbot/evaluate', s.chatbotEvaluate);
+
+// Comandos guiados
+router.get('/commands/:projectId', s.commands);
 
 module.exports = router;
