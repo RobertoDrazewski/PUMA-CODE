@@ -238,6 +238,17 @@ const en: Dict = {
   chat_subtitle: "AI Assistant",
   chat_processing: "Processing...",
   chat_analyzing: "ANALYZING...",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROJECTS",
+  live_title_2: "IN PRODUCTION",
+  live_subtitle: "Real software operating for our clients at",
+  live_visit: "VISIT WEB",
+  live_goodtrip_desc: "SaaS platform for car rental fleet management.",
+  live_agrotech_desc: "IoT telemetry dashboard for smart vineyards.",
+  live_kalyber_desc: "Professional corporate website and service catalog.",
+  live_mendozapp_desc: "Local web platform for regional services.",
 };
 
 const es: Dict = {
@@ -463,6 +474,17 @@ const es: Dict = {
   chat_subtitle: "Asistente IA",
   chat_processing: "Procesando...",
   chat_analyzing: "ANALIZANDO...",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROYECTOS",
+  live_title_2: "EN PRODUCCIÓN",
+  live_subtitle: "Software real operando para nuestros clientes en",
+  live_visit: "VISITAR WEB",
+  live_goodtrip_desc: "Plataforma SaaS para gestión de flota de alquiler de autos.",
+  live_agrotech_desc: "Panel de telemetría IoT para viñedos inteligentes.",
+  live_kalyber_desc: "Sitio web corporativo profesional y catálogo de servicios.",
+  live_mendozapp_desc: "Plataforma web local para servicios regionales.",
 };
 
 const pt: Dict = {
@@ -687,10 +709,19 @@ const pt: Dict = {
   chat_subtitle: "Assistente IA",
   chat_processing: "Processando...",
   chat_analyzing: "ANALISANDO...",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROJETOS",
+  live_title_2: "EM PRODUÇÃO",
+  live_subtitle: "Software real operando para nossos clientes na",
+  live_visit: "VISITAR WEB",
+  live_goodtrip_desc: "Plataforma SaaS para gestão de frota de aluguel de carros.",
+  live_agrotech_desc: "Painel de telemetria IoT para vinhedos inteligentes.",
+  live_kalyber_desc: "Site corporativo profissional e catálogo de serviços.",
+  live_mendozapp_desc: "Plataforma web local para serviços regionais.",
 };
 
-// Idiomas con traducción parcial: conservan lo ya traducido y heredan en inglés
-// las claves de marketing nuevas (process_*, industries_*, ai_*, case_*, etc.).
 const it: Dict = {
   nav_home: "Inizio",
   nav_process: "Come funziona",
@@ -726,7 +757,7 @@ const it: Dict = {
   services_title: "Le Nostre Soluzioni",
   services_subtitle: "Tecnologia all'avanguardia per scalare il tuo business e ottimizzare ogni processo.",
   s1_title: "Sviluppo Web ad Alte Prestazioni",
-  s1_desc: "Creiamo piattaforme digitali ad alto impatto con Next.js e React per garantire tempi di caricamento istantanei e un'architettura scalabile.",
+  s1_desc: "Creiamo piattaforme digitali ad alto impatto con Next.js e React per garantire tempi di caricamento istantanei e un'architettura scalable.",
   s2_title: "App Native e Cross-Platform",
   s2_desc: "Sviluppiamo applicazioni mobili robuste per iOS e Android, puntando su prestazioni, sicurezza dei dati e un'interfaccia intuitiva.",
   s3_title: "Connettività IoT e Telemetria",
@@ -734,7 +765,7 @@ const it: Dict = {
   s4_title: "Architettura IA e Machine Learning",
   s4_desc: "Integriamo modelli linguistici avanzati e analisi predittiva nel tuo flusso di lavoro per automatizzare le decisioni.",
   s5_title: "Ottimizzazione ed Efficienza Operativa",
-  s5_desc: "Eliminiamo la fatica operativa automatizzando i processi amministrativi e la gestione del magazzino per liberare il tuo team.",
+  s5_desc: "Eliminiamo la fatiga operativa automatizzando i processi amministrativi e la gestione del magazzino per liberare il tuo team.",
   s6_title: "QA Strategico e Qualità Industriale",
   s6_desc: "Garantiamo l'integrità del prodotto con metodologie di testing rigorose, assicurando che ogni rilascio sia sicuro e senza errori.",
   industries_title: "Telemetria per il mondo reale",
@@ -794,7 +825,7 @@ const it: Dict = {
   sec_f3_title: "Hardening dell'infrastruttura",
   sec_f3_desc: "Configurazione sicura di server, header, certificati e DNS (Cloudflare, DNSSEC, TLS) per chiudere le porte inutili.",
   sec_f4_title: "Report e remediation",
-  sec_f4_desc: "Ricevi un report esecutivo con ogni rilievo, la sua gravità e i passi concreti per risolverlo. Senza tecnicismi.",
+  sec_f4_desc: "Ricevi un report esecutivo con ogni rilievo, la sua gravità e i passi concreti per risolverlo. Senza tecnicismos.",
   sec_risk_badge: "Rischio reale",
   sec_risk_title: "Una sola vulnerabilità può costarti i tuoi clienti.",
   sec_risk_desc: "Fughe di dati, furto d'identità del brand, multe e perdita di fiducia. La maggior parte degli attacchi sfrutta falle che si potevano trovare e correggere prima. Anticipa.",
@@ -868,6 +899,17 @@ const it: Dict = {
   exp_addon2_desc: "Chatbot, generazione automatica di banner, interpretazione di immagini o qualsiasi funzione con intelligenza artificiale.",
   exp_note: "Il prezzo finale dipende dagli strumenti che scegli. Racconta al nostro assistente cosa serve alla tua attività e ottieni il preventivo esatto in pochi minuti.",
   exp_cta: "Voglio il mio preventivo",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROGETTI",
+  live_title_2: "IN PRODUZIONE",
+  live_subtitle: "Software reale operativo per i nostri clienti presso",
+  live_visit: "VISITA WEB",
+  live_goodtrip_desc: "Piattaforma SaaS per la gestione di flotte di autonoleggio.",
+  live_agrotech_desc: "Pannello di telemetria IoT per vigneti intelligenti.",
+  live_kalyber_desc: "Sito web aziendale professionale e catalogo di servizi.",
+  live_mendozapp_desc: "Piattaforma web locale per servizi regionali.",
 };
 
 const ca: Dict = {
@@ -976,7 +1018,7 @@ const ca: Dict = {
   sec_f4_desc: "Reps un informe executiu amb cada troballa, la seva gravetat i els passos concrets per solucionar-ho. Sense tecnicismes.",
   sec_risk_badge: "Risc real",
   sec_risk_title: "Una sola vulnerabilitat pot costar-te els teus clients.",
-  sec_risk_desc: "Fuga de dades, suplantació de la teva marca, multes i pèrdua de confiança. La majoria dels atacs aprofiten fallades que es podien detectar i arreglar abans. Avança't.",
+  sec_risk_desc: "Fuga de dades, suplantació de la teva marca, multas i pèrdua de confiança. La majoria dels atacs aprofiten fallades que es podien detectar i arreglar abans. Avança't.",
   sec_b1: "Detecció de vulnerabilitats web, d'API i d'infraestructura.",
   sec_b2: "Auditoria especialitzada de components amb IA.",
   sec_b3: "Informe clar amb prioritats i pla d'acció.",
@@ -1010,7 +1052,7 @@ const ca: Dict = {
   sec_plan3_i6: "Retest fins a 60 dies + suport postlliurament 30 dies",
   sec_monitor_title: "Monitoratge mensual",
   sec_monitor_per: "mes",
-  sec_monitor_desc: "Vigilància contínua per a webs en producció: actualitzacions pendents, noves vulnerabilitats, alerta primerenca i informe mensual. 10% de descompte combinant-lo amb qualsevol pla.",
+  sec_monitor_desc: "Vigilància contínua per a webs en producció: actualitzacions pendentes, noves vulnerabilitats, alerta primerenca i informe mensual. 10% de descompte combinant-lo amb qualsevol pla.",
   auth_title: "Autorització de pentest",
   auth_intro: "Un penetration test requereix el teu consentiment per escrit. Omple les dades, signa a sota i envia — la teva autorització signada s'envia a info@puma-code.com perquè quedi registrada abans d'iniciar cap prova.",
   auth_f_company: "Raó social / Nom complet",
@@ -1047,6 +1089,17 @@ const ca: Dict = {
   exp_addon2_desc: "Chatbot, generació automàtica de banners, interpretació d'imatges o qualsevol funció amb intel·ligència artificial.",
   exp_note: "El preu final depèn de les eines que triïs. Explica al nostre assistent què necessita el teu negoci i obtén el teu pressupost exacte en minuts.",
   exp_cta: "Vull el meu pressupost",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROJECTES",
+  live_title_2: "EN PRODUCCIÓ",
+  live_subtitle: "Programari real operant per als nostres clients a",
+  live_visit: "VISITAR WEB",
+  live_goodtrip_desc: "Plataforma SaaS per a la gestió de flota de lloguer de cotxes.",
+  live_agrotech_desc: "Panell de telemetria IoT per a vinyes intel·ligents.",
+  live_kalyber_desc: "Lloc web corporatiu professional i catàleg de serveis.",
+  live_mendozapp_desc: "Plataforma web local per a serveis regionals.",
 };
 
 const de: Dict = {
@@ -1226,6 +1279,17 @@ const de: Dict = {
   exp_addon2_desc: "Chatbot, automatische Banner-Erstellung, Bilderkennung oder jede Funktion mit künstlicher Intelligenz.",
   exp_note: "Der Endpreis hängt von den gewählten Tools ab. Sagen Sie unserem Assistenten, was Ihr Geschäft braucht, und erhalten Sie Ihr genaues Angebot in Minuten.",
   exp_cta: "Mein Angebot erhalten",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROJEKTE",
+  live_title_2: "IN PRODUKTION",
+  live_subtitle: "Echte Software im Einsatz für unsere Kunden bei",
+  live_visit: "WEB BESUCHEN",
+  live_goodtrip_desc: "SaaS-Plattform für das Flottenmanagement von Mietwagen.",
+  live_agrotech_desc: "IoT-Telemetrie-Dashboard für intelligente Weinberge.",
+  live_kalyber_desc: "Professionelle Unternehmenswebsite und Dienstleistungskatalog.",
+  live_mendozapp_desc: "Lokale Webplattform für regionale Dienste.",
 };
 
 const ru: Dict = {
@@ -1405,6 +1469,17 @@ const ru: Dict = {
   exp_addon2_desc: "Чат-бот, автоматическая генерация баннеров, распознавание изображений или любая функция на основе искусственного интеллекта.",
   exp_note: "Итоговая цена зависит от выбранных инструментов. Расскажите нашему ассистенту, что нужно вашему бизнесу, и получите точную смету за минуты.",
   exp_cta: "Хочу свою смету",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "ПРОЕКТЫ",
+  live_title_2: "В ПРОИЗВОДСТВЕ",
+  live_subtitle: "Реальное ПО, работающее для наших клиентов в",
+  live_visit: "ПОСЕТИТЬ САЙТ",
+  live_goodtrip_desc: "SaaS-платформа для управления автопарком проката.",
+  live_agrotech_desc: "Панель IoT-телеметрии для умных виноградников.",
+  live_kalyber_desc: "Профессиональный корпоративный сайт и каталог услуг.",
+  live_mendozapp_desc: "Локальная веб-платформа для региональных услуг.",
 };
 
 const pl: Dict = {
@@ -1584,6 +1659,17 @@ const pl: Dict = {
   exp_addon2_desc: "Chatbot, automatyczne generowanie banerów, interpretacja obrazów lub dowolna funkcja oparta na sztucznej inteligencji.",
   exp_note: "Cena końcowa zależy od wybranych narzędzi. Powiedz naszemu asystentowi, czego potrzebuje Twój biznes, i otrzymaj dokładną wycenę w kilka minut.",
   exp_cta: "Chcę swoją wycenę",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROJEKTY",
+  live_title_2: "W PRODUKCJI",
+  live_subtitle: "Prawdziwe oprogramowanie działające dla naszych klientów w",
+  live_visit: "ODWIEDŹ STRONĘ",
+  live_goodtrip_desc: "Platforma SaaS do zarządzania flotą wypożyczalni samochodów.",
+  live_agrotech_desc: "Panel telemetrii IoT dla inteligentnych winnic.",
+  live_kalyber_desc: "Profesjonalna strona firmowa i katalog usług.",
+  live_mendozapp_desc: "Lokalna platforma webowa dla usług regionalnych.",
 };
 
 const sv: Dict = {
@@ -1645,7 +1731,7 @@ const sv: Dict = {
   ai_title: "AI som jobbar för ditt företag",
   ai_subtitle: "Konversationsassistenter, prediktiva modeller och automatisering inbyggda i din verksamhet.",
   ai_f1_title: "Konversations-AI-assistenter",
-  ai_f1_desc: "Virtuella agenter som pratar med dina kunder, kvalificerar leads och svarar dygnet runt. Precis som den som offererar ditt projekt just nu.",
+  ai_f1_desc: "Virtuelle agenter som pratar med dina kunder, kvalificerar leads och svarar dygnet runt. Precis som den som offererar ditt projekt just nu.",
   ai_f2_title: "Prediktiv Machine Learning",
   ai_f2_desc: "Prognostisera efterfrågan, upptäck avvikelser och förutse fel innan de kostar dig pengar.",
   ai_f3_title: "Beslutsautomatisering",
@@ -1680,7 +1766,7 @@ const sv: Dict = {
   contact_btn_linkedin: "LinkedIn",
   contact_btn_security: "Cybersäkerhet",
   sec_badge: "Cybersäkerhet · Pentest",
-  sec_title: "Är din mjukvara säker? Vi bevisar det.",
+  sec_title: "Är din mjukvara säker? Vi beviser det.",
   sec_subtitle: "Vi granskar din webbplats, app eller SaaS som en riktig angripare skulle — och ger dig en tydlig plan för att låsa den.",
   sec_f1_title: "Professionell pentest",
   sec_f1_desc: "Vi testar ditt system med verkliga attacktekniker (Black Box) för att hitta sårbarheter innan cyberbrottslingar gör det.",
@@ -1763,6 +1849,17 @@ const sv: Dict = {
   exp_addon2_desc: "Chatbot, automatiskt genererade banners, bildtolkning eller vilken funktion som helst med artificiell intelligens.",
   exp_note: "Slutpriset beror på vilka verktyg du väljer. Berätta för vår assistent vad ditt företag behöver och få din exakta offert på minuter.",
   exp_cta: "Jag vill ha min offert",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROJEKT",
+  live_title_2: "I PRODUKTION",
+  live_subtitle: "Riktig mjukvara i drift för våra kunder hos",
+  live_visit: "BESÖK WEBB",
+  live_goodtrip_desc: "SaaS-plattform för flotthantering av hyrbilar.",
+  live_agrotech_desc: "IoT-telemetripanel för smarta vingårdar.",
+  live_kalyber_desc: "Professionell företagswebbplats och tjänstekatalog.",
+  live_mendozapp_desc: "Lokal webbplattform för regionala tjänster.",
 };
 
 const no: Dict = {
@@ -1821,7 +1918,7 @@ const no: Dict = {
   ind3_desc: "Kjøretøysporing i sanntid, ruteoptimalisering og automatiske varsler for hele flåten.",
   ind4_title: "Handel, vinerier og lager",
   ind4_desc: "Lager, vakter og drift i sanntid fra ett enkelt panel. Slutt på regneark.",
-  ai_title: "AI som jobber for bedriften din",
+  ai_title: "AI som jobbar for bedriften din",
   ai_subtitle: "Samtaleassistenter, prediktive modeller og automatisering bygget inn i driften din.",
   ai_f1_title: "AI-samtaleassistenter",
   ai_f1_desc: "Virtuelle agenter som snakker med kundene dine, kvalifiserer leads og svarer 24/7. Akkurat som den som priser prosjektet ditt nå.",
@@ -1907,7 +2004,7 @@ const no: Dict = {
   sec_monitor_per: "mnd",
   sec_monitor_desc: "Kontinuerlig overvåking for live-nettsteder: ventende oppdateringer, nye sårbarheter, tidlige varsler og en månedsrapport. 10% rabatt kombinert med en hvilken som helst plan.",
   auth_title: "Pentest-autorisasjon",
-  auth_intro: "En penetrasjonstest krever ditt skriftlige samtykke. Fyll inn opplysningene, signer nedenfor og send — din signerte autorisasjon sendes til info@puma-code.com slik at den er dokumentert før noen tester begynner.",
+  auth_intro: "En penetrasjonstest krever ditt skriftlige samtycke. Fyll inn opplysningene, signer nedenfor og send — din signerte autorisasjon sendes til info@puma-code.com slik at den er dokumentert før noen tester begynner.",
   auth_f_company: "Firma / Fullt navn",
   auth_f_id: "Org.nr / ID-nr",
   auth_f_address: "Adresse",
@@ -1942,6 +2039,17 @@ const no: Dict = {
   exp_addon2_desc: "Chatbot, automatisk genererte bannere, bildetolkning eller hvilken som helst funksjon med kunstig intelligens.",
   exp_note: "Sluttprisen avhenger av verktøyene du velger. Fortell assistenten vår hva bedriften din trenger og få ditt nøyaktige tilbud på minutter.",
   exp_cta: "Jeg vil ha tilbudet mitt",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "PROSJEKTER",
+  live_title_2: "I PRODUKSJON",
+  live_subtitle: "Ekte programvare i drift for våre kunder hos",
+  live_visit: "BESØK NETTSTED",
+  live_goodtrip_desc: "SaaS-plattform for flåtestyring av leiebiler.",
+  live_agrotech_desc: "IoT-telemetripanel for smarte vingårder.",
+  live_kalyber_desc: "Profesjonell bedriftsnettside og tjenestekatalog.",
+  live_mendozapp_desc: "Lokal webplattform for regionale tjenester.",
 };
 
 const ja: Dict = {
@@ -2121,6 +2229,17 @@ const ja: Dict = {
   exp_addon2_desc: "チャットボット、バナーの自動生成、画像解釈など、人工知能を活用したあらゆる機能。",
   exp_note: "最終価格は選んだツールによって決まります。アシスタントにビジネスの必要事項を伝えれば、数分で正確な見積もりが得られます。",
   exp_cta: "見積もりが欲しい",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "プロジェクト",
+  live_title_2: "稼働中",
+  live_subtitle: "私たちのクライアントのために実際に稼働しているソフトウェア：",
+  live_visit: "サイトを見る",
+  live_goodtrip_desc: "レンタカーのフリート管理用SaaSプラットフォーム。",
+  live_agrotech_desc: "スマートぶどう畑向けIoTテレメトリダッシュボード。",
+  live_kalyber_desc: "プロフェッショナルな企業サイトとサービスカタログ。",
+  live_mendozapp_desc: "地域サービス向けのローカルWebプラットフォーム。",
 };
 
 const zh: Dict = {
@@ -2300,6 +2419,17 @@ const zh: Dict = {
   exp_addon2_desc: "聊天机器人、横幅自动生成、图像识别或任何由人工智能驱动的功能。",
   exp_note: "最终价格取决于您选择的工具。告诉我们的助手您的业务需要什么，几分钟内获得精确报价。",
   exp_cta: "我想要报价",
+
+  // --- LIVE PROJECTS ---
+  live_eyebrow: "LIVE LABS",
+  live_title_1: "项目",
+  live_title_2: "生产环境中",
+  live_subtitle: "为我们的客户实际运行的软件：",
+  live_visit: "访问网站",
+  live_goodtrip_desc: "用于租车车队管理的SaaS平台。",
+  live_agrotech_desc: "智能葡萄园物联网遥测仪表盘。",
+  live_kalyber_desc: "专业的企业网站和服务目录。",
+  live_mendozapp_desc: "区域服务的本地网络平台。",
 };
 
 const raw: Record<string, Dict> = {

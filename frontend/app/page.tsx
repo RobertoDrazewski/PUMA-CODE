@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import AIChat from '../components/AIChat';
 import { translations } from '../constants/translations';
@@ -46,6 +46,14 @@ const Check = () => (
 const ArrowRight = ({ className = "" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14m-7-7 7 7-7 7" />
+  </svg>
+);
+
+const ExternalLinkIcon = ({ size = 14, className = "" }: { size?: number, className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    <polyline points="15 3 21 3 21 9"></polyline>
+    <line x1="10" y1="14" x2="21" y2="3"></line>
   </svg>
 );
 
@@ -107,6 +115,201 @@ const IndustryCard = ({ icon, title, desc }: { icon: any; title: string; desc: s
     </div>
   </div>
 );
+
+/* ---------- Lógica Live Projects ---------- */
+const FACTORY_URL = 'https://www.puma-code.com/';
+
+const LIVE_PROJECTS = [
+  {
+    id: 'goodtrip',
+    name: 'Good Trip Car Rentals',
+    url: 'https://goodtrip.com.ar/',
+    tags: ['React', 'Node/Express', 'MySQL', 'OpenAI'],
+    accent: '#3b82f6',
+    descKey: 'live_goodtrip_desc',
+    localImage: '/assets/images/goodtrip-preview.png',
+  },
+  {
+    id: 'agrotech',
+    name: 'Puma Agrotech',
+    url: 'https://agrotech-pumacode.com.ar/',
+    tags: ['IoT', 'LoRaWAN', 'ML', 'React'],
+    accent: '#22c55e',
+    descKey: 'live_agrotech_desc',
+    localImage: '/assets/images/agrotech-preview.png',
+  },
+  {
+    id: 'kalyber',
+    name: 'Kalyber',
+    url: 'https://kalyber.com.ar/',
+    tags: ['React', 'Node/Express', 'Tailwind'],
+    accent: '#f97316',
+    descKey: 'live_kalyber_desc',
+    localImage: '/assets/images/kalyber-preview.png',
+  },
+  {
+    id: 'mendozapp',
+    name: 'Mendozapp',
+    url: 'https://mendozapp.com.ar/',
+    tags: ['React', 'Node/Express', 'Tailwind'],
+    accent: '#a855f7',
+    descKey: 'live_mendozapp_desc',
+    localImage: '/assets/images/mendozapp-preview.png',
+  }
+];
+
+const shotFor = (url: string) =>
+  `https://image.thum.io/get/width/1200/crop/750/noanimate/${url}`;
+
+const LiveCard = ({ project, index, t }: any) => {
+  const cardRef = useRef<HTMLElement>(null);
+  const [stage, setStage] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+
+  const handleTilt = (e: any) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty('--rx', `${(-py * 5).toFixed(2)}deg`);
+    el.style.setProperty('--ry', `${(px * 6).toFixed(2)}deg`);
+    el.style.setProperty('--mx', `${(px * 100 + 50).toFixed(1)}%`);
+    el.style.setProperty('--my', `${(py * 100 + 50).toFixed(1)}%`);
+  };
+
+  const resetTilt = () => {
+    const el = cardRef.current;
+    if (!el) return;
+    el.style.setProperty('--rx', '0deg');
+    el.style.setProperty('--ry', '0deg');
+  };
+
+  return (
+    <article
+      ref={cardRef}
+      onMouseMove={handleTilt}
+      onMouseLeave={resetTilt}
+      style={{
+        '--accent': project.accent,
+        transform: 'perspective(1200px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))',
+        animationDelay: `${index * 120}ms`
+      } as React.CSSProperties}
+      className="live-card group relative flex flex-col h-full rounded-2xl overflow-hidden
+                 bg-[#0b0b0c] border border-white/10 transition-[transform,border-color,box-shadow]
+                 duration-300 ease-out will-change-transform animate-fade-in
+                 hover:border-[color:var(--accent)]/60"
+    >
+      {/* Glow que sigue al cursor */}
+      <div
+        className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"
+        style={{
+          background: 'radial-gradient(420px circle at var(--mx,50%) var(--my,50%), color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%)',
+        }}
+      />
+
+      {/* Marco de navegador */}
+      <div className="relative z-10 m-3 mb-0 rounded-xl overflow-hidden border border-white/10 bg-[#111]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#161618] border-b border-white/10">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+          <div className="ml-2 flex-1 truncate text-[10px] font-mono text-gray-500 bg-black/40 rounded px-2 py-0.5">
+            {project.url.replace('https://', '')}
+          </div>
+          <span className="flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase text-[color:var(--accent)]">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-[color:var(--accent)] opacity-60 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[color:var(--accent)]" />
+            </span>
+            LIVE
+          </span>
+        </div>
+
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#0d0d0d]">
+          {!loaded && (
+            <div className="absolute inset-0 grid place-items-center">
+              <div className="h-8 w-8 rounded-full border-2 border-white/10 border-t-[color:var(--accent)] animate-spin" />
+            </div>
+          )}
+          {stage === 0 ? (
+            <iframe
+              title={project.name}
+              src={project.url}
+              loading="lazy"
+              onLoad={() => setLoaded(true)}
+              onError={() => setStage(1)}
+              referrerPolicy="no-referrer"
+              sandbox="allow-scripts allow-same-origin"
+              className="absolute top-0 left-0 origin-top-left border-0 w-[200%] h-[200%] scale-50 transition-transform duration-700 group-hover:scale-[0.52]"
+            />
+          ) : (
+            <img
+              src={stage === 1 ? shotFor(project.url) : project.localImage}
+              alt={project.name}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              onLoad={() => setLoaded(true)}
+              onError={() => stage === 1 && setStage(2)}
+              className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+            />
+          )}
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Abrir ${project.name}`}
+            className="absolute inset-0 z-20"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0b0c] via-transparent to-transparent opacity-70" />
+        </div>
+      </div>
+
+      <div className="relative z-10 p-5 pt-4 flex flex-col flex-grow">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-lg font-black uppercase tracking-tight text-white group-hover:text-[color:var(--accent)] transition-colors">
+            {project.name}
+          </h3>
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 text-gray-500 hover:text-[color:var(--accent)] transition-all hover:scale-110"
+          >
+            <ExternalLinkIcon size={14} />
+          </a>
+        </div>
+
+        <p className="text-gray-400 text-xs leading-relaxed mt-2 mb-4">
+          {t[project.descKey] || 'Proyecto desarrollado por Puma Code.'}
+        </p>
+
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {project.tags.map((tag: string) => (
+            <span
+              key={tag}
+              className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded text-gray-300 bg-white/[0.04] border border-white/10"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <a
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-auto inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-white/90 hover:gap-3 transition-all w-fit"
+        >
+          <span className="border-b-2 pb-0.5" style={{ borderColor: project.accent }}>
+            {t.live_visit || 'VISITAR WEB'}
+          </span>
+          <ArrowRight className="text-[color:var(--accent)] w-3 h-3" />
+        </a>
+      </div>
+    </article>
+  );
+};
 
 /* ---------- Orden de las vistas (coincide con el navbar) ---------- */
 const VIEW_IDS = ['home', 'process', 'services', 'express', 'industries', 'security', 'cases', 'contact'];
@@ -529,72 +732,43 @@ export default function Home() {
         </section>
       </View>
 
-      {/* ===================== VISTA: CASO DE ÉXITO ===================== */}
+      {/* ===================== VISTA: CASO DE ÉXITO (Ahora Live Projects) ===================== */}
       <View id="cases" active={activeView === 'cases'}>
-        <section className="max-w-6xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
-                <Star className="w-3.5 h-3.5" /> {t.case_badge}
+        <section className="relative max-w-7xl mx-auto w-full px-4 md:px-0">
+          {/* Glow ambiental de fondo */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-24 left-1/4 w-[36rem] h-[36rem] rounded-full bg-blue-600/10 blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[30rem] h-[30rem] rounded-full bg-emerald-500/10 blur-[120px]" />
+          </div>
+
+          <div className="mb-14 relative z-10 text-center md:text-left">
+            <span className="font-mono text-[11px] tracking-[0.32em] uppercase text-emerald-400 flex items-center justify-center md:justify-start gap-2.5">
+              <span className="w-6 h-px bg-emerald-500 inline-block" /> {t.live_eyebrow || 'LIVE LABS'}
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase mt-4 leading-none">
+              {t.live_title_1 || 'PROYECTOS'}{' '}
+              <span className="bg-gradient-to-r from-emerald-300 via-white to-blue-400 bg-clip-text text-transparent">
+                {t.live_title_2 || 'EN PRODUCCIÓN'}
               </span>
-              <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tighter leading-tight">{t.case_title}</h2>
-              <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-8">{t.case_desc}</p>
-
-              <ul className="space-y-4 mb-10">
-                {[t.case_b1, t.case_b2, t.case_b3].map((b, i) => (
-                  <li key={i} className="flex items-start gap-3 text-gray-300 text-sm md:text-base">
-                    <Check />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => setShowChat(true)}
-                className="px-9 py-4 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-all font-black active:scale-95 inline-flex items-center gap-3 btn-futuristic"
+            </h2>
+            <p className="text-gray-500 max-w-xl mt-4 mx-auto md:mx-0">
+              {t.live_subtitle || 'Software real operando para nuestros clientes en'}{' '}
+              <a
+                href={FACTORY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white font-semibold underline decoration-blue-500/60 underline-offset-4 hover:decoration-blue-400 transition"
               >
-                {t.case_cta}
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
+                Puma Code
+              </a>
+              .
+            </p>
+          </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 bg-blue-600/10 blur-3xl rounded-full" />
-              <div className="relative glass-effect rounded-[2rem] border-blue-500/20 p-5 shadow-2xl">
-                <div className="flex items-center gap-2 mb-5">
-                  <span className="w-3 h-3 rounded-full bg-red-500/60" />
-                  <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <span className="w-3 h-3 rounded-full bg-green-500/60" />
-                  <span className="ml-3 text-[10px] text-gray-500 font-bold uppercase tracking-widest">rental · dashboard</span>
-                </div>
-
-                <div className="relative rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 p-4 mb-4 overflow-hidden">
-                  <div className="absolute top-2 right-2 inline-flex items-center gap-1 text-[8px] font-black bg-black/30 px-2 py-0.5 rounded-full uppercase tracking-widest"><Clock className="w-2.5 h-2.5" /> 02:14:55</div>
-                  <p className="text-xs font-black uppercase tracking-wider">-20% Fin de semana</p>
-                  <p className="text-[10px] text-blue-100 mt-1">Banner auto-expirable</p>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {[{ k: "Flota activa", v: "42" }, { k: "Reservas hoy", v: "17" }, { k: "Ocupación", v: "88%" }].map((m, i) => (
-                    <div key={i} className="rounded-xl bg-white/5 border border-white/10 p-3 text-center">
-                      <div className="text-xl font-black text-blue-400">{m.v}</div>
-                      <div className="text-[8px] text-gray-500 font-bold uppercase tracking-wider mt-1">{m.k}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="space-y-2">
-                  {[70, 45, 90, 30].map((w, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span className="text-[9px] text-gray-600 w-10 shrink-0">{`AUTO 0${i + 1}`}</span>
-                      <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
-                        <div className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-400" style={{ width: `${w}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-7">
+            {LIVE_PROJECTS.map((p, i) => (
+              <LiveCard key={p.id} project={p} index={i} t={t} />
+            ))}
           </div>
         </section>
       </View>
