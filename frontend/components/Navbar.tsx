@@ -96,7 +96,11 @@ export default function Navbar({ lang, setLang, t, activeView = 'home', onNaviga
               alt="Puma Code Logo"
               width={330}
               height={120}
-              style={{ width: 'auto', height: 'auto' }}
+              // Sin "style" acá: un style inline pisa las clases de Tailwind
+              // (h-9/xl:h-14) sin importar su especificidad, así que el logo
+              // terminaba renderizando a su tamaño natural en vez del que
+              // pedían las clases. Dejamos que h-9/xl:h-14 + w-auto controlen
+              // el tamaño real, con proporción automática.
               className="h-9 xl:h-14 w-auto object-contain block drop-shadow-[0_0_8px_rgba(37,99,235,0.3)] group-hover:drop-shadow-[0_0_15px_rgba(37,99,235,0.6)]"
               priority
             />
