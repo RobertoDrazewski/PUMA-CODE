@@ -234,7 +234,12 @@ body::before {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 7.5rem 0 4rem;          /* deja libre la barra superior fija */
+  /* --nav-h y --footer-h las fijan Navbar.tsx y Footer.tsx midiendo su
+     propia altura real con ResizeObserver, así este espacio siempre es
+     exacto sin importar cuántas filas tenga cada uno. Los valores de
+     respaldo solo se usan en el primer frame, antes de que el JS
+     termine de medir. */
+  padding: calc(var(--nav-h, 7.5rem) + 2rem) 0 calc(var(--footer-h, 3.5rem) + 2rem);
   position: relative;
   z-index: 1;
 }
@@ -258,9 +263,12 @@ body::before {
   margin: 0 auto;
 }
 
-/* En la versión móvil dejamos respirar un poco más arriba */
+/* En la versión móvil dejamos respirar un poco más arriba.
+   El respaldo (19rem) se acerca a la altura real del navbar mobile
+   (logo + fila de idioma/admin + dock de íconos) para que no haya
+   salto visible antes de que el JS termine de medir --nav-h. */
 @media (max-width: 768px) {
-  .view-shell { padding: 6.5rem 0 3rem; }
+  .view-shell { padding: calc(var(--nav-h, 19rem) + 1.5rem) 0 calc(var(--footer-h, 4.5rem) + 1.5rem); }
 }
 
 /* ===========================================================

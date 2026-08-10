@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
+import { Globe, Settings, Gem, Zap, Cpu, Shield, Star, MessageCircle } from './Icons';
 
 const languages = [
   { code: 'es', flag: '🇦🇷', label: 'Español' },
@@ -18,213 +19,170 @@ const languages = [
 ];
 
 export default function Navbar({ lang, setLang, t, activeView = 'home', onNavigate }: any) {
-  const [isOpen, setIsOpen] = useState(false);        // selector de idiomas
-  const [menuOpen, setMenuOpen] = useState(false);    // menú móvil
-  const [scrolled, setScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // selector de idiomas
+  const navRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+  // Mide la altura real del navbar (logo + fila de botones) y se la pasa
+  // a --nav-h para que .view-shell reserve exactamente ese espacio.
+  // El navbar es siempre fijo y sólido: el contenido del body simplemente
+  // scrollea por detrás y queda tapado de forma limpia, sin transparencia.
+  useLayoutEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const update = () => {
+      document.documentElement.style.setProperty('--nav-h', `${el.offsetHeight}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
   }, []);
-
-  // Bloquea el scroll del fondo mientras el menú móvil está abierto
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
 
   const currentLang = languages.find(l => l.code === lang) || languages[0];
 
-  // Cada item del navbar abre una VISTA (no hace scroll)
+  // Cada item abre una VISTA (no hace scroll). Ícono propio por sección.
   const navItems = [
-    { id: 'home',       label: t.nav_home },
-    { id: 'process',    label: t.nav_process },
-    { id: 'services',   label: t.nav_services },
-    { id: 'express',    label: t.nav_express },
-    { id: 'industries', label: t.nav_industries },
-    { id: 'security',   label: t.nav_security },
-    { id: 'cases',      label: t.nav_cases },
-    { id: 'contact',    label: t.nav_contact },
+    { id: 'home',       label: t.nav_home,       icon: Globe },
+    { id: 'process',    label: t.nav_process,    icon: Settings },
+    { id: 'services',   label: t.nav_services,   icon: Gem },
+    { id: 'express',    label: t.nav_express,    icon: Zap },
+    { id: 'industries', label: t.nav_industries, icon: Cpu },
+    { id: 'security',   label: t.nav_security,   icon: Shield },
+    { id: 'cases',      label: t.nav_cases,      icon: Star },
+    { id: 'contact',    label: t.nav_contact,    icon: MessageCircle },
   ];
 
   const go = (id: string) => {
     onNavigate?.(id);
-    setMenuOpen(false);
+    setIsOpen(false);
   };
 
   return (
-    <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'pt-4' : 'pt-0'}`}>
-        <div className={`max-w-7xl mx-auto px-6 h-20 md:h-24 flex justify-between items-center transition-all duration-500
-          ${scrolled ? 'glass-effect rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] border-white/5 mx-4 md:mx-auto' : 'bg-transparent border-b border-white/5'}`}>
-
-          {/* LOGO PUMA CODE */}
-          <button
-            type="button"
-            className="flex items-center cursor-pointer group bg-transparent border-0 p-0"
-            onClick={() => go('home')}
-            aria-label="Puma Code — Inicio"
+    <nav
+      ref={navRef}
+      className="fixed top-0 w-full z-50 shadow-[0_10px_25px_rgba(0,0,0,0.45)]"
+      style={{ backgroundColor: 'var(--background)' }}
+    >
+      {/* ===================== LOGO — fijo siempre, sólido, protagonista ===================== */}
+      <div className="relative">
+        {/* Idioma + admin: flotando en la esquina, sobre la fila del logo,
+            sin ocupar su propia fila (así no suman altura extra) */}
+        <div className="absolute right-3 xl:right-6 top-1/2 -translate-y-1/2 z-10 flex items-center gap-2">
+          <LanguageSelector isOpen={isOpen} setIsOpen={setIsOpen} currentLang={currentLang} lang={lang} setLang={setLang} />
+          <a
+            href="/admin"
+            aria-label="Acceso al panel de administración"
+            title="Panel de administración"
+            className="h-9 w-9 xl:h-10 xl:w-10 flex items-center justify-center bg-white/5 hover:bg-blue-600/10 rounded-full border border-white/10 transition-all active:scale-90 group"
           >
-            <div className="relative transition-transform duration-500 group-hover:scale-105">
-              <Image
-                src="/logo-puma.png"
-                alt="Puma Code Logo"
-                width={330}
-                height={120}
-                style={{ width: 'auto', height: 'auto' }}
-                className="h-8 w-auto md:h-12 object-contain block drop-shadow-[0_0_8px_rgba(37,99,235,0.3)] group-hover:drop-shadow-[0_0_15px_rgba(37,99,235,0.6)]"
-                priority
-              />
-            </div>
-          </button>
+            <AdminIcon className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+          </a>
+        </div>
 
-          {/* LINKS DE ESCRITORIO (cambian de vista) */}
-          <div className="hidden xl:flex items-center gap-9">
-            {navItems.map((item) => {
-              const active = activeView === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => go(item.id)}
-                  className={`relative text-[10px] font-black uppercase tracking-[0.3em] transition-all group bg-transparent border-0 cursor-pointer
-                    ${active ? 'text-white' : 'text-gray-400 hover:text-white'}`}
-                >
-                  {item.label}
-                  <span
-                    className={`absolute -bottom-1 left-0 h-[1px] bg-blue-500 transition-all duration-300 shadow-[0_0_8px_#2563eb]
-                      ${active ? 'w-full' : 'w-0 group-hover:w-full'}`}
-                  ></span>
-                </button>
-              );
-            })}
+        {/* Logo — a todo el ancho, única fila (ya no hay margen extra arriba) */}
+        <button
+          type="button"
+          onClick={() => go('home')}
+          aria-label="Puma Code — Inicio"
+          className="w-full flex items-center justify-center py-3 xl:py-4 bg-transparent border-0 cursor-pointer group"
+        >
+          <div className="relative transition-transform duration-500 group-hover:scale-105">
+            <Image
+              src="/logo-puma.png"
+              alt="Puma Code Logo"
+              width={330}
+              height={120}
+              style={{ width: 'auto', height: 'auto' }}
+              className="h-9 xl:h-14 w-auto object-contain block drop-shadow-[0_0_8px_rgba(37,99,235,0.3)] group-hover:drop-shadow-[0_0_15px_rgba(37,99,235,0.6)]"
+              priority
+            />
           </div>
+        </button>
+      </div>
 
-          {/* CONTROLES DERECHA: idioma + hamburguesa (móvil) */}
-          <div className="flex items-center gap-3">
-            {/* SELECTOR DE IDIOMAS */}
-            <div className="relative">
+      {/* ===================== BOTONES — uno al lado del otro, debajo del logo, siempre visibles ===================== */}
+      <div className="px-3 xl:px-6 pb-3">
+        <div className="grid grid-cols-4 gap-2 xl:flex xl:flex-nowrap xl:items-center xl:justify-center xl:gap-2 max-w-6xl xl:mx-auto">
+          {navItems.map((item) => {
+            const active = activeView === item.id;
+            const Icon = item.icon;
+            return (
               <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 bg-white/5 hover:bg-blue-600/10 px-4 py-2 rounded-full border border-white/10 transition-all group active:scale-90"
+                key={item.id}
+                type="button"
+                onClick={() => go(item.id)}
+                className={`flex flex-col xl:flex-row items-center justify-center gap-1.5 xl:gap-2 h-[72px] xl:h-11 px-1 xl:px-5 rounded-2xl xl:rounded-full border whitespace-nowrap transition-all duration-300 active:scale-90 cursor-pointer
+                  ${active
+                    ? 'bg-blue-600/25 border-blue-500/50 text-white shadow-[0_0_15px_rgba(37,99,235,0.25)]'
+                    : 'bg-white/[0.06] border-white/10 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/20'}`}
               >
-                <span className="text-xl filter drop-shadow-md group-hover:scale-110 transition-transform">{currentLang.flag}</span>
-                <span className="text-white text-[10px] font-black uppercase hidden sm:inline tracking-widest">{currentLang.code}</span>
-                <svg
-                  className={`w-3 h-3 text-blue-500 transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {isOpen && (
-                <>
-                  <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)}></div>
-                  <div className="absolute right-0 mt-4 w-56 glass-effect rounded-2xl border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2 grid grid-cols-1">
-                      <div className="px-3 py-2 text-[9px] font-bold text-blue-500/50 uppercase tracking-[0.2em] mb-1">System Interface</div>
-                      {languages.map((l) => (
-                        <button
-                          key={l.code}
-                          onClick={() => { setLang(l.code); setIsOpen(false); }}
-                          className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
-                            lang === l.code
-                              ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">{l.flag}</span>
-                            <span className="text-[11px] font-bold uppercase tracking-wider">{l.label}</span>
-                          </div>
-                          {lang === l.code && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#2563eb]"></div>}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* ACCESO AL PANEL ADMIN */}
-            <a
-              href="/admin"
-              aria-label="Acceso al panel de administración"
-              title="Panel de administración"
-              className="flex items-center gap-2 bg-white/5 hover:bg-blue-600/10 px-3 sm:px-4 py-2 rounded-full border border-white/10 transition-all group active:scale-90"
-            >
-              <svg
-                className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform"
-                fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-              >
-                <rect x="5" y="11" width="14" height="10" rx="2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 018 0v4" />
-              </svg>
-              <span className="text-white text-[10px] font-black uppercase hidden sm:inline tracking-widest">Admin</span>
-            </a>
-
-            {/* HAMBURGUESA (visible debajo de xl) */}
-            <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              aria-label="Abrir menú"
-              className="xl:hidden flex items-center justify-center w-11 h-11 rounded-full bg-white/5 border border-white/10 hover:bg-blue-600/10 active:scale-90 transition-all"
-            >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* MENÚ MÓVIL A PANTALLA COMPLETA */}
-      {menuOpen && (
-        <div className="mobile-menu xl:hidden">
-          <button
-            type="button"
-            onClick={() => setMenuOpen(false)}
-            aria-label="Cerrar menú"
-            className="absolute top-6 right-6 flex items-center justify-center w-11 h-11 rounded-full bg-white/5 border border-white/10 active:scale-90 transition-all"
-          >
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-
-          <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar">
-            {navItems.map((item) => {
-              const active = activeView === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => go(item.id)}
-                  className={`mobile-link ${active ? 'is-active' : ''}`}
-                >
+                <Icon className={`w-5 h-5 xl:w-3.5 xl:h-3.5 shrink-0 ${active ? 'text-blue-400' : 'text-gray-400'}`} />
+                <span className="text-[8.5px] xl:text-[10px] font-black uppercase tracking-tight xl:tracking-[0.2em] leading-[1.1] text-center xl:text-left line-clamp-2 xl:line-clamp-1 px-0.5 xl:px-0">
                   {item.label}
-                  {active && <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#2563eb]" />}
-                </button>
-              );
-            })}
-
-            {/* ACCESO AL PANEL ADMIN (móvil) */}
-            <a
-              href="/admin"
-              onClick={() => setMenuOpen(false)}
-              className="mobile-link flex items-center gap-3"
-            >
-              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="5" y="11" width="14" height="10" rx="2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 018 0v4" />
-              </svg>
-              Admin
-            </a>
-          </div>
+                </span>
+              </button>
+            );
+          })}
         </div>
-      )}
-    </>
+      </div>
+    </nav>
   );
 }
+
+/* ---------- Selector de idiomas (compacto, siempre en la esquina) ---------- */
+function LanguageSelector({ isOpen, setIsOpen, currentLang, lang, setLang }: any) {
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="h-9 w-9 xl:h-10 xl:w-10 flex items-center justify-center bg-white/5 hover:bg-blue-600/10 rounded-full border border-white/10 transition-all group active:scale-90"
+      >
+        <span className="text-base xl:text-lg filter drop-shadow-md group-hover:scale-110 transition-transform">
+          {currentLang.flag}
+        </span>
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)}></div>
+          <div className="absolute right-0 mt-3 w-56 glass-effect rounded-2xl border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-50">
+            <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2 grid grid-cols-1">
+              <div className="px-3 py-2 text-[9px] font-bold text-blue-500/50 uppercase tracking-[0.2em] mb-1">System Interface</div>
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => { setLang(l.code); setIsOpen(false); }}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                    lang === l.code
+                      ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{l.flag}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider">{l.label}</span>
+                  </div>
+                  {lang === l.code && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_#2563eb]"></div>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Ícono de admin (inline) ---------- */
+const AdminIcon = ({ className = "" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 018 0v4" />
+  </svg>
+);

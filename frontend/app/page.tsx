@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
 import { translations } from '../constants/translations';
 import {
@@ -411,6 +412,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-black text-white overflow-x-hidden flex flex-col selection:bg-blue-500/30">
       <Navbar lang={lang} setLang={setLang} t={t} activeView={activeView} onNavigate={navigate} />
+      <Footer t={t} />
 
       {/* LUCES AMBIENTALES FLOTANTES (fondo de toda la app) */}
       <div className="bg-orbs" aria-hidden="true">
@@ -794,12 +796,6 @@ export default function Home() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
               Instagram
             </a>
-          </div>
-
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-600 text-[10px] font-bold uppercase tracking-[0.3em]">
-            <span>PUMA CODE ENGINE v2.0</span>
-            <span>MENDOZA, ARGENTINA • WORLDWIDE SERVICE</span>
-            <span>© 2026</span>
           </div>
         </section>
       </View>

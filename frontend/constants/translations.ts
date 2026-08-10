@@ -245,10 +245,10 @@ const en: Dict = {
   live_title_2: "IN PRODUCTION",
   live_subtitle: "Real software operating for our clients at",
   live_visit: "VISIT WEB",
-  live_goodtrip_desc: "SaaS platform for car rental fleet management.",
-  live_agrotech_desc: "IoT telemetry dashboard for smart vineyards.",
-  live_kalyber_desc: "Professional corporate website and service catalog.",
-  live_mendozapp_desc: "Local web platform for regional services.",
+  live_goodtrip_desc: "SaaS car rental platform with a real-time booking engine, fleet management and online checkout. An AI-powered assistant (OpenAI) handles customer inquiries around the clock. Backend built in Node.js/Express + MySQL, frontend in React.",
+  live_agrotech_desc: "Precision-agriculture platform for vineyards: IoT sensors connected over LoRaWAN track soil moisture, temperature and weather in real time, while Machine Learning models generate predictive irrigation and frost alerts. Interactive dashboard built in React.",
+  live_kalyber_desc: "Corporate site with a dynamic service catalog and content-management panel, built to scale alongside the brand. Frontend in React + Tailwind CSS, backend in Node.js/Express.",
+  live_mendozapp_desc: "Web platform connecting the Mendoza community with local businesses and service providers, featuring search, profiles and direct contact listings. Built in React + Tailwind CSS, with a Node.js/Express backend.",
 };
 
 const es: Dict = {
@@ -481,10 +481,10 @@ const es: Dict = {
   live_title_2: "EN PRODUCCIÓN",
   live_subtitle: "Software real operando para nuestros clientes en",
   live_visit: "VISITAR WEB",
-  live_goodtrip_desc: "Plataforma SaaS para gestión de flota de alquiler de autos.",
-  live_agrotech_desc: "Panel de telemetría IoT para viñedos inteligentes.",
-  live_kalyber_desc: "Sitio web corporativo profesional y catálogo de servicios.",
-  live_mendozapp_desc: "Plataforma web local para servicios regionales.",
+  live_goodtrip_desc: "Plataforma SaaS de alquiler de autos con motor de reservas en tiempo real, gestión de flota y checkout online. Un asistente virtual con IA (OpenAI) atiende consultas de clientes las 24 horas. Backend en Node.js/Express + MySQL, frontend en React.",
+  live_agrotech_desc: "Plataforma de agricultura de precisión para viñedos: sensores IoT conectados vía LoRaWAN monitorean humedad de suelo, temperatura y clima en tiempo real, mientras modelos de Machine Learning generan alertas predictivas de riego y heladas. Dashboard interactivo construido en React.",
+  live_kalyber_desc: "Sitio corporativo con catálogo dinámico de servicios y panel de administración de contenido, pensado para escalar junto a la marca. Frontend en React + Tailwind CSS y backend en Node.js/Express.",
+  live_mendozapp_desc: "Plataforma web que conecta a la comunidad de Mendoza con comercios y prestadores de servicios locales, con buscador, perfiles y fichas de contacto directo. Desarrollada en React + Tailwind CSS, con backend en Node.js/Express.",
 };
 
 const pt: Dict = {
@@ -716,10 +716,10 @@ const pt: Dict = {
   live_title_2: "EM PRODUÇÃO",
   live_subtitle: "Software real operando para nossos clientes na",
   live_visit: "VISITAR WEB",
-  live_goodtrip_desc: "Plataforma SaaS para gestão de frota de aluguel de carros.",
-  live_agrotech_desc: "Painel de telemetria IoT para vinhedos inteligentes.",
-  live_kalyber_desc: "Site corporativo profissional e catálogo de serviços.",
-  live_mendozapp_desc: "Plataforma web local para serviços regionais.",
+  live_goodtrip_desc: "Plataforma SaaS de aluguel de carros com motor de reservas em tempo real, gestão de frota e checkout online. Um assistente virtual com IA (OpenAI) atende os clientes 24 horas por dia. Backend em Node.js/Express + MySQL, frontend em React.",
+  live_agrotech_desc: "Plataforma de agricultura de precisão para vinhedos: sensores IoT conectados via LoRaWAN monitoram umidade do solo, temperatura e clima em tempo real, enquanto modelos de Machine Learning geram alertas preditivos de irrigação e geadas. Dashboard interativo construído em React.",
+  live_kalyber_desc: "Site corporativo com catálogo dinâmico de serviços e painel de gestão de conteúdo, pensado para escalar junto com a marca. Frontend em React + Tailwind CSS e backend em Node.js/Express.",
+  live_mendozapp_desc: "Plataforma web que conecta a comunidade de Mendoza a comércios e prestadores de serviços locais, com busca, perfis e fichas de contato direto. Desenvolvida em React + Tailwind CSS, com backend em Node.js/Express.",
 };
 
 const it: Dict = {
@@ -906,10 +906,10 @@ const it: Dict = {
   live_title_2: "IN PRODUZIONE",
   live_subtitle: "Software reale operativo per i nostri clienti presso",
   live_visit: "VISITA WEB",
-  live_goodtrip_desc: "Piattaforma SaaS per la gestione di flotte di autonoleggio.",
-  live_agrotech_desc: "Pannello di telemetria IoT per vigneti intelligenti.",
-  live_kalyber_desc: "Sito web aziendale professionale e catalogo di servizi.",
-  live_mendozapp_desc: "Piattaforma web locale per servizi regionali.",
+  live_goodtrip_desc: "Piattaforma SaaS per il noleggio auto con motore di prenotazione in tempo reale, gestione della flotta e checkout online. Un assistente virtuale basato su IA (OpenAI) gestisce le richieste dei clienti 24 ore su 24. Backend in Node.js/Express + MySQL, frontend in React.",
+  live_agrotech_desc: "Piattaforma di agricoltura di precisione per vigneti: sensori IoT connessi via LoRaWAN monitorano umidità del suolo, temperatura e clima in tempo reale, mentre modelli di Machine Learning generano avvisi predittivi di irrigazione e gelate. Dashboard interattiva realizzata in React.",
+  live_kalyber_desc: "Sito aziendale con catalogo dinamico dei servizi e pannello di gestione dei contenuti, pensato per crescere insieme al brand. Frontend in React + Tailwind CSS e backend in Node.js/Express.",
+  live_mendozapp_desc: "Piattaforma web che collega la comunità di Mendoza a negozi e fornitori di servizi locali, con ricerca, profili e schede di contatto diretto. Sviluppata in React + Tailwind CSS, con backend in Node.js/Express.",
 };
 
 const ca: Dict = {
@@ -1096,10 +1096,10 @@ const ca: Dict = {
   live_title_2: "EN PRODUCCIÓ",
   live_subtitle: "Programari real operant per als nostres clients a",
   live_visit: "VISITAR WEB",
-  live_goodtrip_desc: "Plataforma SaaS per a la gestió de flota de lloguer de cotxes.",
-  live_agrotech_desc: "Panell de telemetria IoT per a vinyes intel·ligents.",
-  live_kalyber_desc: "Lloc web corporatiu professional i catàleg de serveis.",
-  live_mendozapp_desc: "Plataforma web local per a serveis regionals.",
+  live_goodtrip_desc: "Plataforma SaaS de lloguer de cotxes amb motor de reserves en temps real, gestió de flota i checkout en línia. Un assistent virtual amb IA (OpenAI) atén les consultes dels clients les 24 hores. Backend en Node.js/Express + MySQL, frontend en React.",
+  live_agrotech_desc: "Plataforma d'agricultura de precisió per a vinyes: sensors IoT connectats via LoRaWAN monitoren la humitat del sòl, la temperatura i el clima en temps real, mentre models de Machine Learning generen alertes predictives de reg i gelades. Tauler interactiu construït en React.",
+  live_kalyber_desc: "Lloc corporatiu amb catàleg dinàmic de serveis i panell de gestió de contingut, pensat per escalar junt amb la marca. Frontend en React + Tailwind CSS i backend en Node.js/Express.",
+  live_mendozapp_desc: "Plataforma web que connecta la comunitat de Mendoza amb comerços i prestadors de serveis locals, amb cercador, perfils i fitxes de contacte directe. Desenvolupada en React + Tailwind CSS, amb backend en Node.js/Express.",
 };
 
 const de: Dict = {
@@ -1286,10 +1286,10 @@ const de: Dict = {
   live_title_2: "IN PRODUKTION",
   live_subtitle: "Echte Software im Einsatz für unsere Kunden bei",
   live_visit: "WEB BESUCHEN",
-  live_goodtrip_desc: "SaaS-Plattform für das Flottenmanagement von Mietwagen.",
-  live_agrotech_desc: "IoT-Telemetrie-Dashboard für intelligente Weinberge.",
-  live_kalyber_desc: "Professionelle Unternehmenswebsite und Dienstleistungskatalog.",
-  live_mendozapp_desc: "Lokale Webplattform für regionale Dienste.",
+  live_goodtrip_desc: "SaaS-Plattform für Autovermietung mit Echtzeit-Buchungssystem, Flottenmanagement und Online-Checkout. Ein KI-gestützter Assistent (OpenAI) beantwortet Kundenanfragen rund um die Uhr. Backend in Node.js/Express + MySQL, Frontend in React.",
+  live_agrotech_desc: "Precision-Farming-Plattform für Weinberge: IoT-Sensoren, die über LoRaWAN verbunden sind, überwachen Bodenfeuchtigkeit, Temperatur und Wetter in Echtzeit, während Machine-Learning-Modelle prädiktive Bewässerungs- und Frostwarnungen erzeugen. Interaktives Dashboard, entwickelt in React.",
+  live_kalyber_desc: "Unternehmenswebsite mit dynamischem Dienstleistungskatalog und Content-Management-Panel, konzipiert, um mit der Marke zu wachsen. Frontend in React + Tailwind CSS, Backend in Node.js/Express.",
+  live_mendozapp_desc: "Webplattform, die die Gemeinschaft von Mendoza mit lokalen Geschäften und Dienstleistern verbindet, mit Suche, Profilen und direkten Kontaktkarten. Entwickelt in React + Tailwind CSS, mit Node.js/Express-Backend.",
 };
 
 const ru: Dict = {
@@ -1476,10 +1476,10 @@ const ru: Dict = {
   live_title_2: "В ПРОИЗВОДСТВЕ",
   live_subtitle: "Реальное ПО, работающее для наших клиентов в",
   live_visit: "ПОСЕТИТЬ САЙТ",
-  live_goodtrip_desc: "SaaS-платформа для управления автопарком проката.",
-  live_agrotech_desc: "Панель IoT-телеметрии для умных виноградников.",
-  live_kalyber_desc: "Профессиональный корпоративный сайт и каталог услуг.",
-  live_mendozapp_desc: "Локальная веб-платформа для региональных услуг.",
+  live_goodtrip_desc: "SaaS-платформа для аренды автомобилей с системой бронирования в реальном времени, управлением автопарком и онлайн-оплатой. Виртуальный ассистент на базе ИИ (OpenAI) отвечает на вопросы клиентов круглосуточно. Backend на Node.js/Express + MySQL, frontend на React.",
+  live_agrotech_desc: "Платформа точного земледелия для виноградников: IoT-датчики, подключённые через LoRaWAN, отслеживают влажность почвы, температуру и погоду в реальном времени, а модели машинного обучения формируют прогнозные оповещения о поливе и заморозках. Интерактивная панель на React.",
+  live_kalyber_desc: "Корпоративный сайт с динамическим каталогом услуг и панелью управления контентом, созданный для роста вместе с брендом. Frontend на React + Tailwind CSS, backend на Node.js/Express.",
+  live_mendozapp_desc: "Веб-платформа, соединяющая жителей Мендосы с местными компаниями и поставщиками услуг, с поиском, профилями и прямыми контактами. Разработана на React + Tailwind CSS с backend на Node.js/Express.",
 };
 
 const pl: Dict = {
@@ -1666,10 +1666,10 @@ const pl: Dict = {
   live_title_2: "W PRODUKCJI",
   live_subtitle: "Prawdziwe oprogramowanie działające dla naszych klientów w",
   live_visit: "ODWIEDŹ STRONĘ",
-  live_goodtrip_desc: "Platforma SaaS do zarządzania flotą wypożyczalni samochodów.",
-  live_agrotech_desc: "Panel telemetrii IoT dla inteligentnych winnic.",
-  live_kalyber_desc: "Profesjonalna strona firmowa i katalog usług.",
-  live_mendozapp_desc: "Lokalna platforma webowa dla usług regionalnych.",
+  live_goodtrip_desc: "Platforma SaaS do wynajmu samochodów z systemem rezerwacji w czasie rzeczywistym, zarządzaniem flotą i płatnościami online. Wirtualny asystent oparty na AI (OpenAI) obsługuje klientów całą dobę. Backend w Node.js/Express + MySQL, frontend w React.",
+  live_agrotech_desc: "Platforma rolnictwa precyzyjnego dla winnic: czujniki IoT połączone przez LoRaWAN monitorują wilgotność gleby, temperaturę i pogodę w czasie rzeczywistym, a modele uczenia maszynowego generują predykcyjne alerty nawadniania i przymrozków. Interaktywny panel zbudowany w React.",
+  live_kalyber_desc: "Strona korporacyjna z dynamicznym katalogiem usług i panelem zarządzania treścią, zaprojektowana do skalowania wraz z marką. Frontend w React + Tailwind CSS, backend w Node.js/Express.",
+  live_mendozapp_desc: "Platforma internetowa łącząca społeczność Mendozy z lokalnymi firmami i usługodawcami, z wyszukiwarką, profilami i bezpośrednimi danymi kontaktowymi. Zbudowana w React + Tailwind CSS, z backendem w Node.js/Express.",
 };
 
 const sv: Dict = {
@@ -1856,10 +1856,10 @@ const sv: Dict = {
   live_title_2: "I PRODUKTION",
   live_subtitle: "Riktig mjukvara i drift för våra kunder hos",
   live_visit: "BESÖK WEBB",
-  live_goodtrip_desc: "SaaS-plattform för flotthantering av hyrbilar.",
-  live_agrotech_desc: "IoT-telemetripanel för smarta vingårdar.",
-  live_kalyber_desc: "Professionell företagswebbplats och tjänstekatalog.",
-  live_mendozapp_desc: "Lokal webbplattform för regionala tjänster.",
+  live_goodtrip_desc: "SaaS-plattform för biluthyrning med bokningssystem i realtid, flotthantering och online-checkout. En AI-driven assistent (OpenAI) hanterar kundfrågor dygnet runt. Backend i Node.js/Express + MySQL, frontend i React.",
+  live_agrotech_desc: "Precisionsjordbruksplattform för vingårdar: IoT-sensorer anslutna via LoRaWAN övervakar jordfuktighet, temperatur och väder i realtid, medan maskininlärningsmodeller genererar prediktiva bevattnings- och frostvarningar. Interaktiv instrumentpanel byggd i React.",
+  live_kalyber_desc: "Företagswebbplats med dynamisk tjänstekatalog och innehållshanteringspanel, byggd för att växa med varumärket. Frontend i React + Tailwind CSS, backend i Node.js/Express.",
+  live_mendozapp_desc: "Webbplattform som kopplar samman Mendozas invånare med lokala företag och tjänsteleverantörer, med sökfunktion, profiler och direktkontakt. Byggd i React + Tailwind CSS, med backend i Node.js/Express.",
 };
 
 const no: Dict = {
@@ -2046,10 +2046,10 @@ const no: Dict = {
   live_title_2: "I PRODUKSJON",
   live_subtitle: "Ekte programvare i drift for våre kunder hos",
   live_visit: "BESØK NETTSTED",
-  live_goodtrip_desc: "SaaS-plattform for flåtestyring av leiebiler.",
-  live_agrotech_desc: "IoT-telemetripanel for smarte vingårder.",
-  live_kalyber_desc: "Profesjonell bedriftsnettside og tjenestekatalog.",
-  live_mendozapp_desc: "Lokal webplattform for regionale tjenester.",
+  live_goodtrip_desc: "SaaS-plattform for bilutleie med sanntids bookingmotor, flåtestyring og online betaling. En AI-drevet assistent (OpenAI) svarer på kundehenvendelser døgnet rundt. Backend i Node.js/Express + MySQL, frontend i React.",
+  live_agrotech_desc: "Presisjonslandbruksplattform for vingårder: IoT-sensorer koblet via LoRaWAN overvåker jordfuktighet, temperatur og vær i sanntid, mens maskinlæringsmodeller genererer prediktive varsler for vanning og frost. Interaktivt dashbord bygget i React.",
+  live_kalyber_desc: "Bedriftsnettside med dynamisk tjenestekatalog og innholdsstyringspanel, bygget for å skalere sammen med merkevaren. Frontend i React + Tailwind CSS, backend i Node.js/Express.",
+  live_mendozapp_desc: "Webplattform som knytter innbyggerne i Mendoza til lokale bedrifter og tjenesteleverandører, med søk, profiler og direkte kontaktinformasjon. Bygget i React + Tailwind CSS, med backend i Node.js/Express.",
 };
 
 const ja: Dict = {
@@ -2236,10 +2236,10 @@ const ja: Dict = {
   live_title_2: "稼働中",
   live_subtitle: "私たちのクライアントのために実際に稼働しているソフトウェア：",
   live_visit: "サイトを見る",
-  live_goodtrip_desc: "レンタカーのフリート管理用SaaSプラットフォーム。",
-  live_agrotech_desc: "スマートぶどう畑向けIoTテレメトリダッシュボード。",
-  live_kalyber_desc: "プロフェッショナルな企業サイトとサービスカタログ。",
-  live_mendozapp_desc: "地域サービス向けのローカルWebプラットフォーム。",
+  live_goodtrip_desc: "リアルタイム予約エンジン、フリート管理、オンライン決済を備えたレンタカー向けSaaSプラットフォーム。AI(OpenAI)による仮想アシスタントが24時間顧客対応を行う。バックエンドはNode.js/Express + MySQL、フロントエンドはReactで構築。",
+  live_agrotech_desc: "ぶどう畑向けの精密農業プラットフォーム。LoRaWAN経由で接続されたIoTセンサーが土壌湿度・気温・気象をリアルタイムで監視し、機械学習モデルが灌漑や霜害の予測アラートを生成。インタラクティブなダッシュボードはReactで構築。",
+  live_kalyber_desc: "動的なサービスカタログとコンテンツ管理パネルを備えた企業サイト。ブランドの成長に合わせて拡張できる設計。フロントエンドはReact + Tailwind CSS、バックエンドはNode.js/Express。",
+  live_mendozapp_desc: "メンドーサの住民と地域の店舗・サービス提供者をつなぐWebプラットフォーム。検索機能、プロフィール、直接連絡先を提供。React + Tailwind CSSで開発し、バックエンドはNode.js/Express。",
 };
 
 const zh: Dict = {
@@ -2426,10 +2426,10 @@ const zh: Dict = {
   live_title_2: "生产环境中",
   live_subtitle: "为我们的客户实际运行的软件：",
   live_visit: "访问网站",
-  live_goodtrip_desc: "用于租车车队管理的SaaS平台。",
-  live_agrotech_desc: "智能葡萄园物联网遥测仪表盘。",
-  live_kalyber_desc: "专业的企业网站和服务目录。",
-  live_mendozapp_desc: "区域服务的本地网络平台。",
+  live_goodtrip_desc: "面向租车行业的SaaS平台，具备实时预订引擎、车队管理和在线结账功能。基于AI(OpenAI)的虚拟助手可全天候处理客户咨询。后端采用Node.js/Express + MySQL，前端使用React构建。",
+  live_agrotech_desc: "面向葡萄园的精准农业平台：通过LoRaWAN连接的物联网传感器实时监测土壤湿度、温度和气候，机器学习模型生成灌溉和霜冻的预测预警。交互式仪表盘使用React构建。",
+  live_kalyber_desc: "拥有动态服务目录和内容管理面板的企业网站，旨在随品牌一起扩展。前端采用React + Tailwind CSS，后端使用Node.js/Express。",
+  live_mendozapp_desc: "连接门多萨社区与本地商家和服务提供商的网络平台，提供搜索、资料页和直接联系方式。使用React + Tailwind CSS开发，后端为Node.js/Express。",
 };
 
 const raw: Record<string, Dict> = {
