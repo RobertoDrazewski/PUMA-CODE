@@ -245,10 +245,13 @@ body::before {
 }
 
 /* Oculta la vista inactiva pero la mantiene en el DOM (SEO) */
-.view-hidden { display: none; }
+.view-pending > section { opacity: 0; }
 
-/* Animación de entrada al cambiar de vista (fade + leve subida + desenfoque) */
-.view-active { animation: viewIn 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+/* Al entrar en pantalla la primera vez (scroll real, ver IntersectionObserver
+   en page.tsx): fade + leve subida + desenfoque. Solo se dispara una vez. */
+.view-inview > section {
+  animation: viewIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
 
 @keyframes viewIn {
   from { opacity: 0; transform: translateY(26px) scale(0.985); filter: blur(6px); }
@@ -401,5 +404,5 @@ body::before {
 /* Reduce-motion: apaga flotaciones y derivas */
 @media (prefers-reduced-motion: reduce) {
   .icon-fx, .bg-orbs .orb { animation: none !important; }
-  .view-active { animation: none !important; }
+  .view-inview > section { animation: none !important; opacity: 1 !important; }
 }

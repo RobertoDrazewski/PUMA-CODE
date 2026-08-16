@@ -5,11 +5,13 @@ import dynamic from 'next/dynamic';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
+import Card3D from '../components/Card3D';
 
 // El motor 3D (Three.js/WebGL) solo puede correr en el navegador del cliente,
 // nunca en el server durante el build est\u00e1tico. ssr:false evita errores de
 // build y hace que se cargue reci\u00e9n cuando el navegador lo necesita.
 const HeroScene = dynamic(() => import('../components/HeroScene'), { ssr: false });
+const ScrollScene = dynamic(() => import('../components/ScrollScene'), { ssr: false });
 import { translations } from '../constants/translations';
 import {
   Globe, Smartphone, Radio, Cpu, Bot, Gem,
@@ -68,16 +70,38 @@ const ExternalLinkIcon = ({ size = 14, className = "" }: { size?: number, classN
    Cada item del navbar muestra una de estas. Solo la activa se ve;
    las demás quedan en el DOM (ocultas) para no perder SEO.
    Si el contenido es alto, la vista crece y se hace scroll dentro de ella. */
-const View = ({ id, active, accent, children }: any) => (
-  <div
-    data-view={id}
-    aria-hidden={!active}
-    style={accent ? ({ ['--fx' as any]: accent }) : undefined}
-    className={`view-shell ${active ? 'view-active' : 'view-hidden'}`}
-  >
-    {children}
-  </div>
-);
+const View = ({ id, accent, children }: any) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setSeen(true);
+          io.disconnect(); // se anima una sola vez, no cada vez que volvés a pasar
+        }
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      id={id}
+      data-view={id}
+      ref={ref}
+      style={accent ? ({ ['--fx' as any]: accent }) : undefined}
+      className={`view-shell ${seen ? 'view-inview' : 'view-pending'}`}
+    >
+      {children}
+    </div>
+  );
+};
 
 /* ---------- Tarjeta de servicio ---------- */
 const ServiceCard = ({ num, icon, t, fileName }: any) => {
@@ -329,27 +353,54 @@ export default function Home() {
 
   const t = translations[lang] || translations['es'];
 
-  /* Navegar a una vista: actualiza estado, URL (#) y sube al inicio */
+  /* Navegar a una vista: hace scroll suave hasta esa sección real */
   const navigate = useCallback((id: string) => {
     if (!VIEW_IDS.includes(id)) id = 'home';
-    setActiveView(id);
+    const el = document.querySelector(`[data-view="${id}"]`) as HTMLElement | null;
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (typeof window !== 'undefined') {
       const hash = id === 'home' ? ' ' : `#${id}`;
       history.pushState(null, '', id === 'home' ? window.location.pathname : hash);
-      window.scrollTo({ top: 0, behavior: 'auto' });
     }
+  }, []);
+
+  /* Scrollspy: mientras scrolleás, el navbar resalta la sección en la que
+     estás. No controla si algo se ve o no (todo está siempre visible),
+     solo el estado visual del navbar. */
+  useEffect(() => {
+    const sections = VIEW_IDS
+      .map((id) => document.querySelector(`[data-view="${id}"]`))
+      .filter(Boolean) as HTMLElement[];
+    if (!sections.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length === 0) return;
+        const top = visible.reduce((a, b) =>
+          a.boundingClientRect.top < b.boundingClientRect.top ? a : b
+        );
+        const id = top.target.getAttribute('data-view');
+        if (id) setActiveView(id);
+      },
+      { rootMargin: '-35% 0px -55% 0px', threshold: 0 }
+    );
+    sections.forEach((s) => io.observe(s));
+    return () => io.disconnect();
   }, []);
 
   /* Soporta enlaces directos (#security) y el botón Atrás del navegador */
   useEffect(() => {
-    const apply = () => {
+    const apply = (smooth: boolean) => {
       const id = window.location.hash.replace('#', '');
-      setActiveView(VIEW_IDS.includes(id) ? id : 'home');
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      const target = VIEW_IDS.includes(id) ? id : 'home';
+      const el = document.querySelector(`[data-view="${target}"]`) as HTMLElement | null;
+      el?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
     };
-    apply();
-    window.addEventListener('popstate', apply);
-    return () => window.removeEventListener('popstate', apply);
+    apply(false); // al cargar la página: salto instantáneo, sin animar el scroll
+    const onPopState = () => apply(true);
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   useEffect(() => {
@@ -417,6 +468,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-black text-white overflow-x-hidden flex flex-col selection:bg-blue-500/30">
+      <ScrollScene activeSection={activeView} />
       <Navbar lang={lang} setLang={setLang} t={t} activeView={activeView} onNavigate={navigate} />
       <Footer t={t} />
 
@@ -430,7 +482,7 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,_var(--tw-gradient-stops))] from-blue-900/10 via-black to-black -z-10" />
 
       {/* ===================== VISTA: HOME (Hero + Stats) ===================== */}
-      <View id="home" active={activeView === 'home'}>
+      <View id="home" >
         <section className="flex flex-col items-center justify-center text-center w-full">
           {/* Protagonista del hero: la cabeza de Puma Code armándose con
               caracteres de código. Tiene su propio espacio, en primer plano,
@@ -491,23 +543,25 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: PROCESO (corta → agrandada) ===================== */}
-      <View id="process" active={activeView === 'process'}>
+      <View id="process" >
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-14">
             <h2 className="text-4xl md:text-7xl font-black mb-6 tracking-tighter text-futuristic">{t.process_title}</h2>
             <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto">{t.process_subtitle}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8" style={{ perspective: 1200 }}>
             {steps.map((step, i) => (
-              <div key={i} className="card-glow group relative p-8 md:p-10 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/40 transition-all duration-500">
-                <div className="flex items-center justify-between mb-6">
-                  <IconTile icon={step.icon} size="lg" />
-                  <span className="text-5xl md:text-6xl font-black text-blue-500/15 leading-none">{i + 1}</span>
+              <Card3D key={i} delay={i * 0.15}>
+                <div className="card-glow group relative h-full flex flex-col p-8 md:p-10 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:border-blue-500/40 transition-all duration-500">
+                  <div className="flex items-center justify-between mb-6">
+                    <IconTile icon={step.icon} size="lg" />
+                    <span className="text-5xl md:text-6xl font-black text-blue-500/15 leading-none">{i + 1}</span>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">{step.title}</h3>
+                  <p className="text-gray-400 text-sm md:text-base leading-relaxed">{step.desc}</p>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-2">{step.title}</h3>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed">{step.desc}</p>
-              </div>
+              </Card3D>
             ))}
           </div>
 
@@ -524,7 +578,7 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: SERVICIOS (+ banda de IA) ===================== */}
-      <View id="services" active={activeView === 'services'}>
+      <View id="services" >
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-futuristic">{t.services_title}</h2>
@@ -561,7 +615,7 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: EXPRESS ===================== */}
-      <View id="express" active={activeView === 'express'} accent="rgba(16,185,129,0.5)">
+      <View id="express" accent="rgba(16,185,129,0.5)">
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-14">
             <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-emerald-500/30 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-[0.25em] uppercase">
@@ -629,7 +683,7 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: INDUSTRIAS (corta → agrandada) ===================== */}
-      <View id="industries" active={activeView === 'industries'}>
+      <View id="industries" >
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-14">
             <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-[0.25em] uppercase">
@@ -648,7 +702,7 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: SEGURIDAD (alta → scroll interno) ===================== */}
-      <View id="security" active={activeView === 'security'} accent="rgba(239,68,68,0.5)">
+      <View id="security" accent="rgba(239,68,68,0.5)">
         <section className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 border border-red-500/30 rounded-full bg-red-500/10 text-red-400 text-[10px] font-black tracking-[0.25em] uppercase">
@@ -751,7 +805,7 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: CASO DE ÉXITO (Ahora Live Projects) ===================== */}
-      <View id="cases" active={activeView === 'cases'}>
+      <View id="cases" >
         <section className="relative max-w-7xl mx-auto w-full px-4 md:px-0">
           {/* Glow ambiental de fondo */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -792,7 +846,7 @@ export default function Home() {
       </View>
 
       {/* ===================== VISTA: CONTACTO (+ CTA final) ===================== */}
-      <View id="contact" active={activeView === 'contact'}>
+      <View id="contact" >
         <section className="max-w-4xl mx-auto w-full text-center">
           <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">{t.cta_title}</h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-12 leading-relaxed">{t.cta_subtitle}</p>
