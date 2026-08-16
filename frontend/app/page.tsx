@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
+
+// El motor 3D (Three.js/WebGL) solo puede correr en el navegador del cliente,
+// nunca en el server durante el build est\u00e1tico. ssr:false evita errores de
+// build y hace que se cargue reci\u00e9n cuando el navegador lo necesita.
+const HeroScene = dynamic(() => import('../components/HeroScene'), { ssr: false });
 import { translations } from '../constants/translations';
 import {
   Globe, Smartphone, Radio, Cpu, Bot, Gem,
@@ -426,7 +432,17 @@ export default function Home() {
       {/* ===================== VISTA: HOME (Hero + Stats) ===================== */}
       <View id="home" active={activeView === 'home'}>
         <section className="flex flex-col items-center justify-center text-center w-full">
-          <div className="max-w-4xl">
+          {/* Protagonista del hero: la cabeza de Puma Code armándose con
+              caracteres de código. Tiene su propio espacio, en primer plano,
+              arriba del headline — no compite con el texto por el mismo lugar. */}
+          <div
+            className="relative w-full max-w-xl mx-auto mb-6 rounded-3xl overflow-hidden"
+            style={{ aspectRatio: '0.846 / 1' }}
+          >
+            <HeroScene />
+          </div>
+
+          <div className="max-w-4xl relative z-10">
             <div className="mb-6 inline-block px-4 py-1.5 border border-blue-500/30 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold tracking-widest uppercase">
               {t.hero_badge}
             </div>
