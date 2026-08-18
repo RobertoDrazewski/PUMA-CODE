@@ -7,15 +7,17 @@ import DashboardTab from '../../components/admin/DashboardTab';
 import ClientsTab from '../../components/admin/ClientsTab';
 import KanbanTab from '../../components/admin/KanbanTab';
 import SentinelTab from '../../components/admin/SentinelTab';
+import AssistantsTab from '../../components/admin/AssistantsTab';
 import UsersTab from '../../components/admin/UsersTab';
 
-type TabKey = 'dashboard' | 'clients' | 'kanban' | 'sentinel' | 'admin';
+type TabKey = 'dashboard' | 'clients' | 'kanban' | 'sentinel' | 'assistants' | 'admin';
 
 const TABS: { key: TabKey; label: string; icon: string; adminOnly?: boolean }[] = [
   { key: 'dashboard', label: 'Resumen', icon: '📊' },
   { key: 'clients', label: 'Clientes y ventas', icon: '💼' },
   { key: 'kanban', label: 'Proyectos', icon: '🗂️' },
   { key: 'sentinel', label: 'Cybersecurity', icon: '🛡️' },
+  { key: 'assistants', label: 'Asistentes', icon: '🤖' },
   { key: 'admin', label: 'Equipo', icon: '👥', adminOnly: true },
 ];
 
@@ -85,6 +87,7 @@ export default function AdminPage() {
           {tab === 'clients' && <ClientsTab />}
           {tab === 'kanban' && <KanbanTab canManageUsers={isAdmin} />}
           {tab === 'sentinel' && <SentinelTab />}
+          {tab === 'assistants' && <AssistantsTab />}
           {tab === 'admin' && isAdmin && <UsersTab currentUserId={user.id} />}
         </main>
       </div>

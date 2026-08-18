@@ -98,10 +98,32 @@ async function seedSentinel() {
   console.log('🛡️  Datos demo de Sentinel cargados (proyectos + sellos + auditorías).');
 }
 
+async function seedAssistants() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS n FROM assistants');
+  if (rows[0].n > 0) return;
+
+  const items = [
+    ['puma-ventas', 'Puma · Consultor de ventas', 'Cotiza proyectos y responde consultas en puma-code.com', '🐆', 'activo', null],
+    ['kalyber-monitor', 'Kalyber · Monitor de flota', 'Vigilancia de telemetría, alarmas y webhooks de pagos', '📡', 'planificado', null],
+    ['mendozapp-outreach', 'Mendozapp · Outreach', 'Contacto y seguimiento con bodegas y comercios turísticos', '🗺️', 'planificado', null],
+    ['preciso-sentinel', 'Preciso.tech · Vigía de anomalías', 'Detección de anomalías de combustible y limpieza de datos', '⛽', 'planificado', null],
+  ];
+
+  for (let i = 0; i < items.length; i++) {
+    const [key, name, role, icon, status, githubRepo] = items[i];
+    await pool.query(
+      'INSERT INTO assistants (`key`, name, role, icon, status, github_repo, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [key, name, role, icon, status, githubRepo, i]
+    );
+  }
+  console.log('🤖 Registro inicial de Asistentes cargado.');
+}
+
 async function initDb() {
   await runSchema();
   await seedAdmin();
   await seedSentinel();
+  await seedAssistants();
 }
 
 module.exports = { initDb };

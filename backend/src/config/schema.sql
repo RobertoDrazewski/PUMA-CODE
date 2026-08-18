@@ -106,3 +106,45 @@ CREATE TABLE IF NOT EXISTS sentinel_audits (
   INDEX idx_audits_project (project_id),
   INDEX idx_audits_date (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------------------------------------------
+--  ASISTENTES IA · leads capturados por Puma (consultor de ventas)
+--  Se llena solo, desde aiController, cada vez que el chat público
+--  termina en una cotización enviada por mail. Es la base de la
+--  pestaña "Asistentes" del panel: acá se ve cómo está trabajando.
+--  status: cotizado (recién generado) | contactado | convertido | descartado
+-- ----------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ai_leads (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  assistant_key VARCHAR(60) NOT NULL DEFAULT 'puma-ventas',
+  client_name   VARCHAR(160) NOT NULL,
+  client_email  VARCHAR(160) NOT NULL,
+  project_name  VARCHAR(200) DEFAULT NULL,
+  service_type  ENUM('express','desarrollo','pentest') NOT NULL,
+  profile       VARCHAR(160) DEFAULT NULL,
+  quoted_usd    DECIMAL(12,2) DEFAULT NULL,
+  language      VARCHAR(10) DEFAULT NULL,
+  status        ENUM('cotizado','contactado','convertido','descartado') NOT NULL DEFAULT 'cotizado',
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_leads_assistant (assistant_key),
+  INDEX idx_leads_date (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ----------------------------------------------------------------
+--  ASISTENTES IA · registro editable de "puestos" de Puma Code
+--  Antes vivía hardcodeado en el backend; ahora Roberto lo administra
+--  desde el panel (estado y repo de GitHub por asistente).
+--  status: planificado | desarrollo | activo
+-- ----------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS assistants (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  `key`        VARCHAR(60) NOT NULL UNIQUE,
+  name         VARCHAR(160) NOT NULL,
+  role         VARCHAR(250) DEFAULT NULL,
+  icon         VARCHAR(10) DEFAULT NULL,
+  status       ENUM('planificado','desarrollo','activo') NOT NULL DEFAULT 'planificado',
+  github_repo  VARCHAR(300) DEFAULT NULL,
+  sort_order   INT NOT NULL DEFAULT 0,
+  created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

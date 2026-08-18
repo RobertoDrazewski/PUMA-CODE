@@ -1,5 +1,6 @@
 const { OpenAI } = require('openai');
 const { Resend } = require('resend');
+const { pool } = require('../config/db');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'sk-missing-key' });
 
@@ -40,6 +41,20 @@ async function sendEmail({ to, replyTo, subject, html, attachments }) {
     throw new Error(error.message || JSON.stringify(error));
   }
   return data;
+}
+
+// Registra un lead cotizado para la pestaña "Asistentes" del panel.
+// Nunca debe romper el flujo de cotización/email: si falla, solo se loguea.
+async function logLead({ clientName, clientEmail, projectName, serviceType, profile, quotedUsd, language }) {
+  try {
+    await pool.query(
+      `INSERT INTO ai_leads (assistant_key, client_name, client_email, project_name, service_type, profile, quoted_usd, language)
+       VALUES ('puma-ventas', ?, ?, ?, ?, ?, ?, ?)`,
+      [clientName, clientEmail, projectName || null, serviceType, profile || null, quotedUsd || null, language || null]
+    );
+  } catch (err) {
+    console.error('⚠️ No se pudo registrar el lead en ai_leads:', err.message);
+  }
 }
 
 // Aviso temprano en los logs si falta la API key.
@@ -1410,6 +1425,11 @@ Responde estrictamente en JSON:
           </div>`,
       });
 
+      await logLead({
+        clientName, clientEmail: userData.email, projectName: proyecto,
+        serviceType: 'pentest', profile: perfil, quotedUsd: usd, language,
+      });
+
       return res.status(200).json({ success: true, tipo_servicio: tipoServicio });
     }
 
@@ -1461,6 +1481,11 @@ Responde estrictamente en JSON:
             <p style="margin: 24px 0 0; text-align: center; color: #9ca3af; font-size: 11px;">${escapeHtml(L.footer)}</p>
           </div>
         </div>`,
+    });
+
+    await logLead({
+      clientName, clientEmail: userData.email, projectName: proyecto,
+      serviceType: tipoServicio, profile: perfil, quotedUsd: usd, language,
     });
 
     return res.status(200).json({ success: true, tipo_servicio: tipoServicio });

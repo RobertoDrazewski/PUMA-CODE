@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
 import Card3D from '../components/Card3D';
+import Reveal from '../components/Reveal';
 
 // El motor 3D (Three.js/WebGL) solo puede correr en el navegador del cliente,
 // nunca en el server durante el build est\u00e1tico. ssr:false evita errores de
@@ -106,7 +107,7 @@ const View = ({ id, accent, children }: any) => {
 /* ---------- Tarjeta de servicio ---------- */
 const ServiceCard = ({ num, icon, t, fileName }: any) => {
   return (
-    <div className="card-glow group relative flex flex-col p-6 md:p-8 rounded-[2.5rem] bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-blue-500/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden hover:shadow-[0_0_40px_rgba(37,99,235,0.15)]">
+    <div className="card-glow group relative h-full flex flex-col p-6 md:p-8 rounded-[2.5rem] bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-blue-500/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden hover:shadow-[0_0_40px_rgba(37,99,235,0.15)]">
       <div className="pointer-events-none absolute -right-12 -top-12 w-44 h-44 bg-blue-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
       <div className="relative flex items-center justify-between mb-5">
@@ -137,7 +138,7 @@ const ServiceCard = ({ num, icon, t, fileName }: any) => {
 
 /* ---------- Tarjeta de industria / telemetría (más grande) ---------- */
 const IndustryCard = ({ icon, title, desc }: { icon: any; title: string; desc: string }) => (
-  <div className="card-glow group relative p-9 md:p-10 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-blue-500/[0.06] hover:border-blue-500/40 transition-all duration-500 overflow-hidden">
+  <div className="card-glow group relative h-full flex flex-col p-9 md:p-10 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-blue-500/[0.06] hover:border-blue-500/40 transition-all duration-500 overflow-hidden">
     <div className="absolute -right-8 -top-8 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     <div className="relative">
       <IconTile icon={icon} size="lg" className="mb-6" />
@@ -585,9 +586,16 @@ export default function Home() {
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.services_subtitle}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ perspective: 1400 }}>
             {[1, 2, 3, 4, 5, 6].map((num, index) => (
-              <ServiceCard key={num} num={num} icon={serviceIcons[index]} fileName={serviceFileNames[index]} t={t} />
+              <Reveal
+                key={num}
+                variant="slideBlur"
+                direction={index % 2 === 0 ? 'left' : 'right'}
+                delay={(index % 3) * 0.12}
+              >
+                <ServiceCard num={num} icon={serviceIcons[index]} fileName={serviceFileNames[index]} t={t} />
+              </Reveal>
             ))}
           </div>
 
@@ -601,13 +609,15 @@ export default function Home() {
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">{t.ai_subtitle}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8" style={{ perspective: 1200 }}>
               {aiFeatures.map((f, i) => (
-                <div key={i} className="card-glow group p-8 rounded-[2rem] glass-effect border-blue-500/10">
-                  <IconTile icon={f.icon} className="mb-5" />
-                  <h3 className="text-xl font-bold mb-3">{f.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
-                </div>
+                <Reveal key={i} variant="scaleGlow" delay={i * 0.15}>
+                  <div className="card-glow group p-8 rounded-[2rem] glass-effect border-blue-500/10 h-full">
+                    <IconTile icon={f.icon} className="mb-5" />
+                    <h3 className="text-xl font-bold mb-3">{f.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -693,9 +703,11 @@ export default function Home() {
             <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto">{t.industries_subtitle}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8" style={{ perspective: 1400 }}>
             {industries.map((ind, i) => (
-              <IndustryCard key={i} icon={ind.icon} title={ind.title} desc={ind.desc} />
+              <Reveal key={i} variant="flip" direction={i % 2 === 0 ? 'left' : 'right'} delay={i * 0.1}>
+                <IndustryCard icon={ind.icon} title={ind.title} desc={ind.desc} />
+              </Reveal>
             ))}
           </div>
         </section>
@@ -714,14 +726,16 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {securityFeatures.map((f, i) => (
-              <div key={i} className="card-glow group relative p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-red-500/[0.06] hover:border-red-500/40 transition-all duration-500 overflow-hidden">
-                <div className="absolute -right-8 -top-8 w-32 h-32 bg-red-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative">
-                  <IconTile icon={f.icon} tone="red" className="mb-5" />
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-red-300 transition-colors">{f.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+              <Reveal key={i} variant="scan" delay={i * 0.1}>
+                <div className="card-glow group relative p-8 rounded-[2rem] border border-white/10 bg-white/[0.02] hover:bg-red-500/[0.06] hover:border-red-500/40 transition-all duration-500 overflow-hidden h-full">
+                  <div className="absolute -right-8 -top-8 w-32 h-32 bg-red-600/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative">
+                    <IconTile icon={f.icon} tone="red" className="mb-5" />
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-red-300 transition-colors">{f.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
 
