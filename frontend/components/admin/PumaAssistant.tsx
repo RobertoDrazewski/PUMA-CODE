@@ -57,12 +57,7 @@ export default function PumaAssistant() {
   const historyRef = useRef<Turn[]>([]);
   const followUpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stoppedRef = useRef(false); // true cuando Roberto apretó "detener" — ignora la respuesta que venga en camino
-  const suppressMicRef = useRef(false); // true mientras Puma está hablando — el mic se pausa para no escucharse a sí mismo
-  const wakeEnabledRef = useRef(true); // espejo de wakeEnabled, para leerlo sin closures viejos dentro de speak()
-
-  useEffect(() => {
-    wakeEnabledRef.current = wakeEnabled;
-  }, [wakeEnabled]);
+  const suppressMicRef = useRef(false); // true mientras Puma está hablando — el mic sigue prendido pero se ignora todo lo que capta
 
   const faceState: PumaFaceState =
     phase === "listening" ? "listening" : phase === "thinking" ? "thinking" : phase === "speaking" ? "speaking" : "idle";
@@ -88,11 +83,6 @@ export default function PumaAssistant() {
     suppressMicRef.current = false;
     window.speechSynthesis?.cancel();
     goIdle();
-    // Si el mic estaba pausado por estar hablando, lo reactivamos ya
-    // (salvo que esté muteado a propósito).
-    if (wakeEnabledRef.current) {
-      try { recognitionRef.current?.start(); } catch { /* ya estaba corriendo */ }
-    }
   }, [goIdle]);
 
   // Después de que Puma responde, se queda escuchando activamente un rato
@@ -115,11 +105,13 @@ export default function PumaAssistant() {
       return;
     }
 
-    // Pausamos el mic mientras Puma habla — si no, el reconocimiento
-    // capta la propia voz de Puma saliendo por el parlante y se arruina
-    // todo lo que decís apenas termina (justo lo que pasaba).
+    // El mic sigue prendido todo el tiempo (parar y reiniciar el motor de
+    // reconocimiento es poco confiable entre navegadores — a veces se
+    // queda "muerto" después de un stop() y no vuelve a escuchar nunca
+    // más, sin ningún error visible). En vez de eso, lo dejamos correr y
+    // el propio onresult IGNORA todo mientras Puma está hablando — mismo
+    // resultado (no se escucha a sí mismo), sin arriesgar el motor.
     suppressMicRef.current = true;
-    try { recognitionRef.current?.stop(); } catch { /* no estaba corriendo */ }
 
     synth.cancel(); // corta cualquier lectura anterior colgada
 
@@ -132,14 +124,8 @@ export default function PumaAssistant() {
     const esVoice = voices.find((v) => v.lang.startsWith("es"));
     if (esVoice) utterance.voice = esVoice;
 
-    const resumeMic = () => {
-      suppressMicRef.current = false;
-      if (!wakeEnabledRef.current) return; // estaba muteado — no lo reactivamos solo
-      try { recognitionRef.current?.start(); } catch { /* ya estaba corriendo */ }
-    };
-
     utterance.onend = () => {
-      resumeMic();
+      suppressMicRef.current = false;
       armFollowUp();
     };
     utterance.onerror = (e) => {
@@ -147,8 +133,8 @@ export default function PumaAssistant() {
       // (por ejemplo si la conversación fluida dispara una respuesta
       // nueva mientras la anterior todavía se estaba leyendo) — es
       // esperable, no un error real, así que no lo mostramos.
+      suppressMicRef.current = false;
       const benign = e.error === "canceled" || e.error === "interrupted";
-      resumeMic();
       if (benign) {
         armFollowUp();
         return;
@@ -228,6 +214,11 @@ export default function PumaAssistant() {
         return;
       }
 
+      // Puma está hablando ahora mismo — ignoramos todo lo demás (es su
+      // propia voz saliendo por el parlante, no vos). El comando de corte
+      // de arriba es la única excepción — por eso va antes de este check.
+      if (suppressMicRef.current) return;
+
       if (!activeRef.current) {
         // Modo dormido: solo buscamos la wake word.
         const heard = (finalChunk + " " + interim).trim();
@@ -279,7 +270,9 @@ export default function PumaAssistant() {
     };
 
     recognition.onend = () => {
-      if (suppressMicRef.current) return; // Puma está hablando — el mic se reactiva solo cuando termine (ver speak())
+      // Se reinicia solo siempre — el mic nunca se para a propósito acá
+      // (ver suppressMicRef más arriba, que solo filtra resultados, no
+      // el ciclo de vida del reconocimiento).
       restartTimer = setTimeout(() => {
         try { recognition.start(); } catch { /* ya estaba corriendo */ }
       }, 300);
