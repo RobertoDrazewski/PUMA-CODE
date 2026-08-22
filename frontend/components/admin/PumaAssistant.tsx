@@ -49,8 +49,10 @@ export default function PumaAssistant() {
   const [reply, setReply] = useState("");
   const [error, setError] = useState("");
   const [wakeEnabled, setWakeEnabled] = useState(true);
+  const [voiceSupported, setVoiceSupported] = useState(true);
   const [inputText, setInputText] = useState("");
   const [history, setHistory] = useState<Turn[]>([]);
+  const [sleepHeard, setSleepHeard] = useState(""); // debug: lo que va transcribiendo en modo dormido, para ver si el "Hey Puma" llega o no
 
   const recognitionRef = useRef<any>(null);
   const activeRef = useRef(false); // true mientras está en modo "comando activo" (post wake-word o mic manual)
@@ -61,6 +63,14 @@ export default function PumaAssistant() {
 
   const faceState: PumaFaceState =
     phase === "listening" ? "listening" : phase === "thinking" ? "thinking" : phase === "speaking" ? "speaking" : "idle";
+
+  // Chequeo de soporte de voz al montar — independiente de si está
+  // muteado o no, para que el aviso sea correcto desde el primer segundo
+  // (Safari/iOS no tiene esta API; Chrome/Edge en compu sí).
+  useEffect(() => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setVoiceSupported(!!SR);
+  }, []);
 
   const clearFollowUp = useCallback(() => {
     if (followUpTimerRef.current) {
@@ -222,9 +232,11 @@ export default function PumaAssistant() {
       if (!activeRef.current) {
         // Modo dormido: solo buscamos la wake word.
         const heard = (finalChunk + " " + interim).trim();
+        setSleepHeard(heard); // debug: para ver en pantalla si lo está transcribiendo bien o no
         const wakeMatch = WAKE_PATTERNS.find((re) => re.test(heard));
         if (!wakeMatch) return;
 
+        setSleepHeard("");
         activeRef.current = true;
         setPhase("listening");
         setOpen(true);
@@ -332,22 +344,36 @@ export default function PumaAssistant() {
                 <PumaFace state={faceState} />
               </div>
               <span className="text-xs font-bold tracking-wide uppercase text-blue-400">Puma</span>
-              <button
-                onClick={toggleMute}
-                title={wakeEnabled ? "Silenciar \"Hey Puma\"" : "Activar \"Hey Puma\""}
-                className={`text-xs border rounded-full px-2 py-0.5 transition ${
-                  wakeEnabled
-                    ? "text-slate-400 border-white/10 hover:text-white"
-                    : "text-red-400 border-red-500/30 bg-red-500/10"
-                }`}
-              >
-                {wakeEnabled ? "🎙️" : "🔇"}
-              </button>
+              {voiceSupported ? (
+                <button
+                  onClick={toggleMute}
+                  title={wakeEnabled ? "Silenciar \"Hey Puma\"" : "Activar \"Hey Puma\""}
+                  className={`text-xs border rounded-full px-2 py-0.5 transition ${
+                    wakeEnabled
+                      ? "text-slate-400 border-white/10 hover:text-white"
+                      : "text-red-400 border-red-500/30 bg-red-500/10"
+                  }`}
+                >
+                  {wakeEnabled ? "🎙️" : "🔇"}
+                </button>
+              ) : (
+                <span
+                  title="Este navegador no tiene reconocimiento de voz — típico en Safari/iPhone"
+                  className="text-xs border border-amber-500/30 bg-amber-500/10 text-amber-400 rounded-full px-2 py-0.5"
+                >
+                  🔇 Sin voz acá
+                </span>
+              )}
             </div>
             <button onClick={() => setOpen(false)} className="text-slate-500 hover:text-white text-xs">✕</button>
           </div>
 
-          {!wakeEnabled && (
+          {!voiceSupported && (
+            <p className="text-[10px] text-amber-400/80 mb-2">
+              Este navegador no puede escucharte (pasa en Safari de iPhone) — escribile acá abajo nomás, funciona igual.
+            </p>
+          )}
+          {voiceSupported && !wakeEnabled && (
             <p className="text-[10px] text-red-400/80 mb-2">"Hey Puma" está silenciado — solo responde por texto o con el mic de acá abajo.</p>
           )}
 
@@ -373,7 +399,7 @@ export default function PumaAssistant() {
               >
                 ⏹
               </button>
-            ) : (
+            ) : voiceSupported ? (
               <button
                 onClick={handleMicButton}
                 title="Hablar"
@@ -381,7 +407,7 @@ export default function PumaAssistant() {
               >
                 🎤
               </button>
-            )}
+            ) : null}
             <input
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
@@ -400,9 +426,9 @@ export default function PumaAssistant() {
         </div>
       )}
 
-      {phase === "unsupported" && wakeEnabled && (
-        <p className="text-[10px] text-slate-600 bg-[#0b0b0f]/90 border border-white/10 rounded-full px-3 py-1">
-          Tu navegador no soporta reconocimiento de voz — probá en Chrome.
+      {sleepHeard && voiceSupported && wakeEnabled && !open && (
+        <p className="max-w-[220px] text-[10px] text-slate-500 bg-[#0b0b0f]/90 border border-white/10 rounded-xl px-2.5 py-1.5 text-right">
+          🎧 escuchando: "{sleepHeard}"
         </p>
       )}
 
@@ -412,7 +438,15 @@ export default function PumaAssistant() {
         title="Abrir chat con Puma"
       >
         <PumaFace state={faceState} />
-        {!wakeEnabled && (
+        {!voiceSupported && (
+          <span
+            title="Sin voz en este navegador — usá el texto"
+            className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-500 border-2 border-[#0b0b0f] flex items-center justify-center text-[8px] z-10"
+          >
+            🔇
+          </span>
+        )}
+        {voiceSupported && !wakeEnabled && (
           <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 border-2 border-[#0b0b0f] flex items-center justify-center text-[8px] z-10">
             🔇
           </span>
