@@ -17,6 +17,7 @@ const dashboardRoutes = require('./src/routes/dashboardRoutes');
 const sentinelRoutes = require('./src/routes/sentinelRoutes');
 const sentinelPublicRoutes = require('./src/routes/sentinelPublicRoutes');
 const assistantsRoutes = require('./src/routes/assistantsRoutes');
+const pumaAssistantRoutes = require('./src/routes/pumaAssistantRoutes');
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/sentinel', sentinelRoutes);
 app.use('/api/assistants', assistantsRoutes);
+app.use('/api/assistant', pumaAssistantRoutes);
 
 // Sellos Sentinel: endpoints PUBLICOS (se embeben en sitios de clientes, sin auth)
 app.use('/', sentinelPublicRoutes);

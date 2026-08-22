@@ -9,6 +9,7 @@ import KanbanTab from '../../components/admin/KanbanTab';
 import SentinelTab from '../../components/admin/SentinelTab';
 import AssistantsTab from '../../components/admin/AssistantsTab';
 import UsersTab from '../../components/admin/UsersTab';
+import PumaAssistant from '../../components/admin/PumaAssistant';
 
 type TabKey = 'dashboard' | 'clients' | 'kanban' | 'sentinel' | 'assistants' | 'admin';
 
@@ -91,6 +92,10 @@ export default function AdminPage() {
           {tab === 'admin' && isAdmin && <UsersTab currentUserId={user.id} />}
         </main>
       </div>
+
+      {/* Puma solo le habla al super admin — un trabajador no debería
+          poder consultar leads, facturación o el estado de otros proyectos. */}
+      {isAdmin && <PumaAssistant />}
     </div>
   );
 }

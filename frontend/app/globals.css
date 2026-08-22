@@ -195,6 +195,39 @@ body::before {
   50% { opacity: 0.45; }
 }
 
+/* Halo detrás de la cabeza de Puma en el asistente del panel — cian fijo,
+   siempre encendido incluso en reposo, para que se sienta "vivo". */
+.puma-glow-idle {
+  animation: pumaGlowIdle 3.5s ease-in-out infinite;
+}
+@keyframes pumaGlowIdle {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+/* Pulsos del logo de Puma según el estado del asistente de voz. */
+.puma-pulse-idle {
+  animation: pumaPulseIdle 3.5s ease-in-out infinite;
+}
+@keyframes pumaPulseIdle {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+.puma-pulse-fast {
+  animation: pumaPulseFast 0.9s ease-in-out infinite;
+}
+@keyframes pumaPulseFast {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.puma-pulse-thinking {
+  animation: pumaPulseThinking 1.2s ease-in-out infinite;
+}
+@keyframes pumaPulseThinking {
+  0%, 100% { opacity: 0.8; transform: scale(1) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.08) rotate(3deg); }
+}
+
 /* Tarjetas con leve elevación reutilizable (opcional) */
 .lift {
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
